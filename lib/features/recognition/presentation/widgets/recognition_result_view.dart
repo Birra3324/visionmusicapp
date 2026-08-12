@@ -92,7 +92,11 @@ class RecognitionResultView extends StatelessWidget {
   Widget _buildArtworkPlaceholder() {
     return Container(
       color: kSurfaceDark,
-      child: const Icon(Icons.music_note_rounded, size: 80, color: kVisionGoldDim),
+      child: const Icon(
+        Icons.music_note_rounded,
+        size: 80,
+        color: kVisionGoldDim,
+      ),
     );
   }
 
@@ -114,10 +118,15 @@ class RecognitionResultView extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: kVisionGold,
           foregroundColor: Colors.black,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(kRadiusM)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(kRadiusM),
+          ),
         ),
         icon: const Icon(Icons.play_arrow_rounded),
-        label: const Text('PLAY IN VISION MUSIC', style: TextStyle(fontWeight: FontWeight.bold)),
+        label: const Text(
+          'PLAY IN VISION MUSIC',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }
@@ -156,7 +165,11 @@ class RecognitionResultView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.sentiment_dissatisfied_rounded, size: 80, color: kTextSoft),
+            const Icon(
+              Icons.sentiment_dissatisfied_rounded,
+              size: 80,
+              color: kTextSoft,
+            ),
             const SizedBox(height: 24),
             Text(
               "We couldn't identify this song.",
@@ -177,9 +190,17 @@ class RecognitionResultView extends StatelessWidget {
                 onPressed: onRetry,
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: kVisionGold),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(kRadiusM)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(kRadiusM),
+                  ),
                 ),
-                child: const Text('TRY AGAIN', style: TextStyle(color: kVisionGold, fontWeight: FontWeight.bold)),
+                child: const Text(
+                  'TRY AGAIN',
+                  style: TextStyle(
+                    color: kVisionGold,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
           ],

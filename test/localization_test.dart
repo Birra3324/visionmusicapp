@@ -17,11 +17,31 @@ void main() {
   test('all declared locales contain primary listener strings', () {
     for (final locale in AppLocalizations.supportedLocales) {
       final strings = lookupAppLocalizations(locale);
-      expect(strings.home.trim(), isNotEmpty, reason: '${locale.languageCode}: home');
-      expect(strings.watch.trim(), isNotEmpty, reason: '${locale.languageCode}: watch');
-      expect(strings.library.trim(), isNotEmpty, reason: '${locale.languageCode}: library');
-      expect(strings.profile.trim(), isNotEmpty, reason: '${locale.languageCode}: profile');
-      expect(strings.searchHint.trim(), isNotEmpty, reason: '${locale.languageCode}: searchHint');
+      expect(
+        strings.home.trim(),
+        isNotEmpty,
+        reason: '${locale.languageCode}: home',
+      );
+      expect(
+        strings.watch.trim(),
+        isNotEmpty,
+        reason: '${locale.languageCode}: watch',
+      );
+      expect(
+        strings.library.trim(),
+        isNotEmpty,
+        reason: '${locale.languageCode}: library',
+      );
+      expect(
+        strings.profile.trim(),
+        isNotEmpty,
+        reason: '${locale.languageCode}: profile',
+      );
+      expect(
+        strings.searchHint.trim(),
+        isNotEmpty,
+        reason: '${locale.languageCode}: searchHint',
+      );
     }
   });
 }

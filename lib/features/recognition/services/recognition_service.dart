@@ -10,10 +10,9 @@ import 'recognition_repository.dart';
 class MusicRecognitionService extends ChangeNotifier {
   final AudioRecorder _audioRecorder = AudioRecorder();
   final MusicRecognitionRepository _repository;
-  
-  MusicRecognitionService({
-    required MusicRecognitionRepository repository,
-  }) : _repository = repository;
+
+  MusicRecognitionService({required MusicRecognitionRepository repository})
+    : _repository = repository;
 
   MusicRecognitionStatus _status = MusicRecognitionStatus.idle;
   MusicRecognitionStatus get status => _status;
@@ -35,7 +34,7 @@ class MusicRecognitionService extends ChangeNotifier {
     if (_status == MusicRecognitionStatus.listening) return;
 
     _setStatus(MusicRecognitionStatus.requestingPermission);
-    
+
     final status = await Permission.microphone.request();
     if (status != PermissionStatus.granted) {
       _setStatus(MusicRecognitionStatus.permissionDenied);
@@ -80,7 +79,7 @@ class MusicRecognitionService extends ChangeNotifier {
       }
 
       _setStatus(MusicRecognitionStatus.uploading);
-      
+
       try {
         final recognitionResult = await _repository.recognize(File(path));
         _result = recognitionResult;
@@ -105,7 +104,6 @@ class MusicRecognitionService extends ChangeNotifier {
           await file.delete();
         }
       }
-      
     } catch (e) {
       debugPrint('Error stopping recorder: $e');
       _setStatus(MusicRecognitionStatus.serviceError);
@@ -119,7 +117,7 @@ class MusicRecognitionService extends ChangeNotifier {
     if (await _audioRecorder.isRecording()) {
       await _audioRecorder.stop();
     }
-    
+
     if (_lastRecordedFilePath != null) {
       final file = File(_lastRecordedFilePath!);
       if (await file.exists()) {

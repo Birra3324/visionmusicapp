@@ -236,11 +236,7 @@ class _SearchHubScreenState extends State<SearchHubScreen> {
                   fadeRoute(const MusicIdentificationScreen()),
                 );
               },
-              icon: const Icon(
-                Icons.mic_rounded,
-                color: kVisionGold,
-                size: 22,
-              ),
+              icon: const Icon(Icons.mic_rounded, color: kVisionGold, size: 22),
               constraints: const BoxConstraints(),
               padding: EdgeInsets.zero,
             ),

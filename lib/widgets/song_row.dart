@@ -167,10 +167,7 @@ class SongRow extends StatelessWidget {
               icon: const Icon(Icons.play_arrow_rounded, color: kGoldMid),
               onPressed: () => _onTap(context),
             ),
-            SongMoreOptionsButton(
-              song: song,
-              audioManager: audioManager,
-            ),
+            SongMoreOptionsButton(song: song, audioManager: audioManager),
           ],
         ),
       ),

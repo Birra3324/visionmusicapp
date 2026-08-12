@@ -9,10 +9,8 @@ class MusicRecognitionRepository {
   final String baseUrl;
   final http.Client _client;
 
-  MusicRecognitionRepository({
-    required this.baseUrl,
-    http.Client? client,
-  }) : _client = client ?? http.Client();
+  MusicRecognitionRepository({required this.baseUrl, http.Client? client})
+    : _client = client ?? http.Client();
 
   Future<MusicRecognitionResult?> recognize(File audioFile) async {
     final url = Uri.parse('$baseUrl/recognize');
@@ -39,10 +37,7 @@ class MusicRecognitionRepository {
 
     // 3. Attach Sample
     request.files.add(
-      await http.MultipartFile.fromPath(
-        'sample',
-        audioFile.path,
-      ),
+      await http.MultipartFile.fromPath('sample', audioFile.path),
     );
 
     final streamedResponse = await _client.send(request);

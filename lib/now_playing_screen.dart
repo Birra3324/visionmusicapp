@@ -512,7 +512,8 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                                           ),
                                           const SizedBox(width: 24),
                                           StreamBuilder<bool>(
-                                            stream: widget.audioManager
+                                            stream: widget
+                                                .audioManager
                                                 .isPlayingStream,
                                             initialData:
                                                 widget.audioManager.isPlaying,
@@ -531,7 +532,8 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                                                   child: Icon(
                                                     isPlayingSnap.data == true
                                                         ? Icons.pause_rounded
-                                                        : Icons.play_arrow_rounded,
+                                                        : Icons
+                                                              .play_arrow_rounded,
                                                     color: Colors.black,
                                                     size: 40,
                                                   ),

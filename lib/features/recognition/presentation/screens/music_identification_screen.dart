@@ -9,7 +9,8 @@ class MusicIdentificationScreen extends StatefulWidget {
   const MusicIdentificationScreen({super.key});
 
   @override
-  State<MusicIdentificationScreen> createState() => _MusicIdentificationScreenState();
+  State<MusicIdentificationScreen> createState() =>
+      _MusicIdentificationScreenState();
 }
 
 class _MusicIdentificationScreenState extends State<MusicIdentificationScreen>
@@ -36,7 +37,8 @@ class _MusicIdentificationScreenState extends State<MusicIdentificationScreen>
     return Consumer<MusicRecognitionService>(
       builder: (context, service, _) {
         final isListening = service.status == MusicRecognitionStatus.listening;
-        final hasResult = service.status == MusicRecognitionStatus.matchedInternal ||
+        final hasResult =
+            service.status == MusicRecognitionStatus.matchedInternal ||
             service.status == MusicRecognitionStatus.matchedExternal ||
             service.status == MusicRecognitionStatus.noMatch;
 
@@ -55,7 +57,8 @@ class _MusicIdentificationScreenState extends State<MusicIdentificationScreen>
           ),
           body: Stack(
             children: [
-              if (hasResult && service.result != null || service.status == MusicRecognitionStatus.noMatch)
+              if (hasResult && service.result != null ||
+                  service.status == MusicRecognitionStatus.noMatch)
                 RecognitionResultView(
                   result: service.result,
                   status: service.status,
@@ -79,7 +82,10 @@ class _MusicIdentificationScreenState extends State<MusicIdentificationScreen>
     );
   }
 
-  Widget _buildMainActionButton(MusicRecognitionService service, bool isListening) {
+  Widget _buildMainActionButton(
+    MusicRecognitionService service,
+    bool isListening,
+  ) {
     return GestureDetector(
       onTap: () {
         if (isListening) {
@@ -94,7 +100,10 @@ class _MusicIdentificationScreenState extends State<MusicIdentificationScreen>
           if (isListening)
             ScaleTransition(
               scale: Tween(begin: 1.0, end: 1.2).animate(
-                CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+                CurvedAnimation(
+                  parent: _pulseController,
+                  curve: Curves.easeInOut,
+                ),
               ),
               child: Container(
                 width: 160,
@@ -173,10 +182,7 @@ class _MusicIdentificationScreenState extends State<MusicIdentificationScreen>
             padding: EdgeInsets.only(bottom: 16),
             child: CircularProgressIndicator(color: kVisionGold),
           ),
-        Text(
-          text,
-          style: kStyleHeadline.copyWith(color: kTextMain),
-        ),
+        Text(text, style: kStyleHeadline.copyWith(color: kTextMain)),
       ],
     );
   }

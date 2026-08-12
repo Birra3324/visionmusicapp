@@ -31,10 +31,7 @@ class SongMoreOptionsButton extends StatelessWidget {
       iconSize: iconSize,
       constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
       padding: EdgeInsets.zero,
-      icon: Icon(
-        Icons.more_vert_rounded,
-        color: iconColor ?? kTextSoft,
-      ),
+      icon: Icon(Icons.more_vert_rounded, color: iconColor ?? kTextSoft),
       onSelected: (value) async {
         switch (value) {
           case 'add_queue':
@@ -54,9 +51,7 @@ class SongMoreOptionsButton extends StatelessWidget {
             await audioManager.download(song);
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Saved for offline access.'),
-                ),
+                const SnackBar(content: Text('Saved for offline access.')),
               );
             }
             break;
@@ -76,25 +71,17 @@ class SongMoreOptionsButton extends StatelessWidget {
             if (song.youtubeUrl != null) {
               final uri = Uri.parse(song.youtubeUrl!);
               if (await canLaunchUrl(uri)) {
-                await launchUrl(
-                  uri,
-                  mode: LaunchMode.externalApplication,
-                );
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
               }
             }
             break;
         }
       },
       itemBuilder: (context) => [
-        const PopupMenuItem(
-          value: 'add_queue',
-          child: Text('Add to Queue'),
-        ),
+        const PopupMenuItem(value: 'add_queue', child: Text('Add to Queue')),
         PopupMenuItem(
           value: 'toggle_save',
-          child: Text(
-            isSaved ? 'Remove from Library' : 'Add to Library',
-          ),
+          child: Text(isSaved ? 'Remove from Library' : 'Add to Library'),
         ),
         PopupMenuItem(
           value: 'toggle_favorite',
