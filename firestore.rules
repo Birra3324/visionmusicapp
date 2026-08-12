@@ -1,0 +1,119 @@
+rules_version = '2';
+
+// Vision Music — Firestore security rules
+//
+// Written 2026-08-11. Previously no rules existed in the repository, meaning
+// the boundary protecting user data lived only in the Firebase console and was
+// most likely still the 30-day test-mode default.
+//
+// Principle: the catalogue is public to read and closed to write. Anything
+// belonging to a user is readable and writable only by that user. There is no
+// path in this file that grants blanket access.
+//
+// Catalogue writes are deliberately denied to *everyone*, including signed-in
+// users. Songs and videos are published from a trusted context — the Firebase
+// console, the Admin SDK, or a Cloud Function — none of which are subject to
+// these rules. A client should never be able to alter the catalogue.
+//
+// NOT YET DEPLOYED. Review, then:
+//   firebase deploy --only firestore:rules
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ─────────────────────────────────────────────────────────────
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Rejects a write that tries to change immutable identity fields.
+    function keepsOwner(userId) {
+      return request.resource.data.userId == userId;
+    }
+
+    // ── Catalogue: public read, no client write ─────────────────────────────
+
+    match /songs/{songId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /videos/{videoId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /videoCategories/{categoryId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // ── User documents ──────────────────────────────────────────────────────
+    //
+    // A user may read and write only their own profile. Creating a profile for
+    // somebody else, or reading another user's document, is denied.
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      // Account deletion is a privacy right, and both app stores require it.
+      allow delete: if isOwner(userId);
+
+      // Everything owned by a user lives beneath their document, so ownership
+      // is structural rather than something each rule has to re-derive.
+
+      match /favorites/{songId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /library/{itemId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /recentlyPlayed/{entryId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /playlists/{playlistId} {
+        allow read, write: if isOwner(userId);
+
+        match /tracks/{trackId} {
+          allow read, write: if isOwner(userId);
+        }
+      }
+
+      match /downloads/{downloadId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // ── Public playlists ────────────────────────────────────────────────────
+    //
+    // Reserved for a future sharing feature. Readable by anyone only when the
+    // owner has explicitly marked it public; writable only by its owner.
+    // Present now so sharing does not later arrive as an ad-hoc exception.
+
+    match /publicPlaylists/{playlistId} {
+      allow read: if resource.data.isPublic == true;
+      allow create: if isSignedIn() && keepsOwner(request.auth.uid);
+      allow update, delete: if isSignedIn()
+                            && resource.data.userId == request.auth.uid
+                            && keepsOwner(request.auth.uid);
+    }
+
+    // ── Default deny ────────────────────────────────────────────────────────
+    //
+    // Any collection not named above is inaccessible. New features must add an
+    // explicit rule, which is the point: forgetting to do so fails closed.
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

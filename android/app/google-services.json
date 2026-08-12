@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "190873708714",
+    "project_id": "visionmusic-dev",
+    "storage_bucket": "visionmusic-dev.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:190873708714:android:57de878985e6c1782b08d3",
+        "android_client_info": {
+          "package_name": "com.visionmusic.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKkEKhXtW95s5ys5EyR8JqaCXYLQ_JpeE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

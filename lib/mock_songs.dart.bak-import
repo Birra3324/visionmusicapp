@@ -1,0 +1,111 @@
+import 'package:visionmusicapp/song.dart';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Vision Music v1 Launch Catalog
+// Last cleaned: 2026-04-26 by Cloudy/Claude — catalog integrity audit
+//
+// KNOWN ISSUES FLAGGED FOR BIRRA CONFIRMATION:
+//
+// 1. yosan_getahun — title is set to artist name "Yosan Getahun"
+//    → What is the actual song title? Update title field once confirmed.
+//
+// 2. shagoye / Shukri Jamal — audio file is shagoye.mp3,
+//    but the cover image reads "Marartuu – Shukrii Jamal"
+//    → Is the song "Shagoye" or "Marartuu"? Confirm the correct title.
+//
+// 3. hirphaa — the original hirphaa.jpg showed "Dawoo – Abera Indale" (wrong artist).
+//    → imagePath set to null until a correct Hirphaa Gaanfuree cover is provided.
+//
+// 4. lagaa / Davo — "158:03" duration display is a just_audio parsing bug, not a bad file.
+//    lagaa.mp3 is approx 4:36. Needs a separate player fix, not a catalog fix.
+//
+// 5. daraara-lagaa.mp3 — orphaned audio file on disk, not in catalog. Leave for now.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const mockSongs = [
+  Song(
+    id: 'nuho_gobana',
+    title: 'Nuho Gobana',
+    artist: 'Ali Birra',
+    albumTitle: 'Best of Ali Birra',
+    genre: 'Oromo Music',
+    filePath: 'assets/audio/Nuho gobana.mp3',
+    imagePath: 'assets/images/alii birra.jpeg',
+  ),
+  Song(
+    // FIXED 2026-04-26: was haragee.jpg which contained Asanti cover art (wrong).
+    // Switched to alii birra.jpeg (confirmed Ali Birra cover).
+    id: 'harargee',
+    title: 'Harargee',
+    artist: 'Ali Birra',
+    albumTitle: 'Best of Ali Birra',
+    genre: 'Oromo Music',
+    filePath: 'assets/audio/harargee.mp3',
+    imagePath: 'assets/images/alii birra.jpeg',
+  ),
+  Song(
+    // FLAGGED: hirphaa.jpg showed "Dawoo – Abera Indale" (wrong artist).
+    // imagePath set to null — no correct Hirphaa Gaanfuree cover exists on disk yet.
+    // Restore imagePath when correct cover is supplied.
+    id: 'hirphaa',
+    title: 'Hirphaa',
+    artist: 'Hirphaa Gaanfuree',
+    albumTitle: 'Gaanfuree Vol. 1',
+    genre: 'Oromo Music',
+    filePath: 'assets/audio/hirphaa.mp3',
+    imagePath: null,
+  ),
+  Song(
+    // FLAGGED: title is the artist name. Confirm actual song title with Birra.
+    id: 'yosan_getahun',
+    title: 'Yosan Getahun',
+    artist: 'Yosan Getahun',
+    albumTitle: 'Single',
+    genre: 'Oromo Music',
+    filePath: 'assets/audio/yosan getahun.mp3',
+    imagePath: 'assets/images/yosan getan.jpg',
+  ),
+  Song(
+    // NOTE: 158:03 duration display is a just_audio parsing bug, not a bad file.
+    // lagaa.mp3 is approx 4:36 at standard bitrate.
+    id: 'lagaa',
+    title: 'Lagaa',
+    artist: 'Davo',
+    albumTitle: 'Lagaa Hits',
+    genre: 'Oromo Music',
+    filePath: 'assets/audio/lagaa.mp3',
+    imagePath: 'assets/images/davo.jpg',
+  ),
+  Song(
+    // FLAGGED: audio file is shagoye.mp3 but cover image reads "Marartuu – Shukrii Jamal".
+    // Confirm with Birra: correct title is "Shagoye" or "Marartuu"?
+    id: 'shagoye',
+    title: 'Shagoye',
+    artist: 'Shukri Jamal',
+    albumTitle: 'Jamal Vol. 2',
+    genre: 'Oromo Music',
+    filePath: 'assets/audio/shagoye.mp3',
+    imagePath: 'assets/images/shukri jamal.jpg',
+  ),
+  Song(
+    id: 'kuyubisaa',
+    title: 'Kuyubisaa',
+    artist: 'Asanti',
+    albumTitle: 'Asanti Gold',
+    genre: 'Oromo Music',
+    filePath: 'assets/audio/kuyubisaa.mp3',
+    imagePath: 'assets/images/asanti.jpg',
+  ),
+  Song(
+    id: 'alibiyyanqabaa',
+    title: 'Alibiyyanqabaa',
+    artist: 'Naaima Abdurahman',
+    albumTitle: "Abdurahman's Best",
+    genre: 'Oromo Music',
+    filePath: 'assets/audio/alibiyyanqabaa.mp3',
+    imagePath: 'assets/images/Naaima abdurahman.jpeg',
+  ),
+  // NOTE: Andualem Gosa removed for v1 — placeholder audio was incorrect.
+  // assets/images/Andualem gosa.jpg kept on disk for future use.
+  // Restore with: title='Gungume', artist='Andualem Gosa', correct audio file.
+];

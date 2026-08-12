@@ -1,0 +1,77 @@
+rules_version = '2';
+
+// Vision Music — Cloud Storage security rules
+//
+// Written 2026-08-11. No rules previously existed in the repository.
+//
+// Storage holds media, which is the expensive resource. An open bucket is not
+// only a data risk but a billing one: anyone who finds the URL pattern can
+// stream your catalogue at your expense, or upload arbitrary files into it.
+//
+// NOT YET DEPLOYED. Review, then:
+//   firebase deploy --only storage
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+
+    function underSizeMb(mb) {
+      return request.resource.size < mb * 1024 * 1024;
+    }
+
+    // ── Catalogue media ─────────────────────────────────────────────────────
+    //
+    // Readable by signed-in users only. Requiring auth to stream is what makes
+    // a listening entitlement enforceable later; a world-readable bucket can
+    // never be walked back once URLs are in circulation.
+    //
+    // No client may write. Catalogue media is published via the Admin SDK or
+    // the console, neither of which these rules apply to.
+
+    match /audio/{allPaths=**} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
+    match /video/{allPaths=**} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
+    // Artwork is public: it appears in share previews and link unfurls, which
+    // are unauthenticated by nature.
+    match /artwork/{allPaths=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // ── User uploads ────────────────────────────────────────────────────────
+    //
+    // Profile photos are the only client-writable path. Constrained by owner,
+    // content type and size — an unconstrained upload path is how buckets get
+    // used as free file hosting.
+
+    match /users/{userId}/profile/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isOwner(userId) && isImage() && underSizeMb(5);
+      allow delete: if isOwner(userId);
+    }
+
+    // ── Default deny ────────────────────────────────────────────────────────
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

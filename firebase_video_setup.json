@@ -1,0 +1,105 @@
+{
+  "collection": "videos",
+  "description": "Firestore collection schema for Vision Music videos",
+  "documents": [
+    {
+      "id": "markato_video",
+      "data": {
+        "title": "Markato (Official Video)",
+        "artist": "Ali Birra",
+        "description": "The legendary Oromo musician performs his iconic track Markato.",
+        "thumbnailPath": "assets/images/alii birra.jpeg",
+        "videoUrl": "https://www.youtube.com/watch?v=ali-birra-markato",
+        "type": "musicVideo",
+        "durationSeconds": 270,
+        "publishedAt": "2026-01-15T00:00:00Z",
+        "viewCount": 12500,
+        "tags": ["oromo", "classic", "official"]
+      }
+    },
+    {
+      "id": "hirphaa_live",
+      "data": {
+        "title": "Hirphaa Gaanfuree — Live at Finfinne",
+        "artist": "Hirphaa Gaanfuree",
+        "description": "An intimate live performance capturing the soul of Oromo music.",
+        "thumbnailPath": null,
+        "videoUrl": "https://www.youtube.com/watch?v=hirphaa-live-finfinne",
+        "type": "liveSession",
+        "durationSeconds": 735,
+        "publishedAt": "2026-02-20T00:00:00Z",
+        "viewCount": 8300,
+        "tags": ["live", "oromo", "concert"]
+      }
+    },
+    {
+      "id": "yosan_interview",
+      "data": {
+        "title": "Yosan Getahun: Journey to 3Obsaa",
+        "artist": "Yosan Getahun",
+        "description": "Behind the scenes interview about the making of 3Obsaa.",
+        "thumbnailPath": "assets/images/yosan_getahun.jpg",
+        "videoUrl": "https://www.youtube.com/watch?v=yosan-getahun-interview",
+        "type": "interview",
+        "durationSeconds": 1125,
+        "publishedAt": "2026-03-01T00:00:00Z",
+        "viewCount": 5400,
+        "tags": ["interview", "behind-the-scenes", "oromo"]
+      }
+    },
+    {
+      "id": "davo_podcast",
+      "data": {
+        "title": "The Sound of Oromo Music — Davo Episode",
+        "artist": "Davo",
+        "description": "Podcast discussion on modern Oromo music trends with Davo.",
+        "thumbnailPath": "assets/images/davo.jpg",
+        "videoUrl": "https://www.youtube.com/watch?v=davo-podcast-oromo-music",
+        "type": "podcast",
+        "durationSeconds": 2120,
+        "publishedAt": "2026-03-10T00:00:00Z",
+        "viewCount": 3200,
+        "tags": ["podcast", "discussion", "oromo-music"]
+      }
+    },
+    {
+      "id": "shukri_documentary",
+      "data": {
+        "title": "Marartuu: The Story Behind the Song",
+        "artist": "Shukri Jamal",
+        "description": "Mini documentary exploring the cultural roots of Marartuu.",
+        "thumbnailPath": "assets/images/shukri_jamal.jpg",
+        "videoUrl": "https://www.youtube.com/watch?v=shukri-jamal-documentary",
+        "type": "documentary",
+        "durationSeconds": 490,
+        "publishedAt": "2026-03-15T00:00:00Z",
+        "viewCount": 6700,
+        "tags": ["documentary", "culture", "oromo"]
+      }
+    },
+    {
+      "id": "asanti_live",
+      "data": {
+        "title": "Kuyubisaa — Acoustic Session",
+        "artist": "Asanti",
+        "description": "Stripped-down acoustic version of the hit song Kuyubisaa.",
+        "thumbnailPath": "assets/images/asanti.jpg",
+        "videoUrl": "https://www.youtube.com/watch?v=asanti-kuyubisaa-acoustic",
+        "type": "liveSession",
+        "durationSeconds": 345,
+        "publishedAt": "2026-03-20T00:00:00Z",
+        "viewCount": 9100,
+        "tags": ["acoustic", "live", "oromo"]
+      }
+    }
+  ],
+  "indexes": [
+    {
+      "fields": [
+        { "fieldPath": "type", "order": "ASCENDING" },
+        { "fieldPath": "publishedAt", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "securityRules": "service cloud.firestore {\n  match /databases/{database}/documents {\n    match /videos/{videoId} {\n      allow read: if true;\n      allow write: if request.auth != null;\n    }\n  }\n}"
+}

@@ -1,0 +1,68 @@
+# Vision Music — iOS Podfile
+#
+# Reset to Flutter's stock template on 2026-08-11.
+#
+# The previous version carried hand-written HEADER_SEARCH_PATHS patches for
+# leveldb-library, GoogleUtilities, AppCheckCore and GoogleSignIn, plus a global
+# block appending ${PODS_ROOT} to every target. Each had been added to silence a
+# "header not found" error, and each one only exposed the next — gRPC-Core was
+# simply the next in line.
+#
+# Firebase, Firestore and gRPC build correctly on iOS with no patches at all.
+# Needing five of them was evidence that the Pods tree itself was broken: it had
+# been restored from iCloud rather than installed here, which is why every file
+# carried 0400 permissions and com.apple.provenance xattrs, and why CocoaPods
+# reported "did not set the base configuration of your project" on every run.
+#
+# The previous file is preserved as Podfile.pre-cleanup-20260811.
+# If a pod genuinely needs a patch after a clean install, add it here with a
+# comment explaining which build error it fixes — never as a blanket rule.
+
+platform :ios, '14.0'
+
+# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
+
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+  end
+
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/FLUTTER_ROOT\=(.*)/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
+end
+
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+
+flutter_ios_podfile_setup
+
+target 'Runner' do
+  use_frameworks!
+
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+  target 'RunnerTests' do
+    inherit! :search_paths
+  end
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+
+    target.build_configurations.each do |config|
+      # Match the project's deployment target. Several pods default lower and
+      # emit warnings otherwise.
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
+    end
+  end
+end

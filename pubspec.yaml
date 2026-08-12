@@ -1,0 +1,64 @@
+name: visionmusicapp
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+3
+
+environment:
+  sdk: ^3.10.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2
+  just_audio: ^0.10.5
+  shared_preferences: ^2.5.3
+  audio_service: ^0.18.12
+  uuid: ^4.3.3
+  provider: ^6.0.5
+  url_launcher: ^6.3.0
+  path_provider: ^2.0.11
+  cupertino_icons: ^1.0.8
+  audio_session: ^0.1.18
+  firebase_core: ^3.13.0
+  firebase_auth: ^5.5.2
+  cloud_firestore: ^5.6.6
+  firebase_storage: ^12.4.5
+  firebase_analytics: ^11.6.0
+  firebase_app_check: ^0.3.2+10
+  firebase_crashlytics: ^4.3.10
+  google_sign_in: ^6.2.1
+  video_player: ^2.9.3
+  chewie: ^1.10.0
+  http: ^1.2.0
+  file_picker: ^11.0.2
+  ffmpeg_kit_flutter_new_audio: ^2.4.4
+  record: ^5.1.0
+  permission_handler: ^11.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  # vision-logo.png is a 0-byte placeholder. Until you replace it with a real
+  # 1024x1024 PNG, use visionlogo.jpg for the launcher icon.
+  # To regenerate icons after adding a real PNG:
+  #   dart run flutter_launcher_icons
+  image_path: "assets/images/visionlogo.jpg"
+  adaptive_icon_background: "#1A0A00"
+  adaptive_icon_foreground: "assets/images/visionlogo.jpg"
+
+
+flutter:
+  generate: true
+  uses-material-design: true
+  assets:
+    - assets/audio/
+    - assets/images/
