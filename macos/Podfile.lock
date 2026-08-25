@@ -1214,11 +1214,6 @@ PODS:
     - Firebase/Firestore (~> 11.15.0)
     - firebase_core
     - FlutterMacOS
-  - ffmpeg_kit_flutter_new_audio (8.1.2):
-    - ffmpeg_kit_flutter_new_audio/audio (= 8.1.2)
-    - FlutterMacOS
-  - ffmpeg_kit_flutter_new_audio/audio (8.1.2):
-    - FlutterMacOS
   - file_picker (0.0.1):
     - FlutterMacOS
   - Firebase/Analytics (11.15.0):
@@ -1563,7 +1558,6 @@ DEPENDENCIES:
   - audio_service (from `Flutter/ephemeral/.symlinks/plugins/audio_service/darwin`)
   - audio_session (from `Flutter/ephemeral/.symlinks/plugins/audio_session/macos`)
   - cloud_firestore (from `Flutter/ephemeral/.symlinks/plugins/cloud_firestore/macos`)
-  - ffmpeg_kit_flutter_new_audio (from `Flutter/ephemeral/.symlinks/plugins/ffmpeg_kit_flutter_new_audio/macos`)
   - file_picker (from `Flutter/ephemeral/.symlinks/plugins/file_picker/macos`)
   - firebase_analytics (from `Flutter/ephemeral/.symlinks/plugins/firebase_analytics/macos`)
   - firebase_app_check (from `Flutter/ephemeral/.symlinks/plugins/firebase_app_check/macos`)
@@ -1625,8 +1619,6 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/audio_session/macos
   cloud_firestore:
     :path: Flutter/ephemeral/.symlinks/plugins/cloud_firestore/macos
-  ffmpeg_kit_flutter_new_audio:
-    :path: Flutter/ephemeral/.symlinks/plugins/ffmpeg_kit_flutter_new_audio/macos
   file_picker:
     :path: Flutter/ephemeral/.symlinks/plugins/file_picker/macos
   firebase_analytics:
@@ -1670,7 +1662,6 @@ SPEC CHECKSUMS:
   audio_session: eaca2512cf2b39212d724f35d11f46180ad3a33e
   BoringSSL-GRPC: dded2a44897e45f28f08ae87a55ee4bcd19bc508
   cloud_firestore: 92bf414ac4a12c1008efa35a70ffe988f90cf740
-  ffmpeg_kit_flutter_new_audio: d2b7d9509af916173733f7e5aeaa477c6c266d7c
   file_picker: 7584aae6fa07a041af2b36a2655122d42f578c1a
   Firebase: d99ac19b909cd2c548339c2241ecd0d1599ab02e
   firebase_analytics: 3091f96bd17636f6da5092a4701ffacf67c6e455

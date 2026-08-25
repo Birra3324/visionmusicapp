@@ -1244,11 +1244,6 @@ PODS:
   - DKPhotoGallery/Resource (0.0.19):
     - SDWebImage
     - SwiftyGif
-  - ffmpeg_kit_flutter_new_audio (8.1.2):
-    - ffmpeg_kit_flutter_new_audio/audio (= 8.1.2)
-    - Flutter
-  - ffmpeg_kit_flutter_new_audio/audio (8.1.2):
-    - Flutter
   - file_picker (0.0.1):
     - DKImagePickerController/PhotoGallery
     - Flutter
@@ -1599,7 +1594,6 @@ DEPENDENCIES:
   - audio_service (from `.symlinks/plugins/audio_service/darwin`)
   - audio_session (from `.symlinks/plugins/audio_session/ios`)
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
-  - ffmpeg_kit_flutter_new_audio (from `.symlinks/plugins/ffmpeg_kit_flutter_new_audio/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - firebase_analytics (from `.symlinks/plugins/firebase_analytics/ios`)
   - firebase_app_check (from `.symlinks/plugins/firebase_app_check/ios`)
@@ -1668,8 +1662,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/audio_session/ios"
   cloud_firestore:
     :path: ".symlinks/plugins/cloud_firestore/ios"
-  ffmpeg_kit_flutter_new_audio:
-    :path: ".symlinks/plugins/ffmpeg_kit_flutter_new_audio/ios"
   file_picker:
     :path: ".symlinks/plugins/file_picker/ios"
   firebase_analytics:
@@ -1717,7 +1709,6 @@ SPEC CHECKSUMS:
   cloud_firestore: fdcc87898326e396d6ef6df543acf9b5c2034b95
   DKImagePickerController: 946cec48c7873164274ecc4624d19e3da4c1ef3c
   DKPhotoGallery: b3834fecb755ee09a593d7c9e389d8b5d6deed60
-  ffmpeg_kit_flutter_new_audio: 9f6a12ae5cdc58d3e31b3b2088c644ee10f866d5
   file_picker: a0560bc09d61de87f12d246fc47d2119e6ef37be
   Firebase: d99ac19b909cd2c548339c2241ecd0d1599ab02e
   firebase_analytics: 0e25ca1d4001ccedd40b4e5b74c0ec34e18f6425
