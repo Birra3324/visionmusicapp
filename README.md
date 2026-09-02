@@ -1,16 +1,68 @@
-# vision_music_clean
+# Vision Music
 
-A new Flutter project.
+Cross-platform music app for Vision Entertainment. One Flutter codebase targets iOS, Android, macOS, and Web.
 
-## Getting Started
+Live site: [visionmusic.et](https://www.visionmusic.et)
 
-This project is a starting point for a Flutter application.
+This is the listener client. The private admin studio and Cloud Functions backend live in separate repos and stay private.
 
-A few resources to get you started if this is your first Flutter project:
+## What it does
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- Audio playback with background controls, a persistent mini-player, playlists, favorites, and search
+- Guest mode plus Google Sign-In (Firebase Auth)
+- Home / Library / Search / Profile
+- Firebase Auth, Firestore, Storage, Analytics, Crashlytics, App Check
+- Localization (English and more via `l10n`)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Stack
+
+| Layer | Tech |
+| --- | --- |
+| Client | Flutter / Dart (`just_audio`, `audio_service`, Provider) |
+| Auth | Firebase Auth, Google Sign-In |
+| Data | Cloud Firestore, Firebase Storage |
+| Platforms | iOS, Android (`com.visionmusic.app`), macOS, Web |
+
+Related public artifacts:
+
+- Marketing site: [github.com/Birra3324/visionmusic-site](https://github.com/Birra3324/visionmusic-site)
+- AI intake automation (separate portfolio project): [github.com/Birra3324/ai-intake-demo](https://github.com/Birra3324/ai-intake-demo)
+
+## Architecture
+
+```mermaid
+flowchart LR
+  App[Flutter client] --> Auth[Firebase Auth]
+  App --> FS[Firestore catalog]
+  App --> ST[Firebase Storage audio]
+  App --> Play[just_audio + audio_service]
+  Site[visionmusic.et] --> App
+```
+
+## Run locally
+
+```bash
+flutter pub get
+flutter run
+```
+
+Firebase options are in `lib/firebase_options.dart` for the `visionmusic-dev` project. Client API keys in `google-services.json` / `GoogleService-Info.plist` are standard FlutterFire public client keys, restricted by app ID. Signing keystores are gitignored.
+
+## Repo layout
+
+```
+lib/
+  main.dart
+  features/          # home, library, search, profile
+  audio/             # playback + background handler
+  services/
+android/ ios/ macos/ web/
+```
+
+## Status
+
+Active listener MVP. Catalog can run from a local demo set or Firebase. Video was cut from MVP. Backend admin publishing is a separate private project.
+
+## License
+
+Private media catalog and artwork belong to Vision Entertainment. Code in this repository is for portfolio review. Do not redistribute tracks or artwork.
