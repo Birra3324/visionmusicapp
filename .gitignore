@@ -50,6 +50,13 @@ android/app/upload-keystore.jks
 *.jks
 *.keystore
 
+# ---- SECURITY: Firebase / GCP service-account keys ----
+# tools/HOW_TO_IMPORT_VIDEOS.md tells operators to drop firebase-key.json
+# in tools/. That file must never be committed.
+**/firebase-key.json
+**/*-firebase-adminsdk-*.json
+**/serviceAccount*.json
+
 # ---- Build artifacts and backups — never commit ----
 *.apk
 _audit-backup-*/
