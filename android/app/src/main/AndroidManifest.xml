@@ -5,6 +5,10 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- Merged also from the `record` plugin. Required if music identification
+         is compiled on (--dart-define=ENABLE_MUSIC_RECOGNITION=true). Declare
+         microphone use on the Play Data safety form before a production AAB. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
     <application
         android:name="${applicationName}"

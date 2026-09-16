@@ -41,5 +41,11 @@
   "searchQuestion": "¿Qué quieres escuchar?",
   "searchInstructions": "Busca por canción, artista o álbum.",
   "noMatches": "No se encontraron resultados.",
-  "continueAsGuest": "Continuar como invitado"
+  "continueAsGuest": "Continuar como invitado",
+  "account": "Cuenta",
+  "signOut": "Cerrar sesión",
+  "privacyPolicy": "Política de privacidad",
+  "privacyPolicyUnavailable": "No se pudo abrir la política de privacidad.",
+  "aiMusicAssistant": "Asistente musical de IA",
+  "aiMusicAssistantSubtitle": "Ayuda de producción. No hay backend de generación en esta versión."
 }

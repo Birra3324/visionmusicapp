@@ -137,4 +137,24 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get continueAsGuest => 'Continuer en tant qu\'invité';
+
+  @override
+  String get account => 'Compte';
+
+  @override
+  String get signOut => 'Se déconnecter';
+
+  @override
+  String get privacyPolicy => 'Politique de confidentialité';
+
+  @override
+  String get privacyPolicyUnavailable =>
+      'Impossible d\'ouvrir la politique de confidentialité.';
+
+  @override
+  String get aiMusicAssistant => 'Assistant musical IA';
+
+  @override
+  String get aiMusicAssistantSubtitle =>
+      'Aide à la production. Aucun backend de génération n\'est configuré.';
 }

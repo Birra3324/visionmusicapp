@@ -357,6 +357,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Continue as Guest'**
   String get continueAsGuest;
+
+  /// No description provided for @account.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get account;
+
+  /// No description provided for @signOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get signOut;
+
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy policy'**
+  String get privacyPolicy;
+
+  /// No description provided for @privacyPolicyUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy policy could not be opened.'**
+  String get privacyPolicyUnavailable;
+
+  /// No description provided for @aiMusicAssistant.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Music Assistant'**
+  String get aiMusicAssistant;
+
+  /// No description provided for @aiMusicAssistantSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Production-plan helper. No generation backend is configured in this build.'**
+  String get aiMusicAssistantSubtitle;
 }
 
 class _AppLocalizationsDelegate

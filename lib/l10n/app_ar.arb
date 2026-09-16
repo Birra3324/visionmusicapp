@@ -41,5 +41,11 @@
   "searchQuestion": "ماذا تريد أن تسمع؟",
   "searchInstructions": "ابحث حسب الأغنية أو الفنان أو الألبوم.",
   "noMatches": "لم يتم العثور على نتائج.",
-  "continueAsGuest": "المتابعة كضيف"
+  "continueAsGuest": "المتابعة كضيف",
+  "account": "الحساب",
+  "signOut": "تسجيل الخروج",
+  "privacyPolicy": "سياسة الخصوصية",
+  "privacyPolicyUnavailable": "تعذر فتح سياسة الخصوصية.",
+  "aiMusicAssistant": "مساعد الموسيقى بالذكاء الاصطناعي",
+  "aiMusicAssistantSubtitle": "مساعد خطة الإنتاج. لا توجد خلفية للتوليد في هذا الإصدار."
 }

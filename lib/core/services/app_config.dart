@@ -17,4 +17,32 @@ class AppConfig {
   /// If `true` and the remote catalog is empty (or Firebase isn't ready),
   /// fall back to `mockSongs` so the demo never shows a blank library.
   static const bool fallbackToLocalOnEmpty = true;
+
+  /// Marketing-site privacy policy used by Profile and Play Console copy.
+  /// The live page / TLS status must be confirmed before a store listing.
+  static const String privacyPolicyUrl =
+      'https://www.visionmusic.et/privacy.html';
+
+  /// AI Music Assistant has **no production generate backend** in this client
+  /// repo. The Profile entry is hidden unless this flag is compiled on.
+  ///
+  /// Enable only for demos:
+  /// `flutter run --dart-define=ENABLE_AI_MUSIC_ASSISTANT=true`
+  ///
+  /// When enabled, the screen is wired to [UnavailableMusicAiClient] — it
+  /// does not call a network URL (none is configured here).
+  static bool enableAiMusicAssistant = const bool.fromEnvironment(
+    'ENABLE_AI_MUSIC_ASSISTANT',
+    defaultValue: false,
+  );
+
+  /// Music identification currently posts to a loopback host
+  /// (`http://127.0.0.1:8081`). That is not a production endpoint, so the
+  /// Search mic entry stays hidden unless this flag is compiled on.
+  ///
+  /// `flutter run --dart-define=ENABLE_MUSIC_RECOGNITION=true`
+  static bool enableMusicRecognition = const bool.fromEnvironment(
+    'ENABLE_MUSIC_RECOGNITION',
+    defaultValue: false,
+  );
 }

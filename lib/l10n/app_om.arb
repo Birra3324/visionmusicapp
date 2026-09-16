@@ -41,5 +41,11 @@
   "searchQuestion": "Maal dhaggeeffachuu barbaadda?",
   "searchInstructions": "Sirba, artistii ykn albamiin barbaadi; yookaan yaada armaan olii fili.",
   "noMatches": "Wanti walsimu hin argamne.",
-  "continueAsGuest": "Akka keessummaatti itti fufi"
+  "continueAsGuest": "Akka keessummaatti itti fufi",
+  "account": "Akkaawuntii",
+  "signOut": "Ba'i",
+  "privacyPolicy": "Imaammata dhuunfaa",
+  "privacyPolicyUnavailable": "Imaammata dhuunfaa banuu hin dandeenye.",
+  "aiMusicAssistant": "Gargaaraa Muusiqaa AI",
+  "aiMusicAssistantSubtitle": "Karoora oomisha. Backend uumuu hin qindaa'ne."
 }

@@ -134,4 +134,23 @@ class AppLocalizationsAm extends AppLocalizations {
 
   @override
   String get continueAsGuest => 'እንደ እንግዳ ይቀጥሉ';
+
+  @override
+  String get account => 'መለያ';
+
+  @override
+  String get signOut => 'ውጣ';
+
+  @override
+  String get privacyPolicy => 'የግላዊነት ፖሊሲ';
+
+  @override
+  String get privacyPolicyUnavailable => 'የግላዊነት ፖሊሲ መክፈት አልተቻለም።';
+
+  @override
+  String get aiMusicAssistant => 'የ AI ሙዚቃ ረዳት';
+
+  @override
+  String get aiMusicAssistantSubtitle =>
+      'የምርት እቅድ። በዚህ ግንባታ ምንም የትውልድ በስተጀርባ የለም።';
 }

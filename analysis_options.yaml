@@ -18,6 +18,12 @@ analyzer:
     - "lib/**/*.bak"
     - "lib/**/*.bak-*"
     - "lib/**/*.bak_*"
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
 
 linter:
   # The lint rules applied to this project can be customized in the

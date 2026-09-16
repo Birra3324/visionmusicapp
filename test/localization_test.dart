@@ -12,6 +12,9 @@ void main() {
     expect(om.profile, isNot(equals('Profile')));
     expect(om.searchQuestion, contains('dhaggeeffachuu'));
     expect(om.continueAsGuest, contains('keessummaatti'));
+    expect(om.signOut, isNotEmpty);
+    expect(om.privacyPolicy, isNotEmpty);
+    expect(om.account, isNotEmpty);
   });
 
   test('all declared locales contain primary listener strings', () {

@@ -11,6 +11,10 @@ class MusicAssistantService {
     required this.client,
   });
 
+  /// Production wiring until a real [MusicAiClient] exists in this repo.
+  factory MusicAssistantService.unavailable() =>
+      MusicAssistantService(client: const UnavailableMusicAiClient());
+
   Future<MusicAssistantResult> generate({
     required String idea,
     String? mood,

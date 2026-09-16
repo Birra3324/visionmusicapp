@@ -28,6 +28,12 @@ android {
     val keystorePropertiesFile = rootProject.file("key.properties")
     if (keystorePropertiesFile.exists()) {
         keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+    } else {
+        println(
+            "WARNING: android/key.properties not found. " +
+                "Release AABs cannot be Play-signed in this checkout. " +
+                "See android/key.properties.example (do not commit secrets).",
+        )
     }
 
     signingConfigs {

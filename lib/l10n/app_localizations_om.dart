@@ -138,4 +138,24 @@ class AppLocalizationsOm extends AppLocalizations {
 
   @override
   String get continueAsGuest => 'Akka keessummaatti itti fufi';
+
+  @override
+  String get account => 'Akkaawuntii';
+
+  @override
+  String get signOut => 'Ba\'i';
+
+  @override
+  String get privacyPolicy => 'Imaammata dhuunfaa';
+
+  @override
+  String get privacyPolicyUnavailable =>
+      'Imaammata dhuunfaa banuu hin dandeenye.';
+
+  @override
+  String get aiMusicAssistant => 'Gargaaraa Muusiqaa AI';
+
+  @override
+  String get aiMusicAssistantSubtitle =>
+      'Karoora oomisha. Backend uumuu hin qindaa\'ne.';
 }
