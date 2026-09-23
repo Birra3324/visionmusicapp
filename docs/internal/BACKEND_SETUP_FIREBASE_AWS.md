@@ -1,3 +1,5 @@
+> Historical engineering note. Not a public runbook and not for production operations. Do not commit service-account keys, keystores, or admin credentials. Index: [README.md](README.md).
+
 # VisionMusic Backend Setup — Firebase + AWS MediaConvert
 
 Chosen architecture: **Firebase hosts and serves everything; AWS does transcoding only.**

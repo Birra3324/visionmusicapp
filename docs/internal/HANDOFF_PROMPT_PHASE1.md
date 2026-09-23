@@ -1,3 +1,5 @@
+> Historical engineering note. Not a public runbook and not for production operations. Do not commit service-account keys, keystores, or admin credentials. Index: [README.md](README.md).
+
 # Prompt for OpenClaw — Phase 1 verification gate
 
 Copy everything below the line into OpenClaw.
@@ -5,7 +7,7 @@ Copy everything below the line into OpenClaw.
 ---
 
 **Project:** `/Users/birragemedi/Desktop/visionmusicapp`
-**Read first:** `docs/VISION_MUSIC_MASTER_AUDIT.md`
+**Read first:** `VISION_MUSIC_MASTER_AUDIT.md`
 
 This is a verification gate, not a feature task. Ten source files have been changed over the last
 two sessions and **five of them have never been compiled**. Nobody has confirmed by ear that this

@@ -1,3 +1,5 @@
+> Historical engineering note. Not a public runbook and not for production operations. Do not commit service-account keys, keystores, or admin credentials. Index: [README.md](README.md).
+
 # Vision Music — Cost Estimate (Admin Ingestion Pipeline)
 
 **Version:** 0.1 (planning — figures are estimates, not quotes)

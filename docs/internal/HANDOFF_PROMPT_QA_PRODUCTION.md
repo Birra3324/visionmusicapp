@@ -1,3 +1,5 @@
+> Historical engineering note. Not a public runbook and not for production operations. Do not commit service-account keys, keystores, or admin credentials. Index: [README.md](README.md).
+
 # Handoff Prompt — VisionMusic Production QA Pass
 
 Run this with Claude Code from a terminal on the Mac that has Flutter, Xcode, and the iPhone attached:
