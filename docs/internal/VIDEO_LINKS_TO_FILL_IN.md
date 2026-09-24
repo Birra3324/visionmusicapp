@@ -1,3 +1,5 @@
+> Historical engineering note. Not a public runbook and not for production operations. Do not commit service-account keys, keystores, or admin credentials. Index: [README.md](README.md).
+
 # Video links — fill these in and the video side switches on
 
 Vision Music already has a complete music-video system. It is dormant for one

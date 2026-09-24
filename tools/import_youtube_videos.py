@@ -17,6 +17,7 @@ HOW TO USE:
        → Firebase Console → Project Settings → Service Accounts
        → "Generate new private key" → save as firebase-key.json
        → Put firebase-key.json in this tools/ folder
+       → Never commit that file. It is gitignored.
 
   4. Run:
        cd tools

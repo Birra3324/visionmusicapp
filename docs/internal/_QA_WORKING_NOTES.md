@@ -1,3 +1,5 @@
+> Historical engineering note. Not a public runbook and not for production operations. Do not commit service-account keys, keystores, or admin credentials. Index: [README.md](README.md).
+
 # QA Working Notes — VisionMusic (2026-08-13)
 
 ## Repo state (differs from handoff prompt — flagged)

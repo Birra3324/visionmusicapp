@@ -1,3 +1,5 @@
+> Historical engineering note. Not a public runbook and not for production operations. Do not commit service-account keys, keystores, or admin credentials. Index: [README.md](README.md).
+
 # Prompt for OpenClaw — import the whole channel into the video catalog
 
 Copy everything below the line into OpenClaw.

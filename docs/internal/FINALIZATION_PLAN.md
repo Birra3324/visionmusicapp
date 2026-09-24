@@ -1,3 +1,5 @@
+> Historical engineering note. Not a public runbook and not for production operations. Do not commit service-account keys, keystores, or admin credentials. Index: [README.md](README.md).
+
 # VisionMusic — Finalization Plan
 
 A concrete, numbered checklist to take the app from its current state to a shippable

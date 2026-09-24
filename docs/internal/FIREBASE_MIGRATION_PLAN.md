@@ -1,3 +1,5 @@
+> Historical engineering note. Not a public runbook and not for production operations. Do not commit service-account keys, keystores, or admin credentials. Index: [README.md](README.md).
+
 # Firebase migration plan — P1-9
 
 **Written 2026-08-11. Nothing has been changed in Firebase. This is a plan for you to execute.**

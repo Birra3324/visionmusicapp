@@ -50,6 +50,12 @@ android/app/upload-keystore.jks
 *.jks
 *.keystore
 
+# Service-account and importer keys. Generate locally; never commit.
+firebase-key.json
+**/firebase-key.json
+*service-account*.json
+*serviceAccount*.json
+
 # ---- Build artifacts and backups — never commit ----
 *.apk
 _audit-backup-*/

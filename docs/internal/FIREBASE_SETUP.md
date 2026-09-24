@@ -1,3 +1,5 @@
+> Historical engineering note. Not a public runbook and not for production operations. Do not commit service-account keys, keystores, or admin credentials. Index: [README.md](README.md).
+
 # Firebase Setup for Vision Music
 
 This project now includes Firebase scaffolding, but it is not connected to a live Firebase project yet.

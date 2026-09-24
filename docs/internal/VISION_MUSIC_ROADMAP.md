@@ -1,3 +1,5 @@
+> Historical engineering note. Not a public runbook and not for production operations. Do not commit service-account keys, keystores, or admin credentials. Index: [README.md](README.md).
+
 # Vision Music — Roadmap
 
 **Date:** 11 August 2026
@@ -81,7 +83,7 @@ which change broke what.
 ### Move to a real Firebase project
 
 **[Resolved 2026-08-12: app repointed to `visionmusic-dev`.]** `device-streaming-6b79dd0d` was an auto-generated scratch project and macOS is registered under the
-iOS appId. Plan is written in `docs/FIREBASE_MIGRATION_PLAN.md`. **Do this before Firestore becomes
+iOS appId. Plan is written in `FIREBASE_MIGRATION_PLAN.md`. **Do this before Firestore becomes
 the live catalogue, not after.**
 
 ### Turn on the Firestore catalogue
