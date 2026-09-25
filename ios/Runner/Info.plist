@@ -66,6 +66,10 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Vision Music may access your photo library so you can set a profile picture or share album artwork.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Vision Music may use the microphone for voice features and music recognition when you choose to use them.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
