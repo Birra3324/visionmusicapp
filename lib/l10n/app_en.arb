@@ -41,5 +41,11 @@
   "searchQuestion": "What do you want to hear?",
   "searchInstructions": "Search by song, artist, or album—or choose a suggestion above.",
   "noMatches": "No matches found.",
-  "continueAsGuest": "Continue as Guest"
+  "continueAsGuest": "Continue as Guest",
+  "account": "Account",
+  "signOut": "Sign out",
+  "privacyPolicy": "Privacy policy",
+  "privacyPolicyUnavailable": "Privacy policy could not be opened.",
+  "aiMusicAssistant": "AI Music Assistant",
+  "aiMusicAssistantSubtitle": "Production-plan helper. No generation backend is configured in this build."
 }

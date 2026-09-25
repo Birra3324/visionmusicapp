@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:visionmusicapp/audio_manager.dart';
+import 'package:visionmusicapp/core/services/app_config.dart';
+import 'package:visionmusicapp/features/ai_music_assistant/screens/ai_music_assistant_screen.dart';
+import 'package:visionmusicapp/features/ai_music_assistant/services/music_assistant_service.dart';
 import 'package:visionmusicapp/features/auth/auth_service.dart';
+import 'package:visionmusicapp/features/auth/login_screen.dart';
 import 'package:visionmusicapp/settings_manager.dart';
 import 'package:visionmusicapp/vision_theme.dart';
 import 'package:visionmusicapp/widgets/vision_background.dart';
@@ -91,12 +96,107 @@ class ProfileHubScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
+            _buildAccountSection(context, user, l10n),
+            const SizedBox(height: 24),
             _buildLanguageRow(settings, l10n),
             const SizedBox(height: 24),
             _buildPlaybackSection(settings, audioManager, l10n),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildAccountSection(
+    BuildContext context,
+    User? user,
+    AppLocalizations l10n,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.account,
+          style: const TextStyle(
+            color: kTextMain,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 8),
+        if (AppConfig.enableAiMusicAssistant)
+          ListTile(
+            key: const Key('profile_ai_music_assistant'),
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(
+              Icons.auto_awesome,
+              color: kVisionGoldLight,
+            ),
+            title: Text(
+              l10n.aiMusicAssistant,
+              style: const TextStyle(color: kTextMain),
+            ),
+            subtitle: Text(
+              l10n.aiMusicAssistantSubtitle,
+              style: const TextStyle(color: kTextSoft, fontSize: 12),
+            ),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => AiMusicAssistantScreen(
+                    service: MusicAssistantService.unavailable(),
+                  ),
+                ),
+              );
+            },
+          ),
+        ListTile(
+          key: const Key('profile_privacy_policy'),
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(
+            Icons.privacy_tip_outlined,
+            color: kVisionGoldLight,
+          ),
+          title: Text(
+            l10n.privacyPolicy,
+            style: const TextStyle(color: kTextMain),
+          ),
+          onTap: () => _openPrivacyPolicy(context, l10n),
+        ),
+        if (user != null)
+          ListTile(
+            key: const Key('profile_sign_out'),
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.logout_rounded, color: kVisionGoldLight),
+            title: Text(
+              l10n.signOut,
+              style: const TextStyle(color: kTextMain),
+            ),
+            onTap: () => _signOut(context),
+          ),
+      ],
+    );
+  }
+
+  Future<void> _openPrivacyPolicy(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) async {
+    final uri = Uri.parse(AppConfig.privacyPolicyUrl);
+    final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!ok && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.privacyPolicyUnavailable)),
+      );
+    }
+  }
+
+  Future<void> _signOut(BuildContext context) async {
+    await AuthService.instance.signOut();
+    if (!context.mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute<void>(builder: (_) => const LoginScreen()),
+      (route) => false,
     );
   }
 

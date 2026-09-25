@@ -41,5 +41,11 @@
   "searchQuestion": "ምን መስማት ይፈልጋሉ?",
   "searchInstructions": "በዘፈን፣ አርቲስት ወይም አልበም ይፈልጉ።",
   "noMatches": "ተዛማጅ ውጤት አልተገኘም።",
-  "continueAsGuest": "እንደ እንግዳ ይቀጥሉ"
+  "continueAsGuest": "እንደ እንግዳ ይቀጥሉ",
+  "account": "መለያ",
+  "signOut": "ውጣ",
+  "privacyPolicy": "የግላዊነት ፖሊሲ",
+  "privacyPolicyUnavailable": "የግላዊነት ፖሊሲ መክፈት አልተቻለም።",
+  "aiMusicAssistant": "የ AI ሙዚቃ ረዳት",
+  "aiMusicAssistantSubtitle": "የምርት እቅድ። በዚህ ግንባታ ምንም የትውልድ በስተጀርባ የለም።"
 }

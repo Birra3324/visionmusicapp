@@ -70,5 +70,7 @@
 	<array>
 		<string>audio</string>
 	</array>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Vision Music uses the microphone to identify a song when you choose Detect Song.</string>
 </dict>
 </plist>

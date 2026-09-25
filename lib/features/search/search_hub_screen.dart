@@ -6,6 +6,7 @@ import 'package:visionmusicapp/song.dart';
 import 'package:visionmusicapp/vision_theme.dart';
 import 'package:visionmusicapp/widgets/fade_route.dart';
 import 'package:visionmusicapp/widgets/vision_background.dart';
+import 'package:visionmusicapp/core/services/app_config.dart';
 import 'package:visionmusicapp/core/services/media_source_resolver.dart';
 import 'package:visionmusicapp/core/services/app_observability.dart';
 import 'package:visionmusicapp/l10n/app_localizations.dart';
@@ -228,7 +229,7 @@ class _SearchHubScreenState extends State<SearchHubScreen> {
                 size: 18,
               ),
             )
-          else
+          else if (AppConfig.enableMusicRecognition)
             IconButton(
               onPressed: () {
                 Navigator.push(

@@ -90,7 +90,7 @@ class YouTubeRepository implements VideoRepository {
 
       if (items == null || items.isEmpty) return null;
 
-      return _convertYouTubeItem(items[0] as Map<String, dynamic>);
+      return await _convertYouTubeItem(items[0] as Map<String, dynamic>);
     } catch (e) {
       debugPrint('Error fetching video by ID: $e');
       return null;

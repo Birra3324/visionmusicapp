@@ -7,7 +7,12 @@ import 'package:visionmusicapp/widgets/vision_background.dart';
 import 'package:visionmusicapp/l10n/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  /// When set (from [FirebaseBootstrapResult.isReady]), this is the source of
+  /// truth for whether Google Sign-In can run. Otherwise [AuthService]
+  /// reports whether Firebase was actually initialized.
+  final bool? firebaseReady;
+
+  const LoginScreen({super.key, this.firebaseReady});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -53,7 +58,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final bool firebaseReady = AuthService.instance.isFirebaseReady;
+    final bool firebaseReady =
+        widget.firebaseReady ?? AuthService.instance.isFirebaseReady;
 
     return VisionBackground(
       child: Scaffold(

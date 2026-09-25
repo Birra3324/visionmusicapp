@@ -137,4 +137,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get continueAsGuest => 'Continue as Guest';
+
+  @override
+  String get account => 'Account';
+
+  @override
+  String get signOut => 'Sign out';
+
+  @override
+  String get privacyPolicy => 'Privacy policy';
+
+  @override
+  String get privacyPolicyUnavailable => 'Privacy policy could not be opened.';
+
+  @override
+  String get aiMusicAssistant => 'AI Music Assistant';
+
+  @override
+  String get aiMusicAssistantSubtitle =>
+      'Production-plan helper. No generation backend is configured in this build.';
 }

@@ -135,4 +135,23 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get continueAsGuest => 'المتابعة كضيف';
+
+  @override
+  String get account => 'الحساب';
+
+  @override
+  String get signOut => 'تسجيل الخروج';
+
+  @override
+  String get privacyPolicy => 'سياسة الخصوصية';
+
+  @override
+  String get privacyPolicyUnavailable => 'تعذر فتح سياسة الخصوصية.';
+
+  @override
+  String get aiMusicAssistant => 'مساعد الموسيقى بالذكاء الاصطناعي';
+
+  @override
+  String get aiMusicAssistantSubtitle =>
+      'مساعد خطة الإنتاج. لا توجد خلفية للتوليد في هذا الإصدار.';
 }
