@@ -3,6 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import 'package:visionmusicapp/audio_manager.dart';
+import 'package:visionmusicapp/features/ai_music_assistant/screens/ai_music_assistant_screen.dart';
+import 'package:visionmusicapp/features/ai_music_assistant/services/http_music_ai_client.dart';
+import 'package:visionmusicapp/features/ai_music_assistant/services/music_assistant_service.dart';
 import 'package:visionmusicapp/features/auth/auth_service.dart';
 import 'package:visionmusicapp/settings_manager.dart';
 import 'package:visionmusicapp/vision_theme.dart';
@@ -93,6 +96,8 @@ class ProfileHubScreen extends StatelessWidget {
             const SizedBox(height: 24),
             _buildLanguageRow(settings, l10n),
             const SizedBox(height: 24),
+            _buildAiAssistantTile(context),
+            const SizedBox(height: 24),
             _buildPlaybackSection(settings, audioManager, l10n),
           ],
         ),
@@ -142,6 +147,44 @@ class ProfileHubScreen extends StatelessWidget {
               .toList(),
         ),
       ],
+    );
+  }
+
+  Widget _buildAiAssistantTile(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: kDarkCard.withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white10),
+      ),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: kVisionGold.withValues(alpha: 0.16),
+          child: const Icon(Icons.auto_awesome, color: kVisionGoldLight),
+        ),
+        title: const Text(
+          'AI Music Assistant',
+          style: TextStyle(
+            color: kTextMain,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        subtitle: const Text(
+          'Turn a song idea into a production plan',
+          style: TextStyle(color: kTextSoft, fontSize: 13),
+        ),
+        trailing: const Icon(Icons.chevron_right_rounded, color: kTextSoft),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => AiMusicAssistantScreen(
+                service: MusicAssistantService(client: HttpMusicAiClient()),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 
