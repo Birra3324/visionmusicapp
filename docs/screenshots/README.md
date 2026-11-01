@@ -1,18 +1,18 @@
 # Screenshots
 
-This listener repo does not contain product UI screenshots. `assets/images/` holds artist artwork and the launcher mark. Those are catalog assets, not app captures, so they are not used here as demo shots.
+Captured 2026-11-01 from a release web build (`flutter build web`), guest mode, bundled catalog, 430×932 viewport.
 
-No `_demo_screenshots` or `store_prep` folder is in this tree.
+| File | Screen |
+| --- | --- |
+| `01_login.png` | Login card: Continue as Guest, optional Google Sign-In |
+| `02_home.png` | Home: Trending Now, Listen and Watch, track list |
+| `03_player.png` | Now Playing for **Markato** (Ali Birra) |
+| `04_library.png` | Library: favorites, recently played, collection |
+| `05_search.png` | Search with suggestion chips |
 
-## Already public
+No Firebase console, terminal, or credential files appear in any frame.
 
-The marketing site repo has one home-screen capture, used on [visionmusic.et](https://www.visionmusic.et):
-
-- [screen-home.png](https://github.com/Birra3324/visionmusic-site/blob/main/assets/img/screen-home.png) — Home, from [visionmusic-site](https://github.com/Birra3324/visionmusic-site)
-
-That file stays in the site repo. It is not copied here.
-
-## Capture the listener demo
+## Recapture
 
 Run the [walkthrough](../demo.md) (`flutter run -d chrome` or a device), then save PNGs into this folder. Suggested names and captions:
 
