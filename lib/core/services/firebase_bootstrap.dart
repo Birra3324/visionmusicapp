@@ -70,12 +70,12 @@ class FirebaseBootstrap {
       // monitoring confirms legitimate production traffic is receiving valid
       // tokens. Debug providers keep simulator/development builds usable.
       await FirebaseAppCheck.instance.activate(
-        androidProvider: kReleaseMode
-            ? AndroidProvider.playIntegrity
-            : AndroidProvider.debug,
-        appleProvider: kReleaseMode
-            ? AppleProvider.appAttestWithDeviceCheckFallback
-            : AppleProvider.debug,
+        providerAndroid: kReleaseMode
+            ? const AndroidPlayIntegrityProvider()
+            : const AndroidDebugProvider(),
+        providerApple: kReleaseMode
+            ? const AppleAppAttestWithDeviceCheckFallbackProvider()
+            : const AppleDebugProvider(),
       );
 
       return FirebaseBootstrapResult(app: app, error: null, isConfigured: true);
