@@ -71,3 +71,5 @@ ios/Podfile.pre-cleanup-*
 ios/Podfile.lock.pre-cleanup-*
 ios/Podfile.lock.stale-icloud-*
 _recovered-from-apk/
+# Local timestamped safety copies
+*.bak-pre-*
