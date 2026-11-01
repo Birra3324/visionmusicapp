@@ -1,11 +1,12 @@
 name: visionmusicapp
-description: "A new Flutter project."
+description: "Vision Music: Flutter listener app for Oromo and Ethiopian music."
 publish_to: 'none'
 
 version: 1.0.0+3
 
 environment:
-  sdk: ^3.10.1
+  sdk: ^3.12.0
+  flutter: ">=3.44.0"
 
 dependencies:
   flutter:

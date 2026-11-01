@@ -1,6 +1,6 @@
 # Vision Music
 
-> Open to remote AI automation roles. Email: [birragemedi@gmail.com](mailto:birragemedi@gmail.com) | GitHub: [@Birra3324](https://github.com/Birra3324) | LinkedIn: [birra-gemedi](https://www.linkedin.com/in/birra-gemedi-813337199/)
+> Built by Birra Gemedi. Open to IT support, desktop support, and technician roles in the Portland area, and remote AI automation work. Email: [birragemedi@gmail.com](mailto:birragemedi@gmail.com) | GitHub: [@Birra3324](https://github.com/Birra3324) | LinkedIn: [birra-gemedi](https://www.linkedin.com/in/birra-gemedi-813337199/)
 
 Cross-platform listener for Vision Entertainment. One Flutter codebase targets iOS, Android, macOS, and Web. Listeners browse Oromo music, play tracks with a persistent mini-player, save favorites on the device, and search the bundled catalog.
 
@@ -11,6 +11,15 @@ Live site: [www.visionmusic.et](https://www.visionmusic.et)
 **Status (Days 26–27):** [public-docs checklist](docs/status.md).
 
 This repository is the listener client. Catalog publishing, transcoding, and the admin studio stay in private projects and are not documented here.
+
+
+## Screenshots
+
+Captured 2026-11-01 from `flutter build web`, guest mode, bundled catalog.
+
+| Login | Home | Now Playing | Library | Search |
+|---|---|---|---|---|
+| ![Login](docs/screenshots/01_login.png) | ![Home](docs/screenshots/02_home.png) | ![Now Playing](docs/screenshots/03_player.png) | ![Library](docs/screenshots/04_library.png) | ![Search](docs/screenshots/05_search.png) |
 
 ## What it does
 
@@ -53,7 +62,7 @@ flowchart LR
 
 ## Run locally
 
-Flutter stable with Dart 3.10 or newer (`environment.sdk` in `pubspec.yaml`).
+Flutter 3.44 or newer with Dart 3.12 or newer (`environment` in `pubspec.yaml`). Verified on 2026-11-01 with Flutter 3.47.9: `flutter analyze` clean of warnings, 71 tests passing, `flutter build web` succeeds.
 
 ```bash
 git clone https://github.com/Birra3324/visionmusicapp.git
