@@ -12,7 +12,28 @@
           "package_name": "com.visionmusic.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "190873708714-7s0biki22for4q0m4aj6t7ce3ucf23e0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.visionmusic.app",
+            "certificate_hash": "97b197fa2ff39011d6d17902737e45fc3bd3d12a"
+          }
+        },
+        {
+          "client_id": "190873708714-gp1e1dol6bnkfpd27gon1agbagu6mgt9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.visionmusic.app",
+            "certificate_hash": "c570a283369a6430b464db69bbd4b1a716a932cf"
+          }
+        },
+        {
+          "client_id": "190873708714-po2arho0n9bghdn2k91n05qd2r55vscf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBKkEKhXtW95s5ys5EyR8JqaCXYLQ_JpeE"
@@ -20,7 +41,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "190873708714-po2arho0n9bghdn2k91n05qd2r55vscf.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "190873708714-l5c8lov4ov4p2bo8u5bj4kageq9fvvs9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.visionmusic.app"
+              }
+            }
+          ]
         }
       }
     }
