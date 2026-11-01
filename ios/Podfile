@@ -18,7 +18,7 @@
 # If a pod genuinely needs a patch after a clean install, add it here with a
 # comment explaining which build error it fixes — never as a blanket rule.
 
-platform :ios, '14.0'
+platform :ios, '15.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -62,7 +62,7 @@ post_install do |installer|
     target.build_configurations.each do |config|
       # Match the project's deployment target. Several pods default lower and
       # emit warnings otherwise.
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
     end
   end
 end
