@@ -1,68 +1,50 @@
 # Vision Music
 
-> Built by Birra Gemedi. Open to IT support, desktop support, and technician roles in the Portland area, and remote AI automation work. Email: [birragemedi@gmail.com](mailto:birragemedi@gmail.com) | GitHub: [@Birra3324](https://github.com/Birra3324) | LinkedIn: [birra-gemedi](https://www.linkedin.com/in/birra-gemedi-813337199/)
+[![CI](https://github.com/Birra3324/visionmusicapp/actions/workflows/ci.yml/badge.svg)](https://github.com/Birra3324/visionmusicapp/actions/workflows/ci.yml)
 
-Cross-platform listener for Vision Entertainment. One Flutter codebase targets iOS, Android, macOS, and Web. Listeners browse Oromo music, play tracks with a persistent mini-player, save favorites on the device, and search the bundled catalog.
+Vision Music is a Flutter/Dart music streaming app for iOS, Android, macOS, and Web. It plays audio with `just_audio` and `audio_service`, and it includes playlists, search, guest access, and Google sign-in.
 
-Live site: [www.visionmusic.et](https://www.visionmusic.et)
+It is live at [https://www.visionmusic.et](https://www.visionmusic.et). The app was built under [Vision Entertainment LLC](https://vision-ent.com/), which ended mid-2026.
 
-**How to demo:** [10–15 minute walkthrough](docs/demo.md) — clone, `flutter run` or Chrome, Continue as Guest, play a track, open Library, search. Screenshots: [docs/screenshots](docs/screenshots/README.md).
+## Features
 
-**Status (Days 26–27):** [public-docs checklist](docs/status.md).
+- Playback with `just_audio` and background controls through `audio_service`, plus a persistent mini-player and a now-playing screen
+- Home, Watch, Library, Search, and Profile
+- Playlists, favorites, and recently played, stored on the device
+- Search by song, artist, or album
+- Continue as a guest, or sign in with Google
+- A bundled catalog so the app plays music on a local run while `AppConfig.useFirebaseCatalog` is off
+- An optional Cloud Firestore catalog when that flag is turned on
+- English, Afaan Oromo, Amharic, Arabic, French, and Spanish
 
-This repository is the listener client. Catalog publishing, transcoding, and the admin studio stay in private projects and are not documented here.
-
+On the login screen, **Continue as Guest** opens the app without a Firebase session. Favorites and recent listening stay on the device.
 
 ## Screenshots
 
-Captured 2026-11-01 from `flutter build web`, guest mode, bundled catalog.
+Captured from a web build in guest mode, using the bundled catalog.
 
 | Login | Home | Now Playing | Library | Search |
 |---|---|---|---|---|
 | ![Login](docs/screenshots/01_login.png) | ![Home](docs/screenshots/02_home.png) | ![Now Playing](docs/screenshots/03_player.png) | ![Library](docs/screenshots/04_library.png) | ![Search](docs/screenshots/05_search.png) |
 
-## What it does
-
-- Audio playback with background controls, a persistent mini-player, playlists, favorites, and search
-- Guest mode, plus Google Sign-In when Firebase is ready
-- Home, Library, Search, and Profile (a Watch tab is also in the shell)
-- Bundled 8-track catalog so the app runs without a Firebase login
-- Optional Firestore catalog behind `AppConfig.useFirebaseCatalog` (off in this tree)
-- Localization: English, Afaan Oromo, Amharic, Arabic, French, and Spanish
-
-Android application id: `com.visionmusic.app`. A public store listing is not part of this repo. The marketing site is the public URL.
-
-## Stack
+## Tech stack
 
 | Layer | Tech |
 | --- | --- |
-| Client | Flutter / Dart (`just_audio`, `audio_service`, Provider) |
-| Auth | Firebase Auth, Google Sign-In; guest entry needs neither |
+| App | Flutter / Dart (`sdk: ^3.12.0`, Flutter `>=3.44.0`) |
+| Playback | `just_audio`, `audio_service`, `audio_session` |
+| State | Provider |
+| Auth | Firebase Auth and Google Sign-In; guest entry needs neither |
 | Data | Bundled assets by default; Cloud Firestore and Firebase Storage when the catalog flag is on |
+| Local storage | `shared_preferences` |
+| UI copy | `flutter_localizations` and `intl` |
 | Platforms | iOS, Android, macOS, Web |
 
-Client config in `lib/firebase_options.dart`, `android/app/google-services.json`, and `GoogleService-Info.plist` is standard FlutterFire public client config. Those keys are restricted client identifiers. Signing keystores and service-account JSON stay out of git.
-
-## Architecture
-
-The diagram is the listener only. Admin publishing and backend jobs are outside this repository.
-
-```mermaid
-flowchart LR
-  Guest["Continue as Guest"] --> App["Flutter listener"]
-  Google["Google Sign-In\nwhen Firebase is ready"] --> App
-  App --> Shell["Home / Library / Search / Profile"]
-  Shell --> Player["just_audio + audio_service"]
-  Shell --> Local["Bundled catalog\nlib/mock_songs.dart"]
-  Shell -.-> Remote["Firestore + Storage\nonly if useFirebaseCatalog"]
-  Site["visionmusic.et"] -.-> App
-```
-
-`AppConfig.useFirebaseCatalog` is `false`, so a local run uses the tracks in `assets/audio/`. Favorites and recent plays are stored on the device with `shared_preferences`.
+The FlutterFire client files already in the tree (`lib/firebase_options.dart`, `android/app/google-services.json`, and `GoogleService-Info.plist`) are the public client config. Signing keystores and service-account JSON stay out of git.
 
 ## Run locally
 
-Flutter 3.44 or newer with Dart 3.12 or newer (`environment` in `pubspec.yaml`). Verified on 2026-11-01 with Flutter 3.47.9: `flutter analyze` clean of warnings, 71 tests passing, `flutter build web` succeeds.
+Use Flutter 3.44 or newer and a Dart SDK that satisfies `^3.12.0` (`environment` in `pubspec.yaml`). Flutter 3.47.9 with Dart 3.13.7 meets that constraint.
 
 ```bash
 git clone https://github.com/Birra3324/visionmusicapp.git
@@ -71,41 +53,42 @@ flutter pub get
 flutter run -d chrome
 ```
 
-`flutter devices` lists phones, simulators, and desktop targets. `flutter run` with no `-d` picks one. On the login screen, choose **Continue as Guest**. The timed path is [docs/demo.md](docs/demo.md).
+`flutter devices` lists phones, simulators, and desktop targets. `flutter run` with no `-d` picks one. Choose **Continue as Guest** on the login screen.
 
-## Repo layout
+## Tests
+
+From the repository root:
+
+```bash
+flutter pub get
+flutter analyze --no-fatal-infos
+flutter test
+```
+
+`flutter analyze` treats info-level lints as fatal by default. `--no-fatal-infos` still fails the command on warnings and errors. CI runs the same two checks on Ubuntu with the Flutter stable channel.
+
+## Project structure
 
 ```
 lib/
-  main.dart
-  app/main_shell.dart     # Home, Watch, Library, Search, Profile
-  features/               # auth, library, search, profile
-  audio/                  # background playback handler
-  core/services/          # catalog flag, Firebase bootstrap
-  mock_songs.dart         # bundled demo catalog
-assets/audio/             # tracks used by the local catalog
-docs/demo.md              # recruiter walkthrough
-docs/status.md            # Days 26–27 checklist
-docs/screenshots/         # how to capture UI shots
-docs/internal/            # historical notes, not a public runbook
-android/ ios/ macos/ web/
+  main.dart                  # bootstrap, catalog load, audio session
+  app/main_shell.dart        # Home, Watch, Library, Search, Profile
+  features/                  # auth, library, search, profile, video
+  audio/audio_handler.dart   # audio_service background handler
+  audio_manager.dart         # queue, favorites, recent plays
+  controllers/               # playlists
+  core/services/             # catalog flag, Firebase bootstrap, media sources
+  mock_songs.dart            # bundled catalog
+  l10n/                      # en, om, am, ar, fr, es
+assets/audio/                # tracks used by the local catalog
+assets/images/
+docs/screenshots/            # login, home, player, library, search
+test/
+android/  ios/  macos/  web/  linux/  windows/
 ```
 
-Analytics event names for the listener are in [docs/ANALYTICS_EVENT_SPEC.md](docs/ANALYTICS_EVENT_SPEC.md). Payloads use opaque track ids.
+Catalog audio and artwork belong to Vision Entertainment LLC.
 
-## Related public work
+## Author
 
-| Repo | What it is |
-| --- | --- |
-| [visionmusic-site](https://github.com/Birra3324/visionmusic-site) | Marketing site and privacy policy for [visionmusic.et](https://www.visionmusic.et) |
-| [ai-intake-demo](https://github.com/Birra3324/ai-intake-demo) | FastAPI intake validation, optional LLM, n8n routing |
-| [company-rag-assistant](https://github.com/Birra3324/company-rag-assistant) | Local knowledge assistant with hybrid retrieval |
-| [customer-operations-agent](https://github.com/Birra3324/customer-operations-agent) | Ticket triage agent, handoff page, n8n bridge |
-
-## Private boundary
-
-This tree is the public listener. Publishing, transcoding, admin roles, and service accounts are out of scope. Historical handoff prompts, audits, and setup notes are kept in [docs/internal](docs/internal/README.md) so the technical record stays available. They are not an operations guide, and they do not include credentials.
-
-## License
-
-Private media catalog and artwork belong to Vision Entertainment. Code in this repository is for portfolio review. Do not redistribute tracks or artwork.
+Birra Gemedi · [birragemedi@gmail.com](mailto:birragemedi@gmail.com) · [LinkedIn](https://www.linkedin.com/in/birra-gemedi-813337199/)
