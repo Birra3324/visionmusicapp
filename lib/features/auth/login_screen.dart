@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:visionmusicapp/app/main_shell.dart';
+import 'package:visionmusicapp/core/services/app_config.dart';
 import 'package:visionmusicapp/features/auth/auth_service.dart';
 import 'package:visionmusicapp/vision_theme.dart';
 import 'package:visionmusicapp/widgets/vision_background.dart';
@@ -99,6 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: TextStyle(color: kTextSoft, fontSize: 14),
                       ),
                       const SizedBox(height: 24),
+                      if (AppConfig.googleSignInEnabled) ...[
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
@@ -137,6 +139,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           textAlign: TextAlign.center,
                           style: TextStyle(color: kTextSoft, fontSize: 12),
                         ),
+                      ],
                       if (_error != null) ...[
                         const SizedBox(height: 12),
                         Text(
