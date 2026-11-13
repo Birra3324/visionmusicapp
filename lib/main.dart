@@ -73,7 +73,9 @@ class _AppBootstrapperState extends State<AppBootstrapper> {
     await session.configure(const AudioSessionConfiguration.music());
 
     _recognitionService = MusicRecognitionService(
-      repository: MusicRecognitionRepository(baseUrl: 'http://127.0.0.1:8081'),
+      repository: MusicRecognitionRepository(
+        baseUrl: AppConfig.recognitionBaseUrl,
+      ),
     );
   }
 

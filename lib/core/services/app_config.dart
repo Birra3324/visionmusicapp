@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 /// App-wide feature flags controlled at compile time.
 ///
 /// Flip [useFirebaseCatalog] to `true` once:
@@ -17,4 +19,22 @@ class AppConfig {
   /// If `true` and the remote catalog is empty (or Firebase isn't ready),
   /// fall back to `mockSongs` so the demo never shows a blank library.
   static const bool fallbackToLocalOnEmpty = true;
+
+  /// Base URL of the music-recognition service, supplied at build time with
+  /// `--dart-define=RECOGNITION_BASE_URL=https://...`. Empty by default: the
+  /// service is not deployed yet, and a hard-coded localhost URL can never
+  /// work on a listener's device.
+  static const String recognitionBaseUrl = String.fromEnvironment(
+    'RECOGNITION_BASE_URL',
+  );
+
+  /// The "identify a song" entry point is shown only when a real recognition
+  /// service URL was provided for this build.
+  static bool get recognitionEnabled => recognitionBaseUrl.isNotEmpty;
+
+  /// Google Sign-In is hidden on iOS until Sign in with Apple and in-app
+  /// account deletion ship (App Store guidelines 4.8 and 5.1.1(v)). iOS
+  /// listeners use guest mode, which already covers every listener feature.
+  static bool get googleSignInEnabled =>
+      kIsWeb || defaultTargetPlatform != TargetPlatform.iOS;
 }
