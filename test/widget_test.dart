@@ -145,6 +145,13 @@ void main() {
       expect(ids.toSet().length, ids.length, reason: 'duplicate video id');
     });
 
+    test('never exposes placeholder entries to listeners', () {
+      for (final v in mockVideos) {
+        expect(v.isPlayable, isTrue, reason: 'id=${v.id} url=${v.videoUrl}');
+        expect(v.videoUrl.contains('REPLACE_'), isFalse, reason: 'id=${v.id}');
+      }
+    });
+
     test('every entry has a title, artist and category', () {
       for (final v in mockVideos) {
         expect(v.title.trim(), isNotEmpty, reason: 'id=${v.id}');
