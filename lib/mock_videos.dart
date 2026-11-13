@@ -11,7 +11,7 @@ import 'package:visionmusicapp/models/video.dart';
 // Example: https://www.youtube.com/watch?v=REAL_VIDEO_ID
 // ─────────────────────────────────────────────────────────────────────────────
 
-final List<Video> mockVideos = [
+final List<Video> _seedVideos = [
   // ── Music Videos ──────────────────────────────────────────────────────────
   Video(
     id: 'mv_markato',
@@ -196,6 +196,16 @@ final List<Video> mockVideos = [
     tags: ['new', 'release', 'afro-pop', 'naaima'],
   ),
 ];
+
+/// The listener-visible seed catalog: only entries with a real video URL.
+///
+/// Seed entries whose URL is still a `REPLACE_` placeholder are kept in
+/// [_seedVideos] as a to-do list, but never shown. A row that looks like real
+/// content and answers "coming soon" when tapped is placeholder content, which
+/// App Review rejects under guideline 2.1 (App Completeness).
+final List<Video> mockVideos = List<Video>.unmodifiable(
+  _seedVideos.where((v) => v.isPlayable),
+);
 
 /// Featured videos — those with isFeatured = true
 List<Video> get featuredMockVideos =>
