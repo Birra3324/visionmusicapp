@@ -2,7 +2,7 @@ name: visionmusicapp
 description: "Vision Music: Flutter listener app for Oromo and Ethiopian music."
 publish_to: 'none'
 
-version: 1.0.1+7
+version: 1.0.1+8
 
 environment:
   sdk: ^3.12.0
