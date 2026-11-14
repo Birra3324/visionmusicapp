@@ -32,7 +32,20 @@ class PublicCatalogPolicy {
 
   static bool isRemoteMediaPath(String value) {
     final uri = Uri.tryParse(value);
-    return uri != null &&
-        (uri.scheme == 'https' || uri.scheme == 'http' || uri.scheme == 'gs');
+    if (uri == null || uri.host.isEmpty || uri.userInfo.isNotEmpty) {
+      return false;
+    }
+    if (uri.scheme == 'gs') return uri.path.length > 1;
+    if (uri.scheme != 'https' && uri.scheme != 'http') return false;
+    if (uri.host != 'firebasestorage.googleapis.com') return true;
+
+    final path = uri.pathSegments;
+    return path.length == 5 &&
+        path[0] == 'v0' &&
+        path[1] == 'b' &&
+        path[2].isNotEmpty &&
+        path[3] == 'o' &&
+        path[4].isNotEmpty &&
+        uri.queryParameters['alt'] == 'media';
   }
 }
