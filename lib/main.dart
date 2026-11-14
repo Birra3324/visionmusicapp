@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:visionmusicapp/audio/audio_handler.dart';
 import 'package:visionmusicapp/audio_manager.dart';
 import 'package:visionmusicapp/core/services/app_config.dart';
+import 'package:visionmusicapp/core/services/catalog_loader.dart';
 import 'package:visionmusicapp/core/services/app_observability.dart';
 import 'package:visionmusicapp/core/services/firebase_bootstrap.dart';
 import 'package:visionmusicapp/core/services/firestore_song_repository.dart';
@@ -79,19 +80,17 @@ class _AppBootstrapperState extends State<AppBootstrapper> {
     );
   }
 
-  Future<List<Song>> _loadCatalog() async {
-    final firebaseReady = _firebaseBootstrapResult?.isReady ?? false;
-    if (AppConfig.useFirebaseCatalog && firebaseReady) {
-      final SongRepository remote = FirestoreSongRepository();
-      final remoteTracks = await remote.fetchAll();
-      if (remoteTracks.isNotEmpty) return remoteTracks;
-      if (!AppConfig.fallbackToLocalOnEmpty) return remoteTracks;
-    }
-    // Default / fallback: bundled mock catalog.
-    const SongRepository local = LocalSongRepository();
-    final localTracks = await local.fetchAll();
-    return localTracks.isEmpty ? List<Song>.from(mockSongs) : localTracks;
-  }
+  Future<List<Song>> _loadCatalog() => loadCatalog<Song>(
+    useFirebase: AppConfig.useFirebaseCatalog,
+    firebaseReady: _firebaseBootstrapResult?.isReady ?? false,
+    allowLocalFallback: AppConfig.fallbackToLocalOnEmpty,
+    loadRemote: () => FirestoreSongRepository().fetchAll(),
+    loadLocal: () async {
+      const SongRepository local = LocalSongRepository();
+      final tracks = await local.fetchAll();
+      return tracks.isEmpty ? List<Song>.from(mockSongs) : tracks;
+    },
+  );
 
   @override
   Widget build(BuildContext context) {
