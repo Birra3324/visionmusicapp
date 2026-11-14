@@ -1,24 +1,17 @@
 import 'package:flutter/foundation.dart';
 
-/// App-wide feature flags controlled at compile time.
-///
-/// Flip [useFirebaseCatalog] to `true` once:
-///   1. Firebase is fully configured (`flutterfire configure` ran), and
-///   2. You've uploaded songs to the Firestore `songs` collection following
-///      the schema documented in `firestore_song_repository.dart`.
-///
-/// When `false`, the app reads the catalog from the bundled mock list in
-/// `lib/mock_songs.dart` — that's the default so the app always has data.
+/// Build configuration. Demo data is explicit; a live build never silently
+/// substitutes bundled songs when Firebase is unavailable or empty.
 class AppConfig {
-  /// Set to `true` to read the catalog from Firestore instead of the bundled
-  /// mock list. The Firestore repository falls back to an empty list if it
-  /// can't reach Firestore, so combine this with [fallbackToLocalOnEmpty] for
-  /// a safe rollout.
-  static const bool useFirebaseCatalog = false;
+  static const bool useFirebaseCatalog = bool.fromEnvironment(
+    'USE_FIREBASE_CATALOG',
+    defaultValue: false,
+  );
 
-  /// If `true` and the remote catalog is empty (or Firebase isn't ready),
-  /// fall back to `mockSongs` so the demo never shows a blank library.
-  static const bool fallbackToLocalOnEmpty = true;
+  static const bool fallbackToLocalOnEmpty = bool.fromEnvironment(
+    'FALLBACK_TO_LOCAL_CATALOG',
+    defaultValue: !useFirebaseCatalog,
+  );
 
   /// Base URL of the music-recognition service, supplied at build time with
   /// `--dart-define=RECOGNITION_BASE_URL=https://...`. Empty by default: the

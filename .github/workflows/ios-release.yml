@@ -1,7 +1,8 @@
-name: iOS release to TestFlight
+name: iOS validation and optional TestFlight upload
 
-# Builds the iOS app on a GitHub macOS runner, signs it with Apple cloud-managed
-# signing, and uploads it to App Store Connect / TestFlight.
+# Default: test and build an unsigned iOS app; no Apple secrets or upload.
+# Upload requires the explicit input and the app-store environment approval.
+# Configure required reviewers on app-store before approving a release.
 #
 # Run it by hand from the Actions tab (or `gh workflow run ios-release.yml`).
 #
@@ -15,6 +16,16 @@ name: iOS release to TestFlight
 on:
   workflow_dispatch:
     inputs:
+      upload_to_testflight:
+        description: Upload only after Birra has approved this release
+        type: boolean
+        default: false
+        required: true
+      use_firebase_catalog:
+        description: Use the published Firebase catalog instead of demo songs
+        type: boolean
+        default: true
+        required: true
       ref:
         description: Branch, tag or commit to build
         default: main
@@ -28,8 +39,29 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  validate:
+    name: Test and build without signing or uploading
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.4'
+          channel: stable
+          cache: true
+      - run: flutter pub get --enforce-lockfile
+      - run: flutter test --dart-define=USE_FIREBASE_CATALOG=${{ inputs.use_firebase_catalog }} --dart-define=FALLBACK_TO_LOCAL_CATALOG=false
+      - name: Unsigned iOS build
+        run: flutter build ios --release --no-codesign --dart-define=USE_FIREBASE_CATALOG=${{ inputs.use_firebase_catalog }} --dart-define=FALLBACK_TO_LOCAL_CATALOG=false
+
   testflight:
-    name: Build and upload
+    if: ${{ inputs.upload_to_testflight == true }}
+    needs: validate
+    environment: app-store
+    name: Approved TestFlight upload
     runs-on: macos-15
     timeout-minutes: 60
     env:
@@ -59,11 +91,15 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.44.4'
           channel: stable
           cache: true
 
       - name: Install dependencies
-        run: flutter pub get
+        run: flutter pub get --enforce-lockfile
+
+      - name: Install approved-release symbol tooling
+        run: dart pub global activate flutterfire_cli 1.5.0
 
       - name: Write App Store Connect API key
         env:
@@ -77,9 +113,13 @@ jobs:
       - name: Prepare iOS build (no signing)
         run: |
           flutter build ios --release --no-codesign \
-            --build-number="$((BUILD_NUMBER + 100))"
+            --build-number="$((BUILD_NUMBER + 100))" \
+            --dart-define=USE_FIREBASE_CATALOG=${{ inputs.use_firebase_catalog }} \
+            --dart-define=FALLBACK_TO_LOCAL_CATALOG=false
 
       - name: Archive
+        env:
+          VM_UPLOAD_CRASHLYTICS_SYMBOLS: "true"
         run: |
           xcodebuild archive \
             -workspace ios/Runner.xcworkspace \
