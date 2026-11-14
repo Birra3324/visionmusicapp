@@ -35,6 +35,23 @@ void main() {
       expect(result, endsWith('/256.aac'));
     });
 
+    test('skips a broken legacy Firebase URL for a playable rendition', () {
+      const playable =
+          'https://firebasestorage.googleapis.com/v0/b/visionmusic.firebasestorage.app'
+          '/o/public%2Frenditions%2Ftrack%2Faac256.m4a?alt=media';
+      final data = <String, dynamic>{
+        'status': 'published',
+        'approved': true,
+        'publishedAudioUrl':
+            'https://firebasestorage.googleapis.com/renditions/track/aac256.m4a',
+      };
+      expect(PublicCatalogPolicy.approvedAudioPath(data), isNull);
+      data['renditions'] = {
+        'aac256': {'url': playable, 'approved': true, 'public': true},
+      };
+      expect(PublicCatalogPolicy.approvedAudioPath(data), playable);
+    });
+
     test('rejects local paths and private renditions', () {
       expect(
         PublicCatalogPolicy.approvedAudioPath({
