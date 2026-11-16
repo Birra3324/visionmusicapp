@@ -15,7 +15,6 @@ import 'package:visionmusicapp/core/services/local_song_repository.dart';
 import 'package:visionmusicapp/core/services/song_repository.dart';
 import 'package:visionmusicapp/core/services/video_service.dart';
 import 'package:visionmusicapp/features/auth/login_screen.dart';
-import 'package:visionmusicapp/mock_songs.dart';
 import 'package:visionmusicapp/settings_manager.dart';
 import 'package:visionmusicapp/song.dart';
 import 'package:visionmusicapp/vision_theme.dart';
@@ -87,8 +86,7 @@ class _AppBootstrapperState extends State<AppBootstrapper> {
     loadRemote: () => FirestoreSongRepository().fetchAll(),
     loadLocal: () async {
       const SongRepository local = LocalSongRepository();
-      final tracks = await local.fetchAll();
-      return tracks.isEmpty ? List<Song>.from(mockSongs) : tracks;
+      return local.fetchAll();
     },
   );
 

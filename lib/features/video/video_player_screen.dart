@@ -172,9 +172,25 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   Future<void> _openYouTube() async {
     final uri = Uri.parse(widget.video.videoUrl);
-    if (await canLaunchUrl(uri)) {
+    var opened = false;
+    try {
+      opened = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+        webOnlyWindowName: '_blank',
+      );
+    } catch (_) {
+      // Failed external launches should offer a retry, not silently do nothing.
+    }
+    if (opened) {
+      await _pauseAudioIfPlaying();
       await AppObservability.instance.videoStarted(widget.video.id);
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Could not open YouTube. Please try again.'),
+        ),
+      );
     }
   }
 

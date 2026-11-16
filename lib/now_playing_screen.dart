@@ -10,6 +10,7 @@ import 'package:visionmusicapp/vision_theme.dart';
 import 'package:visionmusicapp/features/lyrics/lyrics_service.dart';
 import 'package:visionmusicapp/core/services/media_source_resolver.dart';
 import 'package:visionmusicapp/widgets/song_more_options_button.dart';
+import 'package:visionmusicapp/widgets/open_song_video.dart';
 import 'package:visionmusicapp/l10n/app_localizations.dart';
 
 class NowPlayingScreen extends StatefulWidget {
@@ -571,6 +572,29 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                                       ),
 
                                       const SizedBox(height: 20),
+
+                                      if (song.youtubeUrl != null)
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            bottom: 12,
+                                          ),
+                                          child: OutlinedButton.icon(
+                                            onPressed: () => openSongVideo(
+                                              context,
+                                              song,
+                                              widget.audioManager,
+                                            ),
+                                            icon: const Icon(
+                                              Icons.ondemand_video_rounded,
+                                            ),
+                                            label: const Text(
+                                              'Watch on YouTube',
+                                            ),
+                                            style: OutlinedButton.styleFrom(
+                                              minimumSize: const Size(48, 48),
+                                            ),
+                                          ),
+                                        ),
 
                                       // Secondary Actions
                                       Row(

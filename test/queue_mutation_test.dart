@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visionmusicapp/audio_manager.dart';
-import 'package:visionmusicapp/mock_songs.dart';
+import 'fixtures/sample_songs.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

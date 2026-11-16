@@ -8,6 +8,7 @@ import 'package:visionmusicapp/song.dart';
 import 'package:visionmusicapp/vision_theme.dart';
 import 'package:visionmusicapp/widgets/fade_route.dart';
 import 'package:visionmusicapp/widgets/vision_background.dart';
+import 'package:visionmusicapp/widgets/audio_catalog_empty_state.dart';
 import 'package:visionmusicapp/core/services/media_source_resolver.dart';
 
 class LibraryHubScreen extends StatelessWidget {
@@ -57,6 +58,16 @@ class LibraryHubScreen extends StatelessWidget {
             body: ListView(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 48),
               children: [
+                if (songs.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: AudioCatalogEmptyState(
+                      onWatch: () => Navigator.push(
+                        context,
+                        fadeRoute(const VideoHubScreen()),
+                      ),
+                    ),
+                  ),
                 _SectionCard(
                   title: 'Favorites',
                   subtitle: favorites.isEmpty

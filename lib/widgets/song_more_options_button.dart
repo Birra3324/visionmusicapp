@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'open_song_video.dart';
 import '../audio_manager.dart';
 import '../song.dart';
 import '../vision_theme.dart';
@@ -69,12 +69,7 @@ class SongMoreOptionsButton extends StatelessWidget {
             }
             break;
           case 'youtube':
-            if (song.youtubeUrl != null) {
-              final uri = Uri.parse(song.youtubeUrl!);
-              if (await canLaunchUrl(uri)) {
-                await launchUrl(uri, mode: LaunchMode.externalApplication);
-              }
-            }
+            await openSongVideo(context, song, audioManager);
             break;
         }
       },

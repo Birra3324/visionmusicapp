@@ -6,6 +6,15 @@ Most listeners are in Ethiopia, with additional listeners in the United States
 and Europe. Prioritize mobile data use, low operating costs, and a simple first
 release. Birra confirmed the channel https://www.youtube.com/@visionentertainment4507.
 
+## Catalog correction — November 15
+
+The owner confirmed that all previous audio/title/photo pairings were design
+samples. They are excluded from the listener catalog and release asset bundle.
+Watch has three independently verified official videos using YouTube artwork;
+Listen stays empty until the real masters from Telegram are saved and reviewed.
+The separate older-song collection is for future remastering. See
+[AUDIO_CATALOG.md](AUDIO_CATALOG.md) for intake folders and the import checklist.
+
 ## First release
 
 - Keep Listen for original or licensed audio tracks.

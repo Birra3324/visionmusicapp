@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:visionmusicapp/mock_songs.dart';
+import 'fixtures/sample_songs.dart';
 import 'package:visionmusicapp/song.dart';
 
 /// `Song` equality is load-bearing, not cosmetic.
@@ -62,7 +62,7 @@ void main() {
     });
   });
 
-  group('Bundled catalogue integrity', () {
+  group('Design sample fixture integrity', () {
     test('has songs', () {
       expect(mockSongs, isNotEmpty);
     });

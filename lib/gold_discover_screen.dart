@@ -7,6 +7,7 @@ import 'song.dart';
 import 'now_playing_screen.dart';
 import 'widgets/song_row.dart';
 import 'widgets/fade_route.dart';
+import 'widgets/audio_catalog_empty_state.dart';
 import 'core/services/media_source_resolver.dart';
 
 // Used to switch to the Watch tab from the home screen
@@ -28,7 +29,7 @@ class GoldDiscoverScreen extends StatefulWidget {
 
 class _GoldDiscoverScreenState extends State<GoldDiscoverScreen> {
   int _selectedTabIndex = 0;
-  static const List<String> _tabs = ['Recent', 'Popular', 'New', 'Trending'];
+  static const List<String> _tabs = ['Recent', 'All', 'Added', 'A–Z'];
 
   /// First name of the signed-in user, falling back to a neutral greeting
   /// rather than showing an empty space or a raw email address.
@@ -63,13 +64,11 @@ class _GoldDiscoverScreenState extends State<GoldDiscoverScreen> {
       case 0: // Recently Played — real history, newest first
         final recent = widget.audioManager.recentSongs;
         return recent.isEmpty ? all : recent;
-      case 1: // Popular — longest tracks stand in for play counts until we have them
-        final popular = [...all]
-          ..sort((a, b) => b.duration.compareTo(a.duration));
-        return popular;
+      case 1:
+        return all;
       case 2: // New Releases — reverse catalogue order, newest additions last
         return all.reversed.toList();
-      case 3: // Trending — alphabetical, a stable stand-in for real signals
+      case 3: // Alphabetical; never imply popularity without listening data.
       default:
         final trending = [...all]..sort((a, b) => a.title.compareTo(b.title));
         return trending;
@@ -183,23 +182,34 @@ class _GoldDiscoverScreenState extends State<GoldDiscoverScreen> {
               ),
             ),
 
-            // ── Trending horizontal scroll ─────────────────────────────────
-            SliverToBoxAdapter(
-              child: _TrendingSection(
-                audioManager: audioManager,
-                onSeeAll: () => widget.onSwitchTab?.call(2),
+            if (audioManager.tracks.isEmpty)
+              SliverPadding(
+                padding: const EdgeInsets.all(kSpaceM),
+                sliver: SliverToBoxAdapter(
+                  child: AudioCatalogEmptyState(
+                    onWatch: () => widget.onSwitchTab?.call(1),
+                  ),
+                ),
               ),
-            ),
+
+            if (audioManager.tracks.isNotEmpty)
+              SliverToBoxAdapter(
+                child: _TrendingSection(
+                  audioManager: audioManager,
+                  onSeeAll: () => widget.onSwitchTab?.call(2),
+                ),
+              ),
 
             // ── Pinned tab bar ─────────────────────────────────────────────
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: _TabsHeaderDelegate(
-                tabs: _tabs,
-                selectedIndex: _selectedTabIndex,
-                onTabSelected: (i) => setState(() => _selectedTabIndex = i),
+            if (audioManager.tracks.isNotEmpty)
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _TabsHeaderDelegate(
+                  tabs: _tabs,
+                  selectedIndex: _selectedTabIndex,
+                  onTabSelected: (i) => setState(() => _selectedTabIndex = i),
+                ),
               ),
-            ),
 
             // ── Song list ─────────────────────────────────────────────────
             SliverPadding(
@@ -458,7 +468,7 @@ class _TrendingSection extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Trending Now',
+                'Explore music',
                 style: kStyleHeadline.copyWith(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
