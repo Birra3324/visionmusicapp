@@ -50,7 +50,8 @@ class SongRow extends StatelessWidget {
     final artwork = MediaSourceResolver.artwork(song.imagePath);
     final heroTag = '${heroPrefix ?? ''}artwork-${song.id}';
 
-    return GestureDetector(
+    return InkWell(
+      borderRadius: BorderRadius.circular(kRadiusM),
       onTap: () => _onTap(context),
       child: Container(
         margin: const EdgeInsets.only(bottom: kSpaceXS),
@@ -161,8 +162,9 @@ class SongRow extends StatelessWidget {
                     ),
             ),
             IconButton(
+              tooltip: 'Play ${song.title}',
               iconSize: 26,
-              constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
               padding: EdgeInsets.zero,
               icon: const Icon(Icons.play_arrow_rounded, color: kGoldMid),
               onPressed: () => _onTap(context),

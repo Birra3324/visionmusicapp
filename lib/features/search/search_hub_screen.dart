@@ -218,19 +218,17 @@ class _SearchHubScreenState extends State<SearchHubScreen> {
             ),
           ),
           if (_query.isNotEmpty)
-            GestureDetector(
-              onTap: () {
+            IconButton(
+              tooltip: 'Clear search',
+              onPressed: () {
                 _controller.clear();
                 setState(() => _query = '');
               },
-              child: const Icon(
-                Icons.close_rounded,
-                color: kTextSoft,
-                size: 18,
-              ),
+              icon: const Icon(Icons.close_rounded, color: kTextSoft, size: 18),
             )
           else if (AppConfig.recognitionEnabled)
             IconButton(
+              tooltip: 'Identify a song',
               onPressed: () {
                 Navigator.push(
                   context,
@@ -238,7 +236,7 @@ class _SearchHubScreenState extends State<SearchHubScreen> {
                 );
               },
               icon: const Icon(Icons.mic_rounded, color: kVisionGold, size: 22),
-              constraints: const BoxConstraints(),
+              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
               padding: EdgeInsets.zero,
             ),
         ],

@@ -28,6 +28,7 @@ class SongMoreOptionsButton extends StatelessWidget {
     final isFavorite = audioManager.isFavorite(song);
 
     return PopupMenuButton<String>(
+      tooltip: 'More options for ${song.title}',
       iconSize: iconSize,
       constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
       padding: EdgeInsets.zero,

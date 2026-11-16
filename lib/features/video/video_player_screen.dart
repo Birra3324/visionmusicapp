@@ -230,6 +230,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
+            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
             icon: const Icon(Icons.arrow_back_rounded, color: kTextMain),
             onPressed: () => Navigator.pop(context),
           ),
@@ -480,25 +481,22 @@ class _YouTubeThumbnailArea extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              GestureDetector(
-                onTap: onTap,
-                child: Container(
-                  width: 72,
-                  height: 72,
-                  decoration: BoxDecoration(
-                    color: onTap != null
-                        ? kVisionGold.withValues(alpha: 0.92)
-                        : Colors.grey.withValues(alpha: 0.5),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.4),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
+              SizedBox(
+                width: 72,
+                height: 72,
+                child: IconButton.filled(
+                  onPressed: onTap,
+                  tooltip: comingSoon
+                      ? 'Coming soon'
+                      : video.isYouTube
+                      ? 'Open in YouTube'
+                      : 'Play video',
+                  style: IconButton.styleFrom(
+                    backgroundColor: kVisionGold.withValues(alpha: 0.92),
+                    disabledBackgroundColor: Colors.grey.withValues(alpha: 0.5),
+                    foregroundColor: Colors.black,
                   ),
-                  child: Icon(
+                  icon: Icon(
                     comingSoon
                         ? Icons.schedule_rounded
                         : video.isYouTube
@@ -573,7 +571,7 @@ class _RelatedVideoRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final thumb = video.displayThumbnail;
 
-    return GestureDetector(
+    return InkWell(
       onTap: () => Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => VideoPlayerScreen(video: video)),

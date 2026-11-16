@@ -131,9 +131,9 @@ class _ErrorView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Text(
-              error,
-              style: const TextStyle(color: kTextSoft, fontSize: 13),
+            const Text(
+              'Please check your connection and try again.',
+              style: TextStyle(color: kTextSoft, fontSize: 13),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -437,7 +437,7 @@ class _FeaturedCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final thumb = video.displayThumbnail;
 
-    return GestureDetector(
+    return InkWell(
       onTap: () => _openPlayer(context),
       child: Stack(
         fit: StackFit.expand,
@@ -463,10 +463,10 @@ class _FeaturedCard extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                stops: const [0.0, 0.45, 1.0],
+                stops: const [0.0, 0.30, 1.0],
                 colors: [
                   Colors.black.withValues(alpha: 0.15),
-                  Colors.transparent,
+                  Colors.black.withValues(alpha: 0.60),
                   Colors.black.withValues(alpha: 0.90),
                 ],
               ),
@@ -606,8 +606,9 @@ class _CategoryRow extends StatelessWidget {
                   ),
                 ),
               ),
-              GestureDetector(
-                onTap: () => Navigator.push(
+              TextButton(
+                style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+                onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) =>
@@ -669,7 +670,7 @@ class _VideoThumbCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final thumb = video.displayThumbnail;
 
-    return GestureDetector(
+    return InkWell(
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => VideoPlayerScreen(video: video)),

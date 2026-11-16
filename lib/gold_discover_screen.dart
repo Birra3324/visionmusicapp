@@ -109,7 +109,7 @@ class _GoldDiscoverScreenState extends State<GoldDiscoverScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  '${_greeting()}, ${_firstName()} 👋',
+                                  '${_greeting()}, ${_firstName()}',
                                   style: kStyleCaption,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -244,45 +244,58 @@ class _ListenWatchSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(kSpaceM, 0, kSpaceM, kSpaceXL),
-      child: Row(
-        children: [
-          // Listen card
-          Expanded(
-            child: _EntryCard(
-              icon: Icons.headphones_rounded,
-              label: 'Listen',
-              subtitle: 'Music',
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF2A1C09), Color(0xFF4A3310)],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final stackCards =
+              constraints.maxWidth < 448 ||
+              MediaQuery.textScalerOf(context).scale(16) > 20;
+          final cardWidth = stackCards
+              ? constraints.maxWidth
+              : (constraints.maxWidth - kSpaceS) / 2;
+          return Wrap(
+            spacing: kSpaceS,
+            runSpacing: kSpaceS,
+            children: [
+              // Listen card
+              SizedBox(
+                width: cardWidth,
+                child: _EntryCard(
+                  icon: Icons.headphones_rounded,
+                  label: 'Listen',
+                  subtitle: 'Music',
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF2A1C09), Color(0xFF4A3310)],
+                  ),
+                  accentColor: kVisionGold,
+                  // Goes to Library — the music destination. Previously null,
+                  // which left the card looking disabled and doing nothing.
+                  onTap: onListenTap,
+                ),
               ),
-              accentColor: kVisionGold,
-              // Goes to Library — the music destination. Previously null,
-              // which left the card looking disabled and doing nothing.
-              onTap: onListenTap,
-            ),
-          ),
-          const SizedBox(width: kSpaceS),
-          // Watch card
-          Expanded(
-            child: _EntryCard(
-              icon: Icons.play_circle_rounded,
-              label: 'Watch',
-              subtitle: 'Videos',
-              // Burgundy, not blue. Video is the other half of Vision Music,
-              // so it needs to sit in the same warm family as the gold rather
-              // than reading as a separate product.
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF2A0E10), kVisionRedDeep],
+              // Watch card
+              SizedBox(
+                width: cardWidth,
+                child: _EntryCard(
+                  icon: Icons.play_circle_rounded,
+                  label: 'Watch',
+                  subtitle: 'Videos',
+                  // Burgundy, not blue. Video is the other half of Vision Music,
+                  // so it needs to sit in the same warm family as the gold rather
+                  // than reading as a separate product.
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF2A0E10), kVisionRedDeep],
+                  ),
+                  accentColor: kVisionRedText,
+                  onTap: onWatchTap,
+                ),
               ),
-              accentColor: kVisionRed,
-              onTap: onWatchTap,
-            ),
-          ),
-        ],
+            ],
+          );
+        },
       ),
     );
   }
@@ -307,13 +320,14 @@ class _EntryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
+      borderRadius: BorderRadius.circular(kRadiusL),
       onTap: onTap,
       child: AnimatedOpacity(
         opacity: onTap == null ? 0.72 : 1.0,
         duration: const Duration(milliseconds: 200),
         child: Container(
-          height: 88,
+          constraints: const BoxConstraints(minHeight: 88),
           decoration: BoxDecoration(
             gradient: gradient,
             borderRadius: BorderRadius.circular(kRadiusL),
@@ -342,27 +356,30 @@ class _EntryCard extends StatelessWidget {
                 child: Icon(icon, color: accentColor, size: 24),
               ),
               const SizedBox(width: kSpaceS),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      color: accentColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.2,
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: TextStyle(
+                        color: accentColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.2,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(color: kTextSoft, fontSize: 12),
-                  ),
-                ],
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(color: kTextSoft, fontSize: 12),
+                    ),
+                  ],
+                ),
               ),
-              const Spacer(),
+              const SizedBox(width: 8),
               Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 14,
@@ -389,11 +406,10 @@ class _SearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
       child: Container(
-        height: 46,
+        constraints: const BoxConstraints(minHeight: 48),
         decoration: BoxDecoration(
           color: kCardBlack,
           borderRadius: BorderRadius.circular(kRadiusM),
@@ -448,21 +464,15 @@ class _TrendingSection extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              GestureDetector(
-                onTap: onSeeAll,
-                behavior: HitTestBehavior.opaque,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: kSpaceXXS,
-                    vertical: kSpaceXXS,
-                  ),
-                  child: Text(
-                    'See all',
-                    style: kStyleCaption.copyWith(
-                      color: kVisionGold,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
+              TextButton(
+                onPressed: onSeeAll,
+                style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+                child: Text(
+                  'See all',
+                  style: kStyleCaption.copyWith(
+                    color: kVisionGold,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
@@ -522,7 +532,7 @@ class _TrendingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final art = MediaSourceResolver.artwork(song.imagePath);
-    return GestureDetector(
+    return InkWell(
       onTap: () => _openNowPlaying(context),
       child: Container(
         width: width,
@@ -675,9 +685,8 @@ class _TabsHeaderDelegate extends SliverPersistentHeaderDelegate {
         child: Row(
           children: List.generate(tabs.length, (i) {
             final selected = i == selectedIndex;
-            return GestureDetector(
+            return InkWell(
               onTap: () => onTabSelected(i),
-              behavior: HitTestBehavior.opaque,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 180),
                 margin: const EdgeInsets.only(right: kSpaceXS),

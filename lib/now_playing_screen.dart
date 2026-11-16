@@ -10,6 +10,7 @@ import 'package:visionmusicapp/vision_theme.dart';
 import 'package:visionmusicapp/features/lyrics/lyrics_service.dart';
 import 'package:visionmusicapp/core/services/media_source_resolver.dart';
 import 'package:visionmusicapp/widgets/song_more_options_button.dart';
+import 'package:visionmusicapp/l10n/app_localizations.dart';
 
 class NowPlayingScreen extends StatefulWidget {
   final AudioManager audioManager;
@@ -192,16 +193,21 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                     children: [
                       const Icon(Icons.volume_mute_rounded, color: kTextSoft),
                       Expanded(
-                        child: Slider(
-                          min: 0,
-                          max: 1,
-                          value: currentVolume.clamp(0.0, 1.0),
-                          activeColor: kVisionGoldLight,
-                          inactiveColor: Colors.white24,
-                          onChanged: (v) {
-                            setModalState(() => currentVolume = v);
-                            widget.audioManager.setVolume(v);
-                          },
+                        child: Semantics(
+                          label: 'Volume',
+                          child: Slider(
+                            min: 0,
+                            max: 1,
+                            value: currentVolume.clamp(0.0, 1.0),
+                            activeColor: kVisionGoldLight,
+                            inactiveColor: Colors.white24,
+                            semanticFormatterCallback: (value) =>
+                                '${(value * 100).round()} percent',
+                            onChanged: (v) {
+                              setModalState(() => currentVolume = v);
+                              widget.audioManager.setVolume(v);
+                            },
+                          ),
                         ),
                       ),
                       const Icon(Icons.volume_up_rounded, color: kTextSoft),
@@ -225,6 +231,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return StreamBuilder<Song?>(
       stream: widget.audioManager.currentSongStream,
       initialData: widget.audioManager.currentSong,
@@ -296,6 +303,9 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                               child: Row(
                                 children: [
                                   IconButton(
+                                    tooltip: MaterialLocalizations.of(
+                                      context,
+                                    ).backButtonTooltip,
                                     icon: const Icon(
                                       Icons.arrow_back_ios_new_rounded,
                                       color: kTextMain,
@@ -502,6 +512,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                                             MainAxisAlignment.center,
                                         children: [
                                           IconButton(
+                                            tooltip: l10n.previous,
                                             icon: const Icon(
                                               Icons.skip_previous_rounded,
                                             ),
@@ -522,6 +533,10 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                                                 height: 72,
                                                 width: 72,
                                                 child: FloatingActionButton(
+                                                  tooltip:
+                                                      isPlayingSnap.data == true
+                                                      ? l10n.pause
+                                                      : l10n.play,
                                                   onPressed: () => widget
                                                       .audioManager
                                                       .togglePlayPause(),
@@ -543,6 +558,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                                           ),
                                           const SizedBox(width: 24),
                                           IconButton(
+                                            tooltip: l10n.next,
                                             icon: const Icon(
                                               Icons.skip_next_rounded,
                                             ),
@@ -562,6 +578,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                                             MainAxisAlignment.spaceEvenly,
                                         children: [
                                           IconButton(
+                                            tooltip: 'Volume',
                                             icon: const Icon(
                                               Icons.volume_down_rounded,
                                             ),
@@ -570,6 +587,8 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                                                 _showVolumeSheet(context),
                                           ),
                                           IconButton(
+                                            tooltip: l10n.shuffle,
+                                            isSelected: shuffleOn,
                                             icon: Icon(
                                               Icons.shuffle_rounded,
                                               color: shuffleOn
@@ -585,6 +604,9 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                                             iconSize: 26,
                                           ),
                                           IconButton(
+                                            tooltip: l10n.repeat,
+                                            isSelected:
+                                                loopMode != LoopMode.off,
                                             icon: Icon(
                                               repeatIcon,
                                               color: repeatColor,
@@ -593,6 +615,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                                                 .cycleRepeatMode(),
                                           ),
                                           IconButton(
+                                            tooltip: l10n.lyrics,
                                             icon: const Icon(
                                               Icons.lyrics_outlined,
                                             ),
@@ -637,39 +660,44 @@ class _StaticWaveSeekBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        void seek(Offset localPosition) {
-          if (!enabled || constraints.maxWidth <= 0) return;
-          final fraction = (localPosition.dx / constraints.maxWidth).clamp(
-            0.0,
-            1.0,
-          );
-          onSeekFraction(fraction);
-        }
-
-        return Semantics(
-          label: 'Playback position',
-          value: '${(progress * 100).round()} percent',
-          slider: true,
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTapDown: (details) => seek(details.localPosition),
-            onHorizontalDragUpdate: (details) => seek(details.localPosition),
-            child: SizedBox(
-              height: 24,
-              width: double.infinity,
-              child: CustomPaint(
-                painter: _StaticWavePainter(
-                  progress: progress,
-                  seed: seed,
-                  enabled: enabled,
+    return Semantics(
+      label: 'Playback position',
+      child: SizedBox(
+        height: 48,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Positioned.fill(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: CustomPaint(
+                  painter: _StaticWavePainter(
+                    progress: progress,
+                    seed: seed,
+                    enabled: enabled,
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      },
+            // Keep the waveform decoration while using Flutter's slider for
+            // keyboard, touch and screen-reader adjustment of the same value.
+            SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                activeTrackColor: Colors.transparent,
+                inactiveTrackColor: Colors.transparent,
+                disabledActiveTrackColor: Colors.transparent,
+                disabledInactiveTrackColor: Colors.transparent,
+              ),
+              child: Slider(
+                value: progress.clamp(0.0, 1.0),
+                onChanged: enabled ? onSeekFraction : null,
+                semanticFormatterCallback: (value) =>
+                    '${(value * 100).round()} percent',
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

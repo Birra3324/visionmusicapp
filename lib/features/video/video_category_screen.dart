@@ -34,6 +34,7 @@ class VideoCategoryScreen extends StatelessWidget {
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
+            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
             icon: const Icon(Icons.arrow_back_rounded, color: kTextMain),
             onPressed: () => Navigator.pop(context),
           ),
@@ -41,12 +42,16 @@ class VideoCategoryScreen extends StatelessWidget {
             children: [
               Icon(category.icon, color: kVisionGoldLight, size: 20),
               const SizedBox(width: 8),
-              Text(
-                category.name,
-                style: const TextStyle(
-                  color: kTextMain,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
+              Expanded(
+                child: Text(
+                  category.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: kTextMain,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],
@@ -111,7 +116,7 @@ class _GridCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final thumb = video.displayThumbnail;
 
-    return GestureDetector(
+    return InkWell(
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => VideoPlayerScreen(video: video)),
