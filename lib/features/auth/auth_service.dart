@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:visionmusicapp/core/services/firebase_bootstrap.dart';
@@ -8,7 +9,8 @@ class AuthService {
 
   static final AuthService instance = AuthService._();
 
-  bool get isFirebaseReady => !FirebaseBootstrap.hasPlaceholderConfig;
+  bool get isFirebaseReady =>
+      Firebase.apps.isNotEmpty && !FirebaseBootstrap.hasPlaceholderConfig;
 
   Stream<User?> authStateChanges() {
     if (!isFirebaseReady) {

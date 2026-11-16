@@ -3,6 +3,8 @@ import 'package:visionmusicapp/audio_manager.dart';
 import 'package:visionmusicapp/controllers/playlist_controller.dart';
 import 'package:visionmusicapp/playlist_detail_screen.dart';
 import 'package:visionmusicapp/vision_theme.dart';
+import 'widgets/playlist_name_dialog.dart';
+import 'models/playlist.dart';
 
 class PlaylistsScreen extends StatefulWidget {
   final AudioManager audioManager;
@@ -23,46 +25,49 @@ class _PlaylistsScreenState extends State<PlaylistsScreen> {
     _controller.load();
   }
 
-  void _createNewPlaylist() async {
-    final name = await showDialog<String>(
-      context: context,
-      builder: (context) {
-        final controller = TextEditingController();
-        return AlertDialog(
-          backgroundColor: kDarkCard,
-          title: const Text('New Playlist', style: TextStyle(color: kTextMain)),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            style: const TextStyle(color: kTextMain),
-            decoration: const InputDecoration(
-              hintText: 'Playlist Name',
-              hintStyle: TextStyle(color: kTextSoft),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: kTextSoft),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: kVisionGold),
-              ),
-            ),
+  Future<void> _createNewPlaylist() async {
+    final name = await showPlaylistNameDialog(context);
+    if (!mounted || name == null) return;
+    await _controller.createPlaylist(name);
+  }
+
+  Future<void> _managePlaylist(Playlist playlist, String action) async {
+    if (action == 'rename') {
+      final name = await showPlaylistNameDialog(
+        context,
+        initialName: playlist.name,
+      );
+      if (!mounted || name == null) return;
+      await _controller.renamePlaylist(playlist.id, name);
+    } else if (action == 'delete') {
+      final remove = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('Delete playlist?'),
+          content: Text(
+            'Delete "${playlist.name}"? The songs will stay in your catalog.',
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel', style: TextStyle(color: kTextSoft)),
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () => Navigator.pop(context, controller.text),
-              child: const Text('Create', style: TextStyle(color: kVisionGold)),
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text('Delete'),
             ),
           ],
-        );
-      },
-    );
-
-    if (name != null && name.isNotEmpty) {
-      await _controller.createPlaylist(name);
+        ),
+      );
+      if (!mounted || remove != true) return;
+      await _controller.deletePlaylist(playlist.id);
     }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -74,11 +79,13 @@ class _PlaylistsScreenState extends State<PlaylistsScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: kTextMain),
           onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
           IconButton(
+            tooltip: 'Create playlist',
             icon: const Icon(Icons.add, color: kVisionGold),
             onPressed: _createNewPlaylist,
           ),
@@ -138,8 +145,16 @@ class _PlaylistsScreenState extends State<PlaylistsScreen> {
                   '${_controller.songsForPlaylist(playlist).length} songs',
                   style: const TextStyle(color: kTextSoft),
                 ),
-                onTap: () {
-                  Navigator.push(
+                trailing: PopupMenuButton<String>(
+                  tooltip: 'Manage ${playlist.name}',
+                  onSelected: (action) => _managePlaylist(playlist, action),
+                  itemBuilder: (_) => const [
+                    PopupMenuItem(value: 'rename', child: Text('Rename')),
+                    PopupMenuItem(value: 'delete', child: Text('Delete')),
+                  ],
+                ),
+                onTap: () async {
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => PlaylistDetailScreen(
@@ -148,6 +163,7 @@ class _PlaylistsScreenState extends State<PlaylistsScreen> {
                       ),
                     ),
                   );
+                  if (mounted) await _controller.load();
                 },
               );
             },

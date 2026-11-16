@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visionmusicapp/audio_manager.dart';
+import 'package:visionmusicapp/song.dart';
 import 'fixtures/sample_songs.dart';
 
 void main() {
@@ -36,4 +37,42 @@ void main() {
     expect(manager.currentSong, isNull);
     manager.dispose();
   });
+  test(
+    'queue edits never remove songs from search, library or favorites',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      final manager = AudioManager(initialTracks: mockSongs);
+      addTearDown(manager.dispose);
+      await manager.initializePersistentState();
+      final song = mockSongs.first;
+      manager.toggleFavorite(song);
+      manager.toggleSave(song);
+      manager.removeFromQueue(song);
+      expect(manager.queue, isNot(contains(song)));
+      expect(manager.tracks, contains(song));
+      expect(manager.favoriteSongs, contains(song));
+      expect(manager.library, contains(song));
+      await manager.setQueue([mockSongs.last]);
+      expect(manager.tracks, mockSongs);
+      expect(manager.queue, [mockSongs.last]);
+    },
+  );
+
+  test(
+    'failed audio load leaves no false current song and keeps the catalog',
+    () async {
+      const broken = Song(
+        id: 'unavailable',
+        title: 'Unavailable',
+        artist: 'Test',
+        filePath: '',
+      );
+      final manager = AudioManager(initialTracks: [broken]);
+      addTearDown(manager.dispose);
+      await expectLater(manager.playAtIndex(0), throwsArgumentError);
+      expect(manager.currentSong, isNull);
+      expect(manager.playbackError, contains('could not be played'));
+      expect(manager.tracks, [broken]);
+    },
+  );
 }

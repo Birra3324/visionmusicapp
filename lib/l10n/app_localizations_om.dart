@@ -18,10 +18,10 @@ class AppLocalizationsOm extends AppLocalizations {
   String get search => 'Barbaadi';
 
   @override
-  String get play => 'Walalee';
+  String get play => 'Taphachiisi';
 
   @override
-  String get pause => 'Jidha';
+  String get pause => 'Afuurfannoo';
 
   @override
   String get next => 'Itti aanu';
@@ -30,7 +30,7 @@ class AppLocalizationsOm extends AppLocalizations {
   String get previous => 'Dura';
 
   @override
-  String get shuffle => 'Barsiiso';
+  String get shuffle => 'Tartiiba tasaa';
 
   @override
   String get repeat => 'Irra deddeebsi';

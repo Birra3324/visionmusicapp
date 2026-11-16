@@ -110,7 +110,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get autoplay => 'Autoplay';
 
   @override
-  String get autoplayDescription => 'Automatically play the next related track';
+  String get autoplayDescription =>
+      'Automatically play the next track in the queue';
 
   @override
   String get shuffleDescription => 'Play songs in random order';

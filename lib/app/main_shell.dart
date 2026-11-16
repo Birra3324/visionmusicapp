@@ -20,12 +20,26 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
+  String? _shownPlaybackError;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final audioManager = context.watch<AudioManager>();
     final settings = context.watch<SettingsManager>();
+    final playbackError = audioManager.playbackError;
+    if (playbackError != _shownPlaybackError) {
+      _shownPlaybackError = playbackError;
+      if (playbackError != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(playbackError)));
+          }
+        });
+      }
+    }
     // Hide mini player while on the Watch tab (index 1) to avoid audio/video confusion
     final bool showMiniPlayer =
         audioManager.currentSong != null && _currentIndex != 1;

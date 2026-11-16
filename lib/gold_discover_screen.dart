@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:visionmusicapp/features/auth/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:visionmusicapp/widgets/vision_background.dart';
 import 'vision_theme.dart';
@@ -34,7 +35,9 @@ class _GoldDiscoverScreenState extends State<GoldDiscoverScreen> {
   /// First name of the signed-in user, falling back to a neutral greeting
   /// rather than showing an empty space or a raw email address.
   String _firstName() {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = AuthService.instance.isFirebaseReady
+        ? FirebaseAuth.instance.currentUser
+        : null;
     final display = user?.displayName?.trim();
     if (display != null && display.isNotEmpty) return display.split(' ').first;
     final email = user?.email;

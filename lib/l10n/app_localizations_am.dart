@@ -18,10 +18,10 @@ class AppLocalizationsAm extends AppLocalizations {
   String get search => 'ፈልግ';
 
   @override
-  String get play => 'ጫወት';
+  String get play => 'አጫውት';
 
   @override
-  String get pause => 'ጠንቀቅ';
+  String get pause => 'ፋታ';
 
   @override
   String get next => 'ሚቀጥለው';
@@ -30,7 +30,7 @@ class AppLocalizationsAm extends AppLocalizations {
   String get previous => 'ወደ ኋላ';
 
   @override
-  String get shuffle => 'ዘርጋ';
+  String get shuffle => 'በዘፈቀደ';
 
   @override
   String get repeat => 'ድገም';

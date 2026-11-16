@@ -2,7 +2,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:visionmusicapp/l10n/app_localizations.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:visionmusicapp/l10n/localization_delegates.dart';
 import 'package:provider/provider.dart';
 import 'package:visionmusicapp/audio/audio_handler.dart';
 import 'package:visionmusicapp/audio_manager.dart';
@@ -159,20 +159,8 @@ class VisionMusicApp extends StatelessWidget {
       themeMode: ThemeMode.dark,
       locale: settingsManager.locale,
       // Localization support
-      localizationsDelegates: [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('en'), // English
-        Locale('om'), // Afaan Oromo
-        Locale('am'), // Amharic
-        Locale('ar'), // Arabic
-        Locale('fr'), // French
-        Locale('es'), // Spanish
-      ],
+      localizationsDelegates: visionLocalizationDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       builder: (context, child) {
         // Ensure RTL is applied for Arabic
         return Directionality(

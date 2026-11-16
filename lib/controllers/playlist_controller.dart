@@ -9,6 +9,19 @@ import '../song.dart';
 
 class PlaylistController extends ChangeNotifier {
   static const _prefsKey = 'vision_playlists_v1';
+  static int _nextId = 0;
+  static Future<void>? _pendingWrite;
+  bool _disposed = false;
+
+  void _notifyIfActive() {
+    if (!_disposed) notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
 
   final AudioManager audioManager;
 
@@ -17,7 +30,7 @@ class PlaylistController extends ChangeNotifier {
 
   PlaylistController({required this.audioManager});
 
-  Future<void> load() async {
+  Future<void> load({bool notify = true}) async {
     final prefs = await SharedPreferences.getInstance();
     final jsonString = prefs.getString(_prefsKey);
 
@@ -34,12 +47,35 @@ class PlaylistController extends ChangeNotifier {
         // kept so a future migration can attempt recovery rather than
         // discarding it.
         debugPrint('Playlist store unreadable, starting empty: $e');
-        debugPrint('Corrupt payload was: $jsonString');
         _playlists = [];
       }
     }
 
-    notifyListeners();
+    if (notify) _notifyIfActive();
+  }
+
+  // Dialogs and open playlist screens can hold separate controllers. Serialize
+  // read-modify-write operations and refresh before each edit, so stale screens
+  // cannot overwrite a song added elsewhere. A failed write must not block later edits.
+  Future<T> _edit<T>(T Function() change) {
+    late final Future<void> completion;
+    final operation = (_pendingWrite ?? Future<void>.value()).then((_) async {
+      try {
+        await load(notify: false);
+        final result = change();
+        await _save();
+        _notifyIfActive();
+        return result;
+      } finally {
+        if (identical(_pendingWrite, completion)) _pendingWrite = null;
+      }
+    });
+    completion = operation.then<void>(
+      (_) {},
+      onError: (Object _, StackTrace _) {},
+    );
+    _pendingWrite = completion;
+    return operation;
   }
 
   Future<void> _save() async {
@@ -48,50 +84,55 @@ class PlaylistController extends ChangeNotifier {
     await prefs.setString(_prefsKey, jsonEncode(list));
   }
 
-  Future<void> createPlaylist(String name) async {
-    final id = DateTime.now().millisecondsSinceEpoch.toString();
-    final playlist = Playlist(id: id, name: name, trackIds: []);
-    _playlists = [..._playlists, playlist];
-    await _save();
-    notifyListeners();
+  Future<Playlist> createPlaylist(String name) async {
+    final cleanName = name.trim();
+    if (cleanName.isEmpty) throw ArgumentError('Playlist name cannot be empty');
+    return _edit(() {
+      final id = '${DateTime.now().microsecondsSinceEpoch}-${_nextId++}';
+      final playlist = Playlist(id: id, name: cleanName, trackIds: []);
+      _playlists = [..._playlists, playlist];
+      return playlist;
+    });
   }
 
   Future<void> renamePlaylist(String id, String newName) async {
-    _playlists = _playlists
-        .map((p) => p.id == id ? p.copyWith(name: newName) : p)
-        .toList();
-    await _save();
-    notifyListeners();
+    final cleanName = newName.trim();
+    if (cleanName.isEmpty) throw ArgumentError('Playlist name cannot be empty');
+    await _edit(() {
+      _playlists = _playlists
+          .map((p) => p.id == id ? p.copyWith(name: cleanName) : p)
+          .toList();
+    });
   }
 
-  Future<void> deletePlaylist(String id) async {
+  Future<void> deletePlaylist(String id) => _edit(() {
     _playlists = _playlists.where((p) => p.id != id).toList();
-    await _save();
-    notifyListeners();
-  }
+  });
 
   Future<void> addSongToPlaylist(Playlist playlist, Song song) async {
     if (!audioManager.tracks.any((track) => track.id == song.id)) return;
-    final current = _playlists.firstWhere(
-      (p) => p.id == playlist.id,
-      orElse: () => playlist,
-    );
-    final updatedIds = List<String>.from(current.trackIds)..add(song.id);
-    _updatePlaylist(current.copyWith(trackIds: updatedIds));
-    await _save();
-    notifyListeners();
+    await _edit(() {
+      final index = _playlists.indexWhere((p) => p.id == playlist.id);
+      if (index == -1) return;
+      final current = _playlists[index];
+      if (current.trackIds.contains(song.id)) return;
+      _updatePlaylist(
+        current.copyWith(trackIds: [...current.trackIds, song.id]),
+      );
+    });
   }
 
-  Future<void> removeSongFromPlaylist(Playlist playlist, String songId) async {
-    final current = _playlists.firstWhere(
-      (p) => p.id == playlist.id,
-      orElse: () => playlist,
-    );
-    final updatedIds = List<String>.from(current.trackIds)..remove(songId);
-    _updatePlaylist(current.copyWith(trackIds: updatedIds));
-    await _save();
-    notifyListeners();
-  }
+  Future<void> removeSongFromPlaylist(Playlist playlist, String songId) =>
+      _edit(() {
+        final index = _playlists.indexWhere((p) => p.id == playlist.id);
+        if (index == -1) return;
+        final current = _playlists[index];
+        _updatePlaylist(
+          current.copyWith(
+            trackIds: current.trackIds.where((id) => id != songId).toList(),
+          ),
+        );
+      });
 
   void _updatePlaylist(Playlist updated) {
     _playlists = _playlists

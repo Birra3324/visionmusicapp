@@ -300,7 +300,7 @@ class _QueueSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tracks = audioManager.tracks;
+    final tracks = audioManager.queue;
     final current = audioManager.currentSong;
 
     return SafeArea(
@@ -365,9 +365,11 @@ class _QueueSheet extends StatelessWidget {
                             size: 20,
                           )
                         : null,
-                    onTap: () {
+                    onTap: () async {
                       Navigator.of(context).pop();
-                      audioManager.playSong(song);
+                      try {
+                        await audioManager.playSong(song);
+                      } catch (_) {}
                     },
                   );
                 },

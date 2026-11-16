@@ -21,7 +21,10 @@ class VideoCategoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenW = MediaQuery.of(context).size.width;
-    final crossAxisCount = screenW > 900
+    final largeText = MediaQuery.textScalerOf(context).scale(14) > 21;
+    final crossAxisCount = screenW < 400 || largeText
+        ? 1
+        : screenW > 900
         ? 4
         : screenW > 600
         ? 3
@@ -222,7 +225,7 @@ class _GridCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: FontWeight.w700,
                         height: 1.2,
                       ),
@@ -232,10 +235,7 @@ class _GridCard extends StatelessWidget {
                       video.artistName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 10,
-                      ),
+                      style: const TextStyle(color: kTextSoft, fontSize: 12),
                     ),
                   ],
                 ),

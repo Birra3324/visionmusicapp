@@ -33,7 +33,7 @@
   "profile": "Profile",
   "playback": "Playback",
   "autoplay": "Autoplay",
-  "autoplayDescription": "Automatically play the next related track",
+  "autoplayDescription": "Automatically play the next track in the queue",
   "shuffleDescription": "Play songs in random order",
   "repeatDescription": "Repeat the current queue",
   "searchDescription": "Find songs, artists, and albums in the Vision Music catalog.",

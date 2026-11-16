@@ -307,7 +307,7 @@ abstract class AppLocalizations {
   /// No description provided for @autoplayDescription.
   ///
   /// In en, this message translates to:
-  /// **'Automatically play the next related track'**
+  /// **'Automatically play the next track in the queue'**
   String get autoplayDescription;
 
   /// No description provided for @shuffleDescription.

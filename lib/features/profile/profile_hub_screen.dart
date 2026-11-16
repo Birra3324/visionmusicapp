@@ -110,14 +110,15 @@ class ProfileHubScreen extends StatelessWidget {
       'es': 'Español',
     };
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           l10n.language,
           style: const TextStyle(color: kTextMain, fontSize: 15),
         ),
         DropdownButton<String>(
+          isExpanded: true,
           value: settings.localeCode,
           dropdownColor: kDarkCard,
           onChanged: (code) {
@@ -135,6 +136,8 @@ class ProfileHubScreen extends StatelessWidget {
                   value: e.key,
                   child: Text(
                     e.value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(color: kTextMain),
                   ),
                 ),

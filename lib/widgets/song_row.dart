@@ -5,18 +5,21 @@ import '../audio_manager.dart';
 import '../song.dart';
 import '../widgets/fade_route.dart';
 import '../widgets/song_more_options_button.dart';
+import 'open_song_video.dart';
 import '../core/services/media_source_resolver.dart';
 
 class SongRow extends StatelessWidget {
   final Song song;
   final AudioManager audioManager;
   final String? heroPrefix;
+  final Future<void> Function()? onRemoveFromPlaylist;
 
   const SongRow({
     super.key,
     required this.song,
     required this.audioManager,
     this.heroPrefix,
+    this.onRemoveFromPlaylist,
   });
 
   String _formatDuration(Duration duration) {
@@ -122,38 +125,18 @@ class SongRow extends StatelessWidget {
             SizedBox(
               width: 62,
               child: song.youtubeUrl != null
-                  ? Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 3,
+                  ? IconButton(
+                      tooltip: 'Watch ${song.title} on YouTube',
+                      constraints: const BoxConstraints(
+                        minWidth: 48,
+                        minHeight: 48,
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.red.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(5),
-                        border: Border.all(
-                          color: Colors.red.withValues(alpha: 0.3),
-                          width: 0.5,
-                        ),
+                      icon: const Icon(
+                        Icons.ondemand_video_rounded,
+                        color: kVisionRedText,
                       ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.play_circle_outline_rounded,
-                            size: 12,
-                            color: Colors.redAccent,
-                          ),
-                          SizedBox(width: 3),
-                          Text(
-                            'VIDEO',
-                            style: TextStyle(
-                              color: Colors.redAccent,
-                              fontSize: 9,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
+                      onPressed: () =>
+                          openSongVideo(context, song, audioManager),
                     )
                   : Text(
                       _formatDuration(song.duration),
@@ -169,7 +152,11 @@ class SongRow extends StatelessWidget {
               icon: const Icon(Icons.play_arrow_rounded, color: kGoldMid),
               onPressed: () => _onTap(context),
             ),
-            SongMoreOptionsButton(song: song, audioManager: audioManager),
+            SongMoreOptionsButton(
+              song: song,
+              audioManager: audioManager,
+              onRemoveFromPlaylist: onRemoveFromPlaylist,
+            ),
           ],
         ),
       ),

@@ -126,9 +126,8 @@ class MediaSourceResolver {
   ///
   /// On-device file artwork also falls back, deliberately: supporting it needs
   /// `FileImage` and therefore `dart:io`, which would break the web build. No
-  /// artwork is ever written to disk today — "downloaded" is currently only a
-  /// flag in SharedPreferences — so this costs nothing. Revisit if real offline
-  /// downloads land.
+  /// offline-download feature is currently offered. Revisit this fallback when
+  /// actual file caching is implemented.
   static ImageProvider artwork(String? path) {
     final value = path?.trim() ?? '';
     switch (classify(value)) {

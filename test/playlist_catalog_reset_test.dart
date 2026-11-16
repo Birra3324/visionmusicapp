@@ -56,4 +56,29 @@ void main() {
       expect(reducedReader.playlists.single.trackIds, ['real-a', 'real-b']);
     },
   );
+  test(
+    'stale playlist screens preserve concurrent edits from song menus',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      final manager = AudioManager(initialTracks: [a, b]);
+      addTearDown(manager.dispose);
+      final screen = PlaylistController(audioManager: manager);
+      final menu = PlaylistController(audioManager: manager);
+      addTearDown(screen.dispose);
+      addTearDown(menu.dispose);
+      final playlist = await screen.createPlaylist('First release');
+      await menu.load();
+      await Future.wait([
+        menu.addSongToPlaylist(playlist, a),
+        screen.renamePlaylist(playlist.id, 'Keep these songs'),
+        menu.addSongToPlaylist(playlist, b),
+      ]);
+      await screen.load();
+      expect(screen.playlists.single.name, 'Keep these songs');
+      expect(screen.playlists.single.trackIds, ['real-a', 'real-b']);
+      await menu.addSongToPlaylist(playlist, a);
+      await screen.load();
+      expect(screen.playlists.single.trackIds, ['real-a', 'real-b']);
+    },
+  );
 }
