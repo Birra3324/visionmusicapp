@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:visionmusicapp/audio_manager.dart';
 import 'package:visionmusicapp/core/services/video_service.dart';
 import 'package:visionmusicapp/features/video/video_category_screen.dart';
 import 'package:visionmusicapp/features/video/video_player_screen.dart';
@@ -61,21 +64,112 @@ class _VideoHubScreenState extends State<VideoHubScreen> {
     }
   }
 
+  Future<void> _openChannel() async {
+    var opened = false;
+    try {
+      // Launch directly from the tap so browsers retain the user gesture.
+      opened = await launchUrl(
+        Uri.parse('https://www.youtube.com/@visionentertainment4507'),
+        mode: LaunchMode.externalApplication,
+        webOnlyWindowName: '_blank',
+      );
+    } catch (_) {
+      // Keep the listener on this screen with a useful retry message.
+    }
+    if (!mounted) return;
+    if (!opened) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Could not open YouTube. Please try again.'),
+        ),
+      );
+      return;
+    }
+    try {
+      final audio = context.read<AudioManager>();
+      if (audio.isPlaying) await audio.togglePlayPause();
+    } catch (error) {
+      debugPrint('Could not pause music before opening the channel: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return VisionBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: _loading
-            ? const _LoadingView()
-            : _error != null
-            ? _ErrorView(error: _error!, onRetry: _load)
-            : _ContentView(
-                featured: _featured,
-                categories: _categories,
-                byCategory: _byCategory,
-                onRefresh: _load,
+        body: Column(
+          children: [
+            // The channel stays available even when the catalog is unavailable.
+            SafeArea(
+              bottom: false,
+              child: _YouTubeChannelCard(onOpen: _openChannel),
+            ),
+            Expanded(
+              child: _loading
+                  ? const _LoadingView()
+                  : _error != null
+                  ? _ErrorView(error: _error!, onRetry: _load)
+                  : _ContentView(
+                      featured: _featured,
+                      categories: _categories,
+                      byCategory: _byCategory,
+                      onRefresh: _load,
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _YouTubeChannelCard extends StatelessWidget {
+  final VoidCallback onOpen;
+
+  const _YouTubeChannelCard({required this.onOpen});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: kDarkCard,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Vision Entertainment',
+              style: TextStyle(
+                color: kTextMain,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
               ),
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              'Explore our music videos on YouTube.',
+              style: TextStyle(color: kTextSoft, fontSize: 14),
+            ),
+            const SizedBox(height: 12),
+            FilledButton.icon(
+              onPressed: onOpen,
+              style: FilledButton.styleFrom(
+                backgroundColor: kVisionGold,
+                foregroundColor: Colors.black,
+                minimumSize: const Size(48, 48),
+              ),
+              icon: const Icon(Icons.open_in_new_rounded, size: 18),
+              label: const Text('Open YouTube channel'),
+            ),
+          ],
+        ),
       ),
     );
   }
