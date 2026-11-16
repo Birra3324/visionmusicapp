@@ -31,7 +31,7 @@ class AuthService {
 
     final googleUser = await GoogleSignIn().signIn();
     if (googleUser == null) {
-      throw Exception('Google sign-in was cancelled.');
+      throw FirebaseAuthException(code: 'popup-closed-by-user');
     }
 
     final googleAuth = await googleUser.authentication;

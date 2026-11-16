@@ -55,6 +55,17 @@ flutter run -d chrome
 
 `flutter devices` lists phones, simulators, and desktop targets. `flutter run` with no `-d` picks one. Choose **Continue as Guest** on the login screen.
 
+For a browser preview with Google sign-in:
+
+```bash
+flutter run -d web-server --web-hostname localhost --web-port 7357
+```
+
+Open **http://localhost:7357/**. The development Firebase project authorizes
+`localhost`; `127.0.0.1` is a different OAuth domain and will fail sign-in.
+Check Authentication > Settings > Authorized domains when using another host.
+See [Firebase's authorized-domain guidance](https://firebase.google.com/docs/auth/faq-and-troubleshooting#limit_your_authorized_authentication_domains).
+
 ## Tests
 
 From the repository root:

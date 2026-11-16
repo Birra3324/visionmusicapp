@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:visionmusicapp/app/main_shell.dart';
 import 'package:visionmusicapp/core/services/app_config.dart';
 import 'package:visionmusicapp/features/auth/auth_service.dart';
+import 'package:visionmusicapp/features/auth/sign_in_error.dart';
 import 'package:visionmusicapp/vision_theme.dart';
 import 'package:visionmusicapp/widgets/vision_background.dart';
 import 'package:visionmusicapp/l10n/app_localizations.dart';
@@ -40,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (error) {
       if (!mounted) return;
       setState(() {
-        _error = error.toString().replaceFirst('Exception: ', '');
+        _error = signInErrorMessage(error);
       });
     } finally {
       if (mounted) {
@@ -101,53 +102,56 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 24),
                       if (AppConfig.googleSignInEnabled) ...[
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: kVisionGold,
-                            foregroundColor: Colors.black,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 14,
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: kVisionGold,
+                              foregroundColor: Colors.black,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 14,
+                              ),
+                            ),
+                            onPressed: (!_isSigningIn && firebaseReady)
+                                ? _handleGoogleSignIn
+                                : null,
+                            icon: _isSigningIn
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.black,
+                                    ),
+                                  )
+                                : const Icon(Icons.g_mobiledata_rounded),
+                            label: Text(
+                              firebaseReady
+                                  ? 'Sign in with Google'
+                                  : 'Sign in temporarily unavailable',
                             ),
                           ),
-                          onPressed: (!_isSigningIn && firebaseReady)
-                              ? _handleGoogleSignIn
-                              : null,
-                          icon: _isSigningIn
-                              ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.black,
-                                  ),
-                                )
-                              : const Icon(Icons.g_mobiledata_rounded),
-                          label: Text(
-                            firebaseReady
-                                ? 'Sign in with Google'
-                                : 'Sign in temporarily unavailable',
+                        ),
+                        const SizedBox(height: 12),
+                        if (!firebaseReady)
+                          const Text(
+                            'You can continue without signing in.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: kTextSoft, fontSize: 12),
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      if (!firebaseReady)
-                        const Text(
-                          'You can continue without signing in.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: kTextSoft, fontSize: 12),
-                        ),
                       ],
                       if (_error != null) ...[
                         const SizedBox(height: 12),
-                        Text(
-                          _error!,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.redAccent,
-                            fontSize: 12,
+                        Semantics(
+                          liveRegion: true,
+                          child: Text(
+                            _error!,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Color(0xFFFFB4AB),
+                              fontSize: 14,
+                            ),
                           ),
                         ),
                       ],
