@@ -43,8 +43,19 @@ The test suite covers all six locales at 320 px with 2x text, guest Home without
 Firebase, keyboard-open Search, dialog-to-dialog playlist creation, full playlist
 create/rename/delete, concurrent edits from separate playlist controllers,
 catalog/queue separation, and invalid source/settings handling. Final analyzer,
-105-test default and strict-live runs passed, with no analyzer issues. Platform
-build receipts are recorded with the task output.
+105-test default and strict-live runs passed, with no analyzer issues.
+
+Final source builds passed on Flutter 3.44.4 / Dart 3.12.2:
+
+| Check | Result |
+| --- | --- |
+| Web release | Passed |
+| Android debug APK | Passed |
+| iOS debug simulator, Xcode 26.6 | Passed |
+| Web entry point, JavaScript, asset manifest HTTP checks | All 200 |
+| Sample audio in web and APK bundles | Zero files |
+
+Detailed build logs and artifact hashes are recorded with the task output.
 
 The release web build succeeded and its local server returned HTTP 200 for the
 entry page, application JavaScript and asset manifest. The built bundle contains
@@ -56,12 +67,11 @@ final visual check of every changed screen is not claimed.
 The initial iOS simulator attempt found generated Swift-package metadata at
 13.0 while the project and Firebase plugins require 15.0. Regenerating iOS
 configuration aligned the generated package with the existing iOS 15 project
-minimum. No SDK source or global Flutter configuration was changed. Build
-completion is tracked in the output receipt. The iOS simulator build passed.
+minimum. No SDK source or global Flutter configuration was changed. The final
+iOS simulator build passed.
 Android's global license warning was for the unrelated microXR emulator package;
 it was not accepted. The actual build verified the required SDK licenses were
-already accepted and installed NDK 28.2.13676358, Build Tools 35 and Platform 34. Android build completion is
-tracked in the output receipt. Native device playback and low-bandwidth Ethiopian
+already accepted and installed NDK 28.2.13676358, Build Tools 35, Platform 34 and CMake 3.22.1. The final Android debug build passed. Native device playback and low-bandwidth Ethiopian
 network testing remain separate release checks. Real-audio end-to-end checks
 await source masters.
 
@@ -71,6 +81,8 @@ upgrade before changing Flutter versions; they are not current app-code errors.
 
 ## References
 
+- Flutter built-in Kotlin migration prerequisites:
+  https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin/for-app-developers
 - Android SDK package installation and licenses:
   https://developer.android.com/tools/sdkmanager
 
