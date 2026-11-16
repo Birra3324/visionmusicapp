@@ -47,6 +47,17 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref }}
+      - name: Select Xcode 26 (App Store requires the iOS 26 SDK)
+        run: |
+          xcode=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | grep -viE 'beta|candidate' | sort -V | tail -1)
+          if [ -z "$xcode" ]; then
+            echo "::error::No release Xcode 26 on this runner. Installed:"
+            ls -d /Applications/Xcode*.app
+            exit 1
+          fi
+          sudo xcode-select -s "$xcode/Contents/Developer"
+          xcodebuild -version
+          xcodebuild -showsdks | grep -i iphoneos
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.44.4'
@@ -87,6 +98,18 @@ jobs:
             fi
           done
           exit $missing
+
+      - name: Select Xcode 26 (App Store requires the iOS 26 SDK)
+        run: |
+          xcode=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | grep -viE 'beta|candidate' | sort -V | tail -1)
+          if [ -z "$xcode" ]; then
+            echo "::error::No release Xcode 26 on this runner. Installed:"
+            ls -d /Applications/Xcode*.app
+            exit 1
+          fi
+          sudo xcode-select -s "$xcode/Contents/Developer"
+          xcodebuild -version
+          xcodebuild -showsdks | grep -i iphoneos
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
