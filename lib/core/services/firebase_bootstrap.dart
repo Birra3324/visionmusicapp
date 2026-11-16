@@ -57,7 +57,7 @@ class FirebaseBootstrap {
     try {
       final app = await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
-      );
+      ).timeout(const Duration(seconds: 12));
 
       FirebaseFirestore.instance.settings = const Settings(
         persistenceEnabled: true,
@@ -69,14 +69,16 @@ class FirebaseBootstrap {
       // App Check enforcement is enabled from the Firebase console only after
       // monitoring confirms legitimate production traffic is receiving valid
       // tokens. Debug providers keep simulator/development builds usable.
-      await FirebaseAppCheck.instance.activate(
-        providerAndroid: kReleaseMode
-            ? const AndroidPlayIntegrityProvider()
-            : const AndroidDebugProvider(),
-        providerApple: kReleaseMode
-            ? const AppleAppAttestWithDeviceCheckFallbackProvider()
-            : const AppleDebugProvider(),
-      );
+      await FirebaseAppCheck.instance
+          .activate(
+            providerAndroid: kReleaseMode
+                ? const AndroidPlayIntegrityProvider()
+                : const AndroidDebugProvider(),
+            providerApple: kReleaseMode
+                ? const AppleAppAttestWithDeviceCheckFallbackProvider()
+                : const AppleDebugProvider(),
+          )
+          .timeout(const Duration(seconds: 5));
 
       return FirebaseBootstrapResult(app: app, error: null, isConfigured: true);
     } catch (error) {

@@ -1,3 +1,4 @@
+import 'package:visionmusicapp/l10n/listener_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -14,14 +15,22 @@ import 'package:visionmusicapp/widgets/vision_background.dart';
 // ─────────────────────────────────────────────────────────────────────────────
 
 class VideoHubScreen extends StatefulWidget {
-  const VideoHubScreen({super.key});
+  const VideoHubScreen({
+    super.key,
+    this.service,
+    this.loadTimeout = const Duration(seconds: 12),
+  });
+  final VideoService? service;
+  final Duration loadTimeout;
 
   @override
   State<VideoHubScreen> createState() => _VideoHubScreenState();
 }
 
 class _VideoHubScreenState extends State<VideoHubScreen> {
-  final VideoService _service = VideoServiceLocator.instance;
+  late final VideoService _service =
+      widget.service ?? VideoServiceLocator.instance;
+  int _loadRequest = 0;
 
   List<Video> _featured = [];
   List<VideoCategory> _categories = [];
@@ -36,17 +45,27 @@ class _VideoHubScreenState extends State<VideoHubScreen> {
   }
 
   Future<void> _load() async {
+    final request = ++_loadRequest;
     try {
       setState(() {
         _loading = true;
         _error = null;
       });
 
-      final cats = await _service.fetchVideoCategories();
-      final featured = await _service.fetchFeaturedVideos();
-      final byCategory = await _service.fetchVideosByAllCategories(cats);
+      final (cats, videos) = await (
+        _service.fetchVideoCategories(),
+        _service.fetchAllVideos(),
+      ).wait.timeout(widget.loadTimeout);
+      final featured = videos.where((video) => video.isFeatured).toList();
+      final byCategory = <String, List<Video>>{};
+      for (final cat in cats) {
+        final matches = videos
+            .where((video) => video.category == cat.id)
+            .toList();
+        if (matches.isNotEmpty) byCategory[cat.id] = matches;
+      }
 
-      if (mounted) {
+      if (mounted && request == _loadRequest) {
         setState(() {
           _categories = cats;
           _featured = featured;
@@ -55,7 +74,7 @@ class _VideoHubScreenState extends State<VideoHubScreen> {
         });
       }
     } catch (e) {
-      if (mounted) {
+      if (mounted && request == _loadRequest) {
         setState(() {
           _error = e.toString();
           _loading = false;
@@ -78,11 +97,9 @@ class _VideoHubScreenState extends State<VideoHubScreen> {
     }
     if (!mounted) return;
     if (!opened) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not open YouTube. Please try again.'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.l10n.youTubeError)));
       return;
     }
     try {
@@ -98,26 +115,25 @@ class _VideoHubScreenState extends State<VideoHubScreen> {
     return VisionBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: Column(
-          children: [
-            // The channel stays available even when the catalog is unavailable.
-            SafeArea(
-              bottom: false,
-              child: _YouTubeChannelCard(onOpen: _openChannel),
-            ),
-            Expanded(
-              child: _loading
-                  ? const _LoadingView()
-                  : _error != null
-                  ? _ErrorView(error: _error!, onRetry: _load)
-                  : _ContentView(
-                      featured: _featured,
-                      categories: _categories,
-                      byCategory: _byCategory,
-                      onRefresh: _load,
-                    ),
+        body: NestedScrollView(
+          headerSliverBuilder: (context, _) => [
+            SliverToBoxAdapter(
+              child: SafeArea(
+                bottom: false,
+                child: _YouTubeChannelCard(onOpen: _openChannel),
+              ),
             ),
           ],
+          body: _loading
+              ? const _LoadingView()
+              : _error != null
+              ? _ErrorView(error: _error!, onRetry: _load)
+              : _ContentView(
+                  featured: _featured,
+                  categories: _categories,
+                  byCategory: _byCategory,
+                  onRefresh: _load,
+                ),
         ),
       ),
     );
@@ -153,8 +169,8 @@ class _YouTubeChannelCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            const Text(
-              'Explore our music videos on YouTube.',
+            Text(
+              context.l10n.channelDescription,
               style: TextStyle(color: kTextSoft, fontSize: 14),
             ),
             const SizedBox(height: 12),
@@ -166,7 +182,7 @@ class _YouTubeChannelCard extends StatelessWidget {
                 minimumSize: const Size(48, 48),
               ),
               icon: const Icon(Icons.open_in_new_rounded, size: 18),
-              label: const Text('Open YouTube channel'),
+              label: Text(context.l10n.openChannel),
             ),
           ],
         ),
@@ -182,14 +198,15 @@ class _LoadingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           CircularProgressIndicator(color: kVisionGold, strokeWidth: 2),
           SizedBox(height: 20),
           Text(
-            'Loading videos…',
+            context.l10n.loadingVideos,
             style: TextStyle(color: kTextSoft, fontSize: 14),
           ),
         ],
@@ -208,7 +225,7 @@ class _ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
@@ -216,8 +233,8 @@ class _ErrorView extends StatelessWidget {
           children: [
             const Icon(Icons.wifi_off_rounded, color: kTextDim, size: 56),
             const SizedBox(height: 16),
-            const Text(
-              'Could not load videos',
+            Text(
+              context.l10n.videoLoadError,
               style: TextStyle(
                 color: kTextMain,
                 fontSize: 18,
@@ -225,8 +242,8 @@ class _ErrorView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Please check your connection and try again.',
+            Text(
+              context.l10n.checkConnection,
               style: TextStyle(color: kTextSoft, fontSize: 13),
               textAlign: TextAlign.center,
             ),
@@ -234,7 +251,7 @@ class _ErrorView extends StatelessWidget {
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: const Text('Retry'),
+              label: Text(context.l10n.retry),
               style: FilledButton.styleFrom(
                 backgroundColor: kVisionGold,
                 foregroundColor: Colors.black,
@@ -276,16 +293,20 @@ class _ContentView extends StatelessWidget {
             pinned: true,
             expandedHeight: 0,
             backgroundColor: kAppBackground.withValues(alpha: 0.92),
-            title: const Row(
+            title: Row(
               children: [
                 Icon(Icons.play_circle_rounded, color: kVisionGold, size: 22),
                 SizedBox(width: 8),
-                Text(
-                  'Watch',
-                  style: TextStyle(
-                    color: kTextMain,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
+                Expanded(
+                  child: Text(
+                    context.l10n.watch,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: kTextMain,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ),
               ],
@@ -297,7 +318,7 @@ class _ContentView extends StatelessWidget {
                   color: kTextMain,
                   size: 22,
                 ),
-                tooltip: 'Search videos',
+                tooltip: context.l10n.searchVideos,
                 onPressed: () {
                   final videos = <String, Video>{};
                   for (final video in featured) {
@@ -310,7 +331,10 @@ class _ContentView extends StatelessWidget {
                   }
                   showSearch<void>(
                     context: context,
-                    delegate: _VideoSearchDelegate(videos.values.toList()),
+                    delegate: _VideoSearchDelegate(
+                      videos.values.toList(),
+                      context.l10n.videoSearchHint,
+                    ),
                   );
                 },
               ),
@@ -343,9 +367,9 @@ class _ContentView extends StatelessWidget {
 class _VideoSearchDelegate extends SearchDelegate<void> {
   final List<Video> videos;
 
-  _VideoSearchDelegate(this.videos)
+  _VideoSearchDelegate(this.videos, String label)
     : super(
-        searchFieldLabel: 'Videos and artists',
+        searchFieldLabel: label,
         searchFieldStyle: const TextStyle(color: kTextMain),
       );
 
@@ -357,7 +381,7 @@ class _VideoSearchDelegate extends SearchDelegate<void> {
   List<Widget> buildActions(BuildContext context) => [
     if (query.isNotEmpty)
       IconButton(
-        tooltip: 'Clear',
+        tooltip: context.l10n.clear,
         onPressed: () => query = '',
         icon: const Icon(Icons.close_rounded),
       ),
@@ -365,7 +389,7 @@ class _VideoSearchDelegate extends SearchDelegate<void> {
 
   @override
   Widget buildLeading(BuildContext context) => IconButton(
-    tooltip: 'Back',
+    tooltip: context.l10n.back,
     onPressed: () => close(context, null),
     icon: const Icon(Icons.arrow_back_rounded),
   );
@@ -389,8 +413,11 @@ class _VideoSearchDelegate extends SearchDelegate<void> {
               .toList();
 
     if (matches.isEmpty) {
-      return const Center(
-        child: Text('No matching videos.', style: TextStyle(color: kTextSoft)),
+      return Center(
+        child: Text(
+          context.l10n.noVideoMatches,
+          style: TextStyle(color: kTextSoft),
+        ),
       );
     }
 
@@ -469,7 +496,9 @@ class _FeaturedHeroState extends State<_FeaturedHero> {
   @override
   Widget build(BuildContext context) {
     final screenW = MediaQuery.of(context).size.width;
-    final heroHeight = screenW > 600 ? 380.0 : 280.0;
+    final scale = MediaQuery.textScalerOf(context).scale(16) / 16;
+    final heroHeight =
+        (screenW > 600 ? 380.0 : 280.0) + (scale - 1).clamp(0, 3) * 180;
 
     return SizedBox(
       height: heroHeight,
@@ -625,8 +654,8 @@ class _FeaturedCard extends StatelessWidget {
                         size: 20,
                         color: Colors.black,
                       ),
-                      label: const Text(
-                        'Play',
+                      label: Text(
+                        context.l10n.play,
                         style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.w700,
@@ -692,7 +721,7 @@ class _CategoryRow extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  category.name,
+                  localizedVideoCategory(context, category.id, category.name),
                   style: const TextStyle(
                     color: kTextMain,
                     fontSize: 17,
@@ -710,7 +739,7 @@ class _CategoryRow extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  'See all',
+                  context.l10n.seeAll,
                   style: TextStyle(
                     color: kVisionGold.withValues(alpha: 0.85),
                     fontSize: 13,

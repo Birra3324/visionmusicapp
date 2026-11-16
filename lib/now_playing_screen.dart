@@ -1,3 +1,4 @@
+import 'package:visionmusicapp/l10n/listener_strings.dart';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -74,8 +75,8 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                     ),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    'Lyrics',
+                  Text(
+                    context.l10n.lyrics,
                     style: TextStyle(
                       color: kTextMain,
                       fontSize: 18,
@@ -110,10 +111,10 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                           );
                         }
                         if (snapshot.hasError) {
-                          return const _LyricsMessage(
+                          return _LyricsMessage(
                             icon: Icons.error_outline_rounded,
-                            title: 'Could not load lyrics',
-                            detail: 'Please try again in a moment.',
+                            title: context.l10n.lyricsLoadError,
+                            detail: context.l10n.tryLater,
                           );
                         }
                         final lyrics = snapshot.data;
@@ -121,12 +122,10 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                           // Honest empty state. This screen used to display
                           // invented lyrics for real artists' songs; showing
                           // nothing is strictly better than showing fiction.
-                          return const _LyricsMessage(
+                          return _LyricsMessage(
                             icon: Icons.lyrics_outlined,
-                            title: 'Lyrics not available yet',
-                            detail:
-                                'We only show lyrics provided by the artist or '
-                                'a licensed source.',
+                            title: context.l10n.lyricsUnavailable,
+                            detail: context.l10n.lyricsSourceHint,
                           );
                         }
                         return SingleChildScrollView(
@@ -181,8 +180,8 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Volume',
+                  Text(
+                    context.l10n.volume,
                     style: TextStyle(
                       color: kTextMain,
                       fontSize: 16,
@@ -195,15 +194,15 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                       const Icon(Icons.volume_mute_rounded, color: kTextSoft),
                       Expanded(
                         child: Semantics(
-                          label: 'Volume',
+                          label: context.l10n.volume,
                           child: Slider(
                             min: 0,
                             max: 1,
                             value: currentVolume.clamp(0.0, 1.0),
                             activeColor: kVisionGoldLight,
                             inactiveColor: Colors.white24,
-                            semanticFormatterCallback: (value) =>
-                                '${(value * 100).round()} percent',
+                            semanticFormatterCallback: (value) => context.l10n
+                                .volumePercent((value * 100).round()),
                             onChanged: (v) {
                               setModalState(() => currentVolume = v);
                               widget.audioManager.setVolume(v);
@@ -240,11 +239,11 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
         final song = snapshot.data;
 
         if (song == null) {
-          return const Scaffold(
+          return Scaffold(
             backgroundColor: kDarkBackground,
             body: Center(
               child: Text(
-                'No song playing',
+                context.l10n.noSongPlaying,
                 style: TextStyle(color: kTextMain),
               ),
             ),
@@ -587,8 +586,8 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                                             icon: const Icon(
                                               Icons.ondemand_video_rounded,
                                             ),
-                                            label: const Text(
-                                              'Watch on YouTube',
+                                            label: Text(
+                                              context.l10n.watchYouTube,
                                             ),
                                             style: OutlinedButton.styleFrom(
                                               minimumSize: const Size(48, 48),
@@ -602,7 +601,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                                             MainAxisAlignment.spaceEvenly,
                                         children: [
                                           IconButton(
-                                            tooltip: 'Volume',
+                                            tooltip: context.l10n.volume,
                                             icon: const Icon(
                                               Icons.volume_down_rounded,
                                             ),
@@ -685,7 +684,7 @@ class _StaticWaveSeekBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: 'Playback position',
+      label: context.l10n.playbackPosition,
       child: SizedBox(
         height: 48,
         child: Stack(
@@ -716,7 +715,7 @@ class _StaticWaveSeekBar extends StatelessWidget {
                 value: progress.clamp(0.0, 1.0),
                 onChanged: enabled ? onSeekFraction : null,
                 semanticFormatterCallback: (value) =>
-                    '${(value * 100).round()} percent',
+                    context.l10n.volumePercent((value * 100).round()),
               ),
             ),
           ],

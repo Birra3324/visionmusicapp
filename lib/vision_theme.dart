@@ -51,7 +51,11 @@ const kRadiusL = 20.0;
 const kRadiusXL = 28.0;
 
 // ─── Typography ───────────────────────────────────────────────────────────────
+const kVisionFontFallback = ['VisionEthiopic', 'VisionArabic'];
+
 const kStyleDisplay = TextStyle(
+  fontFamily: 'Roboto',
+  fontFamilyFallback: kVisionFontFallback,
   color: kTextMain,
   fontSize: 32,
   fontWeight: FontWeight.w800,
@@ -59,6 +63,8 @@ const kStyleDisplay = TextStyle(
   height: 1.1,
 );
 const kStyleTitle = TextStyle(
+  fontFamily: 'Roboto',
+  fontFamilyFallback: kVisionFontFallback,
   color: kTextMain,
   fontSize: 22,
   fontWeight: FontWeight.w700,
@@ -66,24 +72,32 @@ const kStyleTitle = TextStyle(
   height: 1.2,
 );
 const kStyleHeadline = TextStyle(
+  fontFamily: 'Roboto',
+  fontFamilyFallback: kVisionFontFallback,
   color: kTextMain,
   fontSize: 18,
   fontWeight: FontWeight.w600,
   height: 1.3,
 );
 const kStyleBody = TextStyle(
+  fontFamily: 'Roboto',
+  fontFamilyFallback: kVisionFontFallback,
   color: kTextMain,
   fontSize: 15,
   fontWeight: FontWeight.w500,
   height: 1.4,
 );
 const kStyleCaption = TextStyle(
+  fontFamily: 'Roboto',
+  fontFamilyFallback: kVisionFontFallback,
   color: kTextSoft,
   fontSize: 13,
   fontWeight: FontWeight.w400,
   height: 1.4,
 );
 const kStyleLabel = TextStyle(
+  fontFamily: 'Roboto',
+  fontFamilyFallback: kVisionFontFallback,
   color: kTextSoft,
   fontSize: 12,
   fontWeight: FontWeight.w500,
@@ -115,7 +129,12 @@ BoxDecoration kGlassDecoration({
 
 // ─── Full ThemeData ───────────────────────────────────────────────────────────
 ThemeData buildVisionGoldTheme() {
-  final base = ThemeData.dark(useMaterial3: true);
+  final base = ThemeData(
+    brightness: Brightness.dark,
+    useMaterial3: true,
+    fontFamily: 'Roboto',
+    fontFamilyFallback: kVisionFontFallback,
+  );
   return base.copyWith(
     scaffoldBackgroundColor: kBackgroundDark,
     canvasColor: kBackgroundDark,
@@ -168,7 +187,7 @@ ThemeData buildVisionGoldTheme() {
           size: 24,
         );
       }),
-      height: 68,
+      height: 80,
       labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
     ),
     sliderTheme: const SliderThemeData(

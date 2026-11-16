@@ -337,9 +337,11 @@ class AudioManager extends ChangeNotifier {
     try {
       // Load first, so the mini-player never shows a track that has no
       // audio source behind it yet.
-      await _player.setAudioSource(
-        await MediaSourceResolver.audioSource(song.filePath),
-      );
+      final source = await MediaSourceResolver.audioSource(
+        song.filePath,
+      ).timeout(const Duration(seconds: 12));
+      if (request != _loadRequest) return;
+      await _player.setAudioSource(source).timeout(const Duration(seconds: 20));
       if (request != _loadRequest) return;
       final loadedIndex = _queue.indexOf(song);
       if (loadedIndex == -1) return;
@@ -360,6 +362,10 @@ class AudioManager extends ChangeNotifier {
       unawaited(AppObservability.instance.playStarted(song.id));
       _log('  -> play() requested');
     } catch (e) {
+      if (request != _loadRequest) return;
+      try {
+        await _player.stop().timeout(const Duration(seconds: 3));
+      } catch (_) {}
       if (request != _loadRequest) return;
       _currentIndex = -1;
       playbackError = 'This song could not be played. Please try again.';

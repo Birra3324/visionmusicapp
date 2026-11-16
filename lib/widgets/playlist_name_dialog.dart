@@ -1,3 +1,4 @@
+import 'package:visionmusicapp/l10n/listener_strings.dart';
 import 'package:flutter/material.dart';
 
 Future<String?> showPlaylistNameDialog(
@@ -31,25 +32,29 @@ class _PlaylistNameDialogState extends State<_PlaylistNameDialog> {
   @override
   Widget build(BuildContext context) => AlertDialog(
     title: Text(
-      widget.initialName == null ? 'New Playlist' : 'Rename Playlist',
+      widget.initialName == null
+          ? context.l10n.newPlaylist
+          : context.l10n.renamePlaylist,
     ),
     content: TextField(
       controller: _controller,
       autofocus: true,
       maxLength: 80,
       textInputAction: TextInputAction.done,
-      decoration: const InputDecoration(labelText: 'Playlist name'),
+      decoration: InputDecoration(labelText: context.l10n.playlistName),
       onChanged: (_) => setState(() {}),
       onSubmitted: (_) => _submit(),
     ),
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Cancel'),
+        child: Text(context.l10n.cancel),
       ),
       TextButton(
         onPressed: _controller.text.trim().isEmpty ? null : _submit,
-        child: Text(widget.initialName == null ? 'Create' : 'Save'),
+        child: Text(
+          widget.initialName == null ? context.l10n.create : context.l10n.save,
+        ),
       ),
     ],
   );

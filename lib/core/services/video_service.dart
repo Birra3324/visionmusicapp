@@ -18,11 +18,13 @@ import 'package:visionmusicapp/models/video.dart';
 class VideoService {
   final FirebaseFirestore? _firestore;
 
+  final Duration _requestTimeout;
   final bool _useFirebase;
   final bool _allowLocalFallback;
 
   VideoService({
     this._firestore,
+    this._requestTimeout = const Duration(seconds: 12),
     this._useFirebase = AppConfig.useFirebaseCatalog,
     this._allowLocalFallback = AppConfig.fallbackToLocalOnEmpty,
   });
@@ -67,7 +69,8 @@ class VideoService {
     try {
       final snap = await _publishedVideos
           .orderBy('releaseDate', descending: true)
-          .get();
+          .get()
+          .timeout(_requestTimeout);
       final results = snap.docs.map(Video.fromFirestore).toList();
       return results.isEmpty ? _fallbackVideos : results;
     } catch (e) {
@@ -84,7 +87,8 @@ class VideoService {
       final snap = await _publishedVideos
           .where('isFeatured', isEqualTo: true)
           .orderBy('releaseDate', descending: true)
-          .get();
+          .get()
+          .timeout(_requestTimeout);
       final results = snap.docs.map(Video.fromFirestore).toList();
       return results.isEmpty ? _fallbackFeatured : results;
     } catch (e) {
@@ -101,7 +105,8 @@ class VideoService {
       final snap = await _categoriesRef!
           .where('isActive', isEqualTo: true)
           .orderBy('sortOrder')
-          .get();
+          .get()
+          .timeout(_requestTimeout);
       if (snap.docs.isEmpty) return kDefaultVideoCategories;
       return snap.docs.map(VideoCategory.fromFirestore).toList();
     } catch (e) {
@@ -120,7 +125,8 @@ class VideoService {
       final snap = await _publishedVideos
           .where('category', isEqualTo: categoryId)
           .orderBy('releaseDate', descending: true)
-          .get();
+          .get()
+          .timeout(_requestTimeout);
       final results = snap.docs.map(Video.fromFirestore).toList();
       if (results.isEmpty) {
         return _fallbackVideos.where((v) => v.category == categoryId).toList();
@@ -149,12 +155,12 @@ class VideoService {
   Future<Map<String, List<Video>>> fetchVideosByAllCategories(
     List<VideoCategory> categories,
   ) async {
+    // One catalog read avoids a sequential network request for every category.
+    final all = await fetchAllVideos();
     final map = <String, List<Video>>{};
     for (final cat in categories) {
-      final videos = await fetchVideosByCategory(cat.id);
-      if (videos.isNotEmpty) {
-        map[cat.id] = videos;
-      }
+      final videos = all.where((video) => video.category == cat.id).toList();
+      if (videos.isNotEmpty) map[cat.id] = videos;
     }
     return map;
   }
@@ -169,7 +175,7 @@ class VideoService {
       }
     }
     try {
-      final doc = await _videosRef!.doc(id).get();
+      final doc = await _videosRef!.doc(id).get().timeout(_requestTimeout);
       final data = doc.data();
       if (data?['status'] != 'published' || data?['approved'] != true) {
         return null;
@@ -190,9 +196,10 @@ class VideoService {
   Future<void> incrementViewCount(String videoId) async {
     if (!_firestoreAvailable) return;
     try {
-      await _videosRef!.doc(videoId).update({
-        'viewCount': FieldValue.increment(1),
-      });
+      await _videosRef!
+          .doc(videoId)
+          .update({'viewCount': FieldValue.increment(1)})
+          .timeout(_requestTimeout);
     } catch (e) {
       debugPrint('[VideoService] incrementViewCount error: $e');
     }

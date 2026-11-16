@@ -1,3 +1,4 @@
+import 'package:visionmusicapp/l10n/listener_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:visionmusicapp/features/video/video_player_screen.dart';
 import 'package:visionmusicapp/models/video.dart';
@@ -47,7 +48,7 @@ class VideoCategoryScreen extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  category.name,
+                  localizedVideoCategory(context, category.id, category.name),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -68,7 +69,7 @@ class VideoCategoryScreen extends StatelessWidget {
           ),
         ),
         body: videos.isEmpty
-            ? const Center(
+            ? Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -79,7 +80,7 @@ class VideoCategoryScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 16),
                     Text(
-                      'No videos in this category',
+                      context.l10n.noCategoryVideos,
                       style: TextStyle(color: kTextSoft, fontSize: 15),
                     ),
                   ],

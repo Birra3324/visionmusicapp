@@ -1,3 +1,4 @@
+import 'package:visionmusicapp/l10n/localization_delegates.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -54,6 +55,7 @@ void main() {
     var watched = false;
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: visionLocalizationDelegates,
         home: Scaffold(
           body: MediaQuery(
             data: const MediaQueryData(textScaler: TextScaler.linear(2)),

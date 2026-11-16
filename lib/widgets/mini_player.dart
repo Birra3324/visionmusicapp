@@ -1,3 +1,4 @@
+import 'package:visionmusicapp/l10n/listener_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:visionmusicapp/audio_manager.dart';
 import 'package:visionmusicapp/now_playing_screen.dart';
@@ -247,7 +248,7 @@ class _Controls extends StatelessWidget {
             if (showQueue)
               _IconButton(
                 icon: Icons.queue_music_rounded,
-                tooltip: 'Up next',
+                tooltip: context.l10n.upNext,
                 onTap: () => _showQueue(context),
               ),
           ],
@@ -312,9 +313,9 @@ class _QueueSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
+            Padding(
               padding: EdgeInsets.fromLTRB(kSpaceL, 0, kSpaceL, kSpaceS),
-              child: Text('Up next', style: kStyleHeadline),
+              child: Text(context.l10n.upNext, style: kStyleHeadline),
             ),
             Flexible(
               child: ListView.builder(

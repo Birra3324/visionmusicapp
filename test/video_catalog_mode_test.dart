@@ -1,10 +1,48 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:visionmusicapp/core/services/video_service.dart';
 import 'package:visionmusicapp/mock_videos.dart';
+import 'package:visionmusicapp/models/video.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  test('unresponsive live reads have a bounded deadline', () async {
+    final service = VideoService(
+      firestore: _Firestore(hanging: true),
+      useFirebase: true,
+      allowLocalFallback: false,
+      requestTimeout: const Duration(milliseconds: 20),
+    );
+    await expectLater(
+      service.fetchAllVideos(),
+      throwsA(isA<TimeoutException>()),
+    );
+    await expectLater(
+      service.fetchFeaturedVideos(),
+      throwsA(isA<TimeoutException>()),
+    );
+    await expectLater(
+      service.fetchVideoCategories(),
+      throwsA(isA<TimeoutException>()),
+    );
+    await expectLater(
+      service.fetchVideosByCategory('music_videos'),
+      throwsA(isA<TimeoutException>()),
+    );
+  });
+
+  test('grouping categories reads the video collection only once', () async {
+    final firestore = _Firestore();
+    final service = VideoService(
+      firestore: firestore,
+      useFirebase: true,
+      allowLocalFallback: false,
+    );
+    await service.fetchVideosByAllCategories(kDefaultVideoCategories);
+    expect(firestore.queryReads, 1);
+  });
 
   test('local video mode never contacts Firestore', () async {
     final firestore = _Firestore(error: StateError('must not be contacted'));
@@ -93,12 +131,14 @@ void main() {
 class _Firestore extends Fake implements FirebaseFirestore {
   final Object? error;
   int requests = 0;
-  _Firestore({this.error});
+  int queryReads = 0;
+  final bool hanging;
+  _Firestore({this.error, this.hanging = false});
 
   @override
   CollectionReference<Map<String, dynamic>> collection(String collectionPath) {
     requests++;
-    return _Collection(error);
+    return _Collection(error, hanging, () => queryReads++);
   }
 }
 
@@ -107,7 +147,9 @@ class _Firestore extends Fake implements FirebaseFirestore {
 class _Collection extends Fake
     implements CollectionReference<Map<String, dynamic>> {
   final Object? error;
-  _Collection(this.error);
+  final bool hanging;
+  final void Function() onRead;
+  _Collection(this.error, this.hanging, this.onRead);
 
   @override
   dynamic noSuchMethod(Invocation invocation) {
@@ -116,6 +158,10 @@ class _Collection extends Fake
     }
     if (invocation.memberName == #doc) return _Document(error);
     if (invocation.memberName == #get) {
+      onRead();
+      if (hanging) {
+        return Completer<QuerySnapshot<Map<String, dynamic>>>().future;
+      }
       return error == null
           ? Future<QuerySnapshot<Map<String, dynamic>>>.value(_Snapshot())
           : Future<QuerySnapshot<Map<String, dynamic>>>.error(error!);

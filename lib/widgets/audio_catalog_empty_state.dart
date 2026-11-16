@@ -1,3 +1,4 @@
+import 'package:visionmusicapp/l10n/listener_strings.dart';
 import 'package:flutter/material.dart';
 import '../vision_theme.dart';
 
@@ -18,8 +19,8 @@ class AudioCatalogEmptyState extends StatelessWidget {
       children: [
         const Icon(Icons.headphones_rounded, color: kVisionGold, size: 32),
         const SizedBox(height: 16),
-        const Text(
-          'Our audio catalog is on its way',
+        Text(
+          context.l10n.audioCatalogTitle,
           style: TextStyle(
             color: kTextMain,
             fontSize: 20,
@@ -27,15 +28,15 @@ class AudioCatalogEmptyState extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
-          'Explore Vision Entertainment’s official music videos while we prepare the audio releases.',
+        Text(
+          context.l10n.audioCatalogDescription,
           style: TextStyle(color: kTextSoft, fontSize: 15, height: 1.5),
         ),
         const SizedBox(height: 16),
         FilledButton.icon(
           onPressed: onWatch,
           icon: const Icon(Icons.ondemand_video_rounded),
-          label: const Text('Watch music videos'),
+          label: Text(context.l10n.watchMusicVideos),
           style: FilledButton.styleFrom(minimumSize: const Size(48, 48)),
         ),
       ],

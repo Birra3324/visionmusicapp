@@ -143,7 +143,7 @@ void main() {
     await tester.pumpWidget(app(GoldDiscoverScreen(audioManager: manager)));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
-    expect(find.textContaining('there'), findsOneWidget);
+    expect(find.text('Welcome to Vision Music'), findsOneWidget);
     expect(find.text('Watch music videos'), findsOneWidget);
   });
 
@@ -161,6 +161,18 @@ void main() {
     await tester.enterText(find.byType(TextField), 'Test release');
     await tester.pumpAndSettle();
     expect(find.text('Test release'), findsWidgets);
+    final semantics = tester.ensureSemantics();
+    try {
+      await tester.pump();
+      expect(
+        find.bySemanticsLabel(
+          RegExp(r'^Play Test release by Catalog artist(?:\n|$)'),
+        ),
+        findsOneWidget,
+      );
+    } finally {
+      semantics.dispose();
+    }
     expect(tester.takeException(), isNull);
   });
   testWidgets(

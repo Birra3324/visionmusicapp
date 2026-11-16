@@ -1,3 +1,4 @@
+import 'package:visionmusicapp/l10n/listener_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:visionmusicapp/audio_manager.dart';
 import 'package:visionmusicapp/controllers/playlist_controller.dart';
@@ -43,18 +44,16 @@ class _PlaylistsScreenState extends State<PlaylistsScreen> {
       final remove = await showDialog<bool>(
         context: context,
         builder: (dialogContext) => AlertDialog(
-          title: const Text('Delete playlist?'),
-          content: Text(
-            'Delete "${playlist.name}"? The songs will stay in your catalog.',
-          ),
+          title: Text(context.l10n.deletePlaylistTitle),
+          content: Text(context.l10n.deletePlaylistMessage(playlist.name)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, true),
-              child: const Text('Delete'),
+              child: Text(context.l10n.delete),
             ),
           ],
         ),
@@ -75,7 +74,7 @@ class _PlaylistsScreenState extends State<PlaylistsScreen> {
     return Scaffold(
       backgroundColor: kAppBackground,
       appBar: AppBar(
-        title: const Text('Playlists', style: TextStyle(color: kTextMain)),
+        title: Text(context.l10n.playlists, style: TextStyle(color: kTextMain)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
@@ -85,7 +84,7 @@ class _PlaylistsScreenState extends State<PlaylistsScreen> {
         ),
         actions: [
           IconButton(
-            tooltip: 'Create playlist',
+            tooltip: context.l10n.createPlaylist,
             icon: const Icon(Icons.add, color: kVisionGold),
             onPressed: _createNewPlaylist,
           ),
@@ -106,8 +105,8 @@ class _PlaylistsScreenState extends State<PlaylistsScreen> {
                     color: kTextSoft,
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'No Playlists',
+                  Text(
+                    context.l10n.noPlaylists,
                     style: TextStyle(color: kTextMain, fontSize: 18),
                   ),
                   const SizedBox(height: 8),
@@ -117,7 +116,7 @@ class _PlaylistsScreenState extends State<PlaylistsScreen> {
                       backgroundColor: kVisionGold,
                       foregroundColor: Colors.black,
                     ),
-                    child: const Text('Create Playlist'),
+                    child: Text(context.l10n.createPlaylist),
                   ),
                 ],
               ),
@@ -142,15 +141,23 @@ class _PlaylistsScreenState extends State<PlaylistsScreen> {
                   style: const TextStyle(color: kTextMain),
                 ),
                 subtitle: Text(
-                  '${_controller.songsForPlaylist(playlist).length} songs',
+                  context.l10n.songCount(
+                    _controller.songsForPlaylist(playlist).length,
+                  ),
                   style: const TextStyle(color: kTextSoft),
                 ),
                 trailing: PopupMenuButton<String>(
-                  tooltip: 'Manage ${playlist.name}',
+                  tooltip: context.l10n.managePlaylist(playlist.name),
                   onSelected: (action) => _managePlaylist(playlist, action),
-                  itemBuilder: (_) => const [
-                    PopupMenuItem(value: 'rename', child: Text('Rename')),
-                    PopupMenuItem(value: 'delete', child: Text('Delete')),
+                  itemBuilder: (_) => [
+                    PopupMenuItem(
+                      value: 'rename',
+                      child: Text(context.l10n.rename),
+                    ),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Text(context.l10n.delete),
+                    ),
                   ],
                 ),
                 onTap: () async {

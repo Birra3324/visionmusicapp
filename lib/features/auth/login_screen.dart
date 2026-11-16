@@ -1,3 +1,4 @@
+import 'package:visionmusicapp/l10n/listener_strings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:visionmusicapp/app/main_shell.dart';
@@ -41,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (error) {
       if (!mounted) return;
       setState(() {
-        _error = signInErrorMessage(error);
+        _error = signInErrorMessage(error, strings: context.l10n);
       });
     } finally {
       if (mounted) {
@@ -95,8 +96,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        'Discover Oromo artists, albums, songs, and music videos.',
+                      Text(
+                        context.l10n.loginDescription,
                         textAlign: TextAlign.center,
                         style: TextStyle(color: kTextSoft, fontSize: 14),
                       ),
@@ -128,15 +129,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                 : const Icon(Icons.g_mobiledata_rounded),
                             label: Text(
                               firebaseReady
-                                  ? 'Sign in with Google'
-                                  : 'Sign in temporarily unavailable',
+                                  ? context.l10n.signInGoogle
+                                  : context.l10n.signInUnavailable,
                             ),
                           ),
                         ),
                         const SizedBox(height: 12),
                         if (!firebaseReady)
-                          const Text(
-                            'You can continue without signing in.',
+                          Text(
+                            context.l10n.guestAvailable,
                             textAlign: TextAlign.center,
                             style: TextStyle(color: kTextSoft, fontSize: 12),
                           ),
@@ -164,8 +165,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
-                        'Favorites and recent listening are saved on this device.',
+                      Text(
+                        context.l10n.localActivity,
                         textAlign: TextAlign.center,
                         style: TextStyle(color: kTextSoft, fontSize: 12),
                       ),
@@ -179,7 +180,11 @@ class _LoginScreenState extends State<LoginScreen> {
                               return const SizedBox.shrink();
                             }
                             return Text(
-                              'Signed in as ${user.email ?? user.displayName ?? 'Vision Music user'}',
+                              context.l10n.signedInAs(
+                                user.email ??
+                                    user.displayName ??
+                                    'Vision Music',
+                              ),
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 color: kVisionGoldLight,

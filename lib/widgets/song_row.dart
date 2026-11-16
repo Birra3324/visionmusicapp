@@ -1,3 +1,4 @@
+import 'package:visionmusicapp/l10n/listener_strings.dart';
 import 'package:flutter/material.dart';
 import '../now_playing_screen.dart';
 import '../vision_theme.dart';
@@ -41,9 +42,9 @@ class SongRow extends StatelessWidget {
       }
     } catch (_) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('This song could not be played.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.l10n.songPlaybackError)));
       }
     }
   }
@@ -126,7 +127,7 @@ class SongRow extends StatelessWidget {
               width: 62,
               child: song.youtubeUrl != null
                   ? IconButton(
-                      tooltip: 'Watch ${song.title} on YouTube',
+                      tooltip: context.l10n.watchSong(song.title),
                       constraints: const BoxConstraints(
                         minWidth: 48,
                         minHeight: 48,
@@ -145,7 +146,7 @@ class SongRow extends StatelessWidget {
                     ),
             ),
             IconButton(
-              tooltip: 'Play ${song.title}',
+              tooltip: context.l10n.playSong(song.title),
               iconSize: 26,
               constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
               padding: EdgeInsets.zero,

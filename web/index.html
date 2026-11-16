@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -32,8 +32,20 @@
 
   <title>Vision Music</title>
   <link rel="manifest" href="manifest.json">
+  <style>
+    html, body { margin: 0; min-height: 100%; background: #0b0806; color: #f5f1e8; font-family: system-ui, sans-serif; }
+    #app-loading { min-height: 100vh; display: grid; align-content: center; justify-items: center; gap: 16px; padding: 24px; box-sizing: border-box; text-align: center; }
+    #app-loading h1, #app-loading p { margin: 0; max-width: 36rem; }
+    #loading-retry { background: #e4bc63; color: #171109; font: inherit; border: 0; border-radius: 12px; padding: 14px 24px; min-height: 48px; cursor: pointer; }
+  </style>
 </head>
 <body>
-  <script src="flutter_bootstrap.js" async></script>
+  <main id="app-loading" aria-live="polite">
+    <h1>Vision Music</h1>
+    <p id="loading-status">Opening Vision Music…</p>
+    <button id="loading-retry" type="button" hidden>Retry</button>
+  </main>
+  <script src="loading.js"></script>
+  <script src="flutter_bootstrap.js" async onerror="window.visionLoadingFailed?.()"></script>
 </body>
 </html>

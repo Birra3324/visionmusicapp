@@ -1,3 +1,4 @@
+import 'package:visionmusicapp/l10n/listener_strings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:visionmusicapp/features/auth/auth_service.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +31,12 @@ class GoldDiscoverScreen extends StatefulWidget {
 
 class _GoldDiscoverScreenState extends State<GoldDiscoverScreen> {
   int _selectedTabIndex = 0;
-  static const List<String> _tabs = ['Recent', 'All', 'Added', 'A–Z'];
+  List<String> get _tabs => [
+    context.l10n.recent,
+    context.l10n.all,
+    context.l10n.added,
+    'A–Z',
+  ];
 
   /// First name of the signed-in user, falling back to a neutral greeting
   /// rather than showing an empty space or a raw email address.
@@ -47,15 +53,7 @@ class _GoldDiscoverScreenState extends State<GoldDiscoverScreen> {
         return local[0].toUpperCase() + local.substring(1);
       }
     }
-    return 'there';
-  }
-
-  String _greeting() {
-    final hour = DateTime.now().hour;
-    if (hour >= 5 && hour < 12) return 'Good morning';
-    if (hour >= 12 && hour < 17) return 'Good afternoon';
-    if (hour >= 17 && hour < 22) return 'Good evening';
-    return 'Good night';
+    return '';
   }
 
   /// Each tab is a real view over the catalogue rather than the same list four
@@ -111,7 +109,9 @@ class _GoldDiscoverScreenState extends State<GoldDiscoverScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  '${_greeting()}, ${_firstName()}',
+                                  _firstName().isEmpty
+                                      ? context.l10n.welcome
+                                      : context.l10n.greeting(_firstName()),
                                   style: kStyleCaption,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -274,8 +274,8 @@ class _ListenWatchSection extends StatelessWidget {
                 width: cardWidth,
                 child: _EntryCard(
                   icon: Icons.headphones_rounded,
-                  label: 'Listen',
-                  subtitle: 'Music',
+                  label: context.l10n.listen,
+                  subtitle: context.l10n.music,
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -292,8 +292,8 @@ class _ListenWatchSection extends StatelessWidget {
                 width: cardWidth,
                 child: _EntryCard(
                   icon: Icons.play_circle_rounded,
-                  label: 'Watch',
-                  subtitle: 'Videos',
+                  label: context.l10n.watch,
+                  subtitle: context.l10n.videos,
                   // Burgundy, not blue. Video is the other half of Vision Music,
                   // so it needs to sit in the same warm family as the gold rather
                   // than reading as a separate product.
@@ -432,13 +432,13 @@ class _SearchBar extends StatelessWidget {
           ),
         ),
         padding: const EdgeInsets.symmetric(horizontal: kSpaceM),
-        child: const Row(
+        child: Row(
           children: [
             Icon(Icons.search_rounded, color: kTextSoft, size: 20),
             SizedBox(width: kSpaceS),
             Expanded(
               child: Text(
-                'Search songs, artists, albums...',
+                context.l10n.searchHint,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(color: kTextDim, fontSize: 14),
@@ -471,7 +471,7 @@ class _TrendingSection extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Explore music',
+                context.l10n.exploreMusic,
                 style: kStyleHeadline.copyWith(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
@@ -481,7 +481,7 @@ class _TrendingSection extends StatelessWidget {
                 onPressed: onSeeAll,
                 style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
                 child: Text(
-                  'See all',
+                  context.l10n.seeAll,
                   style: kStyleCaption.copyWith(
                     color: kVisionGold,
                     fontSize: 13,

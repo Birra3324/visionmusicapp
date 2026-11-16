@@ -1,3 +1,4 @@
+import 'package:visionmusicapp/l10n/listener_strings.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -70,7 +71,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
     try {
       _vpc = VideoPlayerController.networkUrl(Uri.parse(widget.video.videoUrl));
-      await _vpc!.initialize();
+      await _vpc!.initialize().timeout(const Duration(seconds: 20));
+      if (!mounted) return;
       _vpc!.addListener(_observeVideoCompletion);
 
       _chewie = ChewieController(
@@ -107,10 +109,26 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         setState(() {
           _initialising = false;
           _hasError = true;
-          _errorMessage = e.toString();
+          _errorMessage = 'playback-unavailable';
         });
       }
     }
+  }
+
+  Future<void> _retryVideo() async {
+    if (_initialising) return;
+    setState(() {
+      _initialising = true;
+      _hasError = false;
+      _errorMessage = '';
+    });
+    _chewie?.dispose();
+    _chewie = null;
+    final previous = _vpc;
+    _vpc = null;
+    await previous?.dispose();
+    if (!mounted) return;
+    await _initVideo();
   }
 
   // ── Related videos ──────────────────────────────────────────────────────
@@ -186,11 +204,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       await _pauseAudioIfPlaying();
       await AppObservability.instance.videoStarted(widget.video.id);
     } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not open YouTube. Please try again.'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.l10n.youTubeError)));
     }
   }
 
@@ -385,8 +401,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                         ),
                       )
                     else if (_related.isNotEmpty) ...[
-                      const Text(
-                        'Up Next',
+                      Text(
+                        context.l10n.upNext,
                         style: TextStyle(
                           color: kTextMain,
                           fontSize: 17,
@@ -425,7 +441,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
     // Seed placeholder (videoUrl still contains REPLACE_). Say so plainly
     // rather than opening a player that can never load, or handing the user a
-    // dead "Open in YouTube" button that 404s.
+    // dead YouTube button that 404s.
     if (!video.isPlayable) {
       return _YouTubeThumbnailArea(
         video: video,
@@ -448,7 +464,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       return _YouTubeThumbnailArea(
         video: video,
         thumbnailWidget: _thumbnailWidget(),
-        onTap: null,
+        onTap: _retryVideo,
         errorMessage: _errorMessage,
       );
     }
@@ -502,11 +518,13 @@ class _YouTubeThumbnailArea extends StatelessWidget {
                 height: 72,
                 child: IconButton.filled(
                   onPressed: onTap,
-                  tooltip: comingSoon
-                      ? 'Coming soon'
+                  tooltip: errorMessage != null
+                      ? context.l10n.retry
+                      : comingSoon
+                      ? context.l10n.comingSoon
                       : video.isYouTube
-                      ? 'Open in YouTube'
-                      : 'Play video',
+                      ? context.l10n.openYouTube
+                      : context.l10n.playVideo,
                   style: IconButton.styleFrom(
                     backgroundColor: kVisionGold.withValues(alpha: 0.92),
                     disabledBackgroundColor: Colors.grey.withValues(alpha: 0.5),
@@ -525,8 +543,8 @@ class _YouTubeThumbnailArea extends StatelessWidget {
               ),
               if (comingSoon) ...[
                 const SizedBox(height: 12),
-                const Text(
-                  'Coming soon',
+                Text(
+                  context.l10n.comingSoon,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -534,10 +552,10 @@ class _YouTubeThumbnailArea extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.symmetric(horizontal: 32),
                   child: Text(
-                    'This video has not been published yet.',
+                    context.l10n.videoUnpublished,
                     textAlign: TextAlign.center,
                     style: TextStyle(color: kTextSoft, fontSize: 13),
                   ),
@@ -545,8 +563,8 @@ class _YouTubeThumbnailArea extends StatelessWidget {
               ],
               if (video.isYouTube && onTap != null) ...[
                 const SizedBox(height: 12),
-                const Text(
-                  'Open in YouTube',
+                Text(
+                  context.l10n.openYouTube,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 14,
@@ -559,7 +577,7 @@ class _YouTubeThumbnailArea extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Text(
-                    'Error: $errorMessage',
+                    context.l10n.videoPlaybackError,
                     style: const TextStyle(
                       color: Colors.redAccent,
                       fontSize: 12,

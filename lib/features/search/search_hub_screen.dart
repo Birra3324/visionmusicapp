@@ -1,3 +1,4 @@
+import 'package:visionmusicapp/l10n/listener_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:visionmusicapp/audio_manager.dart';
 import 'package:visionmusicapp/now_playing_screen.dart';
@@ -243,7 +244,7 @@ class _SearchHubScreenState extends State<SearchHubScreen> {
           ),
           if (_query.isNotEmpty)
             IconButton(
-              tooltip: 'Clear search',
+              tooltip: context.l10n.clear,
               onPressed: () {
                 _controller.clear();
                 setState(() => _query = '');
@@ -252,7 +253,7 @@ class _SearchHubScreenState extends State<SearchHubScreen> {
             )
           else if (AppConfig.recognitionEnabled)
             IconButton(
-              tooltip: 'Identify a song',
+              tooltip: context.l10n.detectSong,
               onPressed: () {
                 Navigator.push(
                   context,
@@ -279,7 +280,7 @@ class _SearchResultRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: 'Play ${song.title} by ${song.artist}',
+      label: context.l10n.playSongBy(song.artist, song.title),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () async {
@@ -295,7 +296,7 @@ class _SearchResultRow extends StatelessWidget {
           } catch (_) {
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('This song could not be played.')),
+                SnackBar(content: Text(context.l10n.songPlaybackError)),
               );
             }
           }

@@ -1,3 +1,4 @@
+import 'package:visionmusicapp/l10n/listener_strings.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -31,7 +32,7 @@ class SongMoreOptionsButton extends StatelessWidget {
     final isFavorite = audioManager.isFavorite(song);
 
     return PopupMenuButton<String>(
-      tooltip: 'More options for ${song.title}',
+      tooltip: context.l10n.moreSongOptions(song.title),
       iconSize: iconSize,
       constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
       padding: EdgeInsets.zero,
@@ -61,9 +62,9 @@ class SongMoreOptionsButton extends StatelessWidget {
             await Clipboard.setData(ClipboardData(text: shareText));
             await AppObservability.instance.share(song.id);
             if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Share text copied.')),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(context.l10n.shareCopied)));
             }
             break;
           case 'youtube':
@@ -73,30 +74,34 @@ class SongMoreOptionsButton extends StatelessWidget {
       },
       itemBuilder: (context) => [
         if (onRemoveFromPlaylist != null)
-          const PopupMenuItem(
+          PopupMenuItem(
             value: 'remove_playlist',
-            child: Text('Remove from Playlist'),
+            child: Text(context.l10n.removeFromPlaylist),
           ),
-        const PopupMenuItem(value: 'add_queue', child: Text('Add to Queue')),
+        PopupMenuItem(value: 'add_queue', child: Text(context.l10n.addToQueue)),
         PopupMenuItem(
           value: 'toggle_save',
-          child: Text(isSaved ? 'Remove from Library' : 'Add to Library'),
+          child: Text(
+            isSaved
+                ? context.l10n.removeFromLibrary
+                : context.l10n.addToLibrary,
+          ),
         ),
         PopupMenuItem(
           value: 'toggle_favorite',
           child: Text(
-            isFavorite ? 'Remove from Favorites' : 'Add to Favorites',
+            isFavorite ? context.l10n.removeFavorite : context.l10n.addFavorite,
           ),
         ),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: 'add_to_playlist',
-          child: Text('Add to Playlist'),
+          child: Text(context.l10n.addToPlaylist),
         ),
-        const PopupMenuItem(value: 'share', child: Text('Share')),
+        PopupMenuItem(value: 'share', child: Text(context.l10n.share)),
         if (song.youtubeUrl != null)
-          const PopupMenuItem(
+          PopupMenuItem(
             value: 'youtube',
-            child: Text('Watch on YouTube'),
+            child: Text(context.l10n.watchYouTube),
           ),
       ],
     );
@@ -110,7 +115,7 @@ class SongMoreOptionsButton extends StatelessWidget {
       final selection = await showDialog<String>(
         context: context,
         builder: (dialogContext) => AlertDialog(
-          title: const Text('Add to Playlist'),
+          title: Text(context.l10n.addToPlaylist),
           content: SizedBox(
             width: 360,
             child: ListView(
@@ -123,7 +128,7 @@ class SongMoreOptionsButton extends StatelessWidget {
                   ),
                 ListTile(
                   leading: const Icon(Icons.add),
-                  title: const Text('New Playlist'),
+                  title: Text(context.l10n.newPlaylist),
                   onTap: () => Navigator.pop(dialogContext, '__new__'),
                 ),
               ],
@@ -132,7 +137,7 @@ class SongMoreOptionsButton extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
           ],
         ),
@@ -153,7 +158,7 @@ class SongMoreOptionsButton extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Added to playlist.')));
+        ).showSnackBar(SnackBar(content: Text(context.l10n.addedToPlaylist)));
       }
     } finally {
       controller.dispose();

@@ -1,5 +1,9 @@
 # Listener QA — November 15, 2026
 
+The later [translation and network pass](TRANSLATION_NETWORK_QA_2026_11_15.md)
+extends this historical 105-test pass with complete listener string catalogs,
+bundled fonts, slow-network recovery and 117-test validation.
+
 ## Scope and source state
 
 This pass continues the audio-catalog reset while the owner prepares original

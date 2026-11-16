@@ -35,7 +35,7 @@ class _MainShellState extends State<MainShell> {
           if (mounted) {
             ScaffoldMessenger.of(
               context,
-            ).showSnackBar(SnackBar(content: Text(playbackError)));
+            ).showSnackBar(SnackBar(content: Text(l10n.songPlaybackError)));
           }
         });
       }
