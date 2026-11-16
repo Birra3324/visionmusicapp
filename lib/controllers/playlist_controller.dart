@@ -50,7 +50,7 @@ class PlaylistController extends ChangeNotifier {
 
   Future<void> createPlaylist(String name) async {
     final id = DateTime.now().millisecondsSinceEpoch.toString();
-    final playlist = Playlist(id: id, name: name, trackIndices: []);
+    final playlist = Playlist(id: id, name: name, trackIds: []);
     _playlists = [..._playlists, playlist];
     await _save();
     notifyListeners();
@@ -71,20 +71,24 @@ class PlaylistController extends ChangeNotifier {
   }
 
   Future<void> addSongToPlaylist(Playlist playlist, Song song) async {
-    final tracks = audioManager.tracks;
-    final index = tracks.indexOf(song);
-    if (index == -1) return;
-
-    final updatedIndices = List<int>.from(playlist.trackIndices)..add(index);
-    _updatePlaylist(playlist.copyWith(trackIndices: updatedIndices));
+    if (!audioManager.tracks.any((track) => track.id == song.id)) return;
+    final current = _playlists.firstWhere(
+      (p) => p.id == playlist.id,
+      orElse: () => playlist,
+    );
+    final updatedIds = List<String>.from(current.trackIds)..add(song.id);
+    _updatePlaylist(current.copyWith(trackIds: updatedIds));
     await _save();
     notifyListeners();
   }
 
-  Future<void> removeSongFromPlaylist(Playlist playlist, int trackIndex) async {
-    final updatedIndices = List<int>.from(playlist.trackIndices)
-      ..remove(trackIndex);
-    _updatePlaylist(playlist.copyWith(trackIndices: updatedIndices));
+  Future<void> removeSongFromPlaylist(Playlist playlist, String songId) async {
+    final current = _playlists.firstWhere(
+      (p) => p.id == playlist.id,
+      orElse: () => playlist,
+    );
+    final updatedIds = List<String>.from(current.trackIds)..remove(songId);
+    _updatePlaylist(current.copyWith(trackIds: updatedIds));
     await _save();
     notifyListeners();
   }
@@ -96,10 +100,7 @@ class PlaylistController extends ChangeNotifier {
   }
 
   List<Song> songsForPlaylist(Playlist playlist) {
-    final tracks = audioManager.tracks;
-    return playlist.trackIndices
-        .where((i) => i >= 0 && i < tracks.length)
-        .map((i) => tracks[i])
-        .toList();
+    final byId = {for (final song in audioManager.tracks) song.id: song};
+    return playlist.trackIds.map((id) => byId[id]).whereType<Song>().toList();
   }
 }

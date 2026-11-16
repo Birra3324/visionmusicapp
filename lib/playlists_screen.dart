@@ -135,7 +135,7 @@ class _PlaylistsScreenState extends State<PlaylistsScreen> {
                   style: const TextStyle(color: kTextMain),
                 ),
                 subtitle: Text(
-                  '${playlist.trackIndices.length} songs',
+                  '${_controller.songsForPlaylist(playlist).length} songs',
                   style: const TextStyle(color: kTextSoft),
                 ),
                 onTap: () {

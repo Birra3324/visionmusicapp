@@ -26,6 +26,13 @@ Channel ID: UCUMRvDa74KYAovuMM21_Iag. The videos use their own YouTube thumbnail
 This is a small curated video catalog, not a complete channel synchronization.
 These video entries establish no match to any local audio file.
 
+## Saved playlists
+
+Playlists now use stable song IDs instead of catalog positions. Existing playlist
+names and legacy position references remain stored, but legacy sample positions
+are not assigned to new songs. New saved songs retain their identity if the
+catalog is reordered or a track is temporarily unavailable.
+
 ## Incoming collections
 
 Desktop intake folder: `~/Desktop/Vision Music Audio/`
