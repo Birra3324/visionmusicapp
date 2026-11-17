@@ -1,10 +1,34 @@
 import 'package:visionmusicapp/song.dart';
 import 'package:visionmusicapp/models/video.dart';
 
-/// Owner confirmed that every old audio/name/photo pairing was a design sample.
-/// Add only original audio with confirmed metadata and matching video evidence.
-/// See docs/AUDIO_CATALOG.md. An empty catalog must never fall back to samples.
-const bundledSongs = <Song>[];
+/// Local candidate based on the owner's recordings and independent matching.
+/// Shilimii uses a delivery encoding of the owner's WAV master.
+const bundledSongs = <Song>[
+  Song(
+    id: 'vision_gumgume',
+    title: 'Gumgume',
+    artist: 'Andualem Gosaa',
+    filePath: 'assets/release_audio/gumgume.mp3',
+    imagePath: kPlaceholderCover,
+    duration: Duration(milliseconds: 310437),
+  ),
+  Song(
+    id: 'vision_qondaala',
+    title: 'Qondaala',
+    artist: 'Fayyisaa Furii',
+    filePath: 'assets/release_audio/qondaala.m4a',
+    imagePath: kPlaceholderCover,
+    duration: Duration(seconds: 340),
+  ),
+  Song(
+    id: 'vision_shilimii',
+    title: 'Shilimii',
+    artist: 'Daanga H Qananii',
+    filePath: 'assets/release_audio/shilimii.m4a',
+    imagePath: kPlaceholderCover,
+    duration: Duration(seconds: 288),
+  ),
+];
 const String kPlaceholderCover = 'assets/images/visionlogo.jpg';
 
 /// Real videos verified on @visionentertainment4507, independent of audio.

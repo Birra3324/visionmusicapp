@@ -68,6 +68,9 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/visionlogo.jpg
+    - assets/release_audio/gumgume.mp3
+    - assets/release_audio/qondaala.m4a
+    - assets/release_audio/shilimii.m4a
     - assets/fonts/OFL-Roboto.txt
     - assets/fonts/OFL-NotoSansEthiopic.txt
     - assets/fonts/OFL-NotoSansArabic.txt
