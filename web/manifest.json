@@ -1,11 +1,11 @@
 {
-    "name": "vision_music_clean",
-    "short_name": "vision_music_clean",
+    "name": "Vision Music",
+    "short_name": "Vision Music",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0B0806",
+    "theme_color": "#0B0806",
+    "description": "Discover Oromo artists, albums, songs, and music videos with Vision Music.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

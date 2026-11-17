@@ -15,8 +15,11 @@ class AudioManager extends ChangeNotifier {
   final AudioPlayer _player = AudioPlayer();
   final SettingsManager _settings = SettingsManager.instance;
 
+  final List<Song> _catalog = [];
   final List<Song> _queue = [];
   int _currentIndex = -1;
+  int _loadRequest = 0;
+  String? playbackError;
 
   /// Recently played, most recent first. Capped at [_recentLimit].
   static const int _recentLimit = 40;
@@ -27,19 +30,17 @@ class AudioManager extends ChangeNotifier {
   // In-memory state for UI
   final Set<String> _favoriteIds = {};
   final Set<String> _libraryIds = {};
-  final Set<String> _downloadedIds = {};
   SharedPreferences? _prefs;
 
   static const _favoriteIdsKey = 'audio.favoriteIds';
   static const _libraryIdsKey = 'audio.libraryIds';
-  static const _downloadedIdsKey = 'audio.downloadedIds';
   static const _recentIdsKey = 'audio.recentIds';
 
   List<Song> get favoriteSongs =>
-      _queue.where((s) => _favoriteIds.contains(s.id)).toList();
+      _catalog.where((s) => _favoriteIds.contains(s.id)).toList();
 
   List<Song> get library =>
-      _queue.where((s) => _libraryIds.contains(s.id)).toList();
+      _catalog.where((s) => _libraryIds.contains(s.id)).toList();
 
   List<Song> get recentSongs => List.unmodifiable(_recent);
   List<Playlist> get playlists => const [];
@@ -48,7 +49,9 @@ class AudioManager extends ChangeNotifier {
       ? _queue[_currentIndex]
       : null;
 
-  List<Song> get tracks => List.unmodifiable(_queue);
+  /// The full catalog is independent of the user's current play queue.
+  List<Song> get tracks => List.unmodifiable(_catalog);
+  List<Song> get queue => List.unmodifiable(_queue);
 
   Stream<Duration> get positionStream => _player.positionStream;
   Stream<Duration?> get durationStream => _player.durationStream;
@@ -117,6 +120,7 @@ class AudioManager extends ChangeNotifier {
 
   AudioManager({List<Song>? initialTracks}) {
     if (initialTracks != null) {
+      _catalog.addAll(initialTracks);
       _queue.addAll(initialTracks);
     }
     _applySettingsToPlayer();
@@ -127,7 +131,11 @@ class AudioManager extends ChangeNotifier {
     // teardown order explicit rather than incidental.
     _playerStateSubscription = _player.playerStateStream.listen((state) {
       if (state.processingState == ProcessingState.completed) {
-        _handleTrackCompleted();
+        unawaited(
+          _handleTrackCompleted().catchError((Object error) {
+            _log('Automatic next track failed: $error');
+          }),
+        );
       }
     });
     _positionAnalyticsSubscription = _player.positionStream.listen((position) {
@@ -147,11 +155,8 @@ class AudioManager extends ChangeNotifier {
     _libraryIds
       ..clear()
       ..addAll(_prefs!.getStringList(_libraryIdsKey) ?? const []);
-    _downloadedIds
-      ..clear()
-      ..addAll(_prefs!.getStringList(_downloadedIdsKey) ?? const []);
 
-    final byId = {for (final song in _queue) song.id: song};
+    final byId = {for (final song in _catalog) song.id: song};
     _recent
       ..clear()
       ..addAll(
@@ -167,7 +172,6 @@ class AudioManager extends ChangeNotifier {
     if (prefs == null) return;
     unawaited(prefs.setStringList(_favoriteIdsKey, _favoriteIds.toList()));
     unawaited(prefs.setStringList(_libraryIdsKey, _libraryIds.toList()));
-    unawaited(prefs.setStringList(_downloadedIdsKey, _downloadedIds.toList()));
     unawaited(
       prefs.setStringList(
         _recentIdsKey,
@@ -320,22 +324,29 @@ class AudioManager extends ChangeNotifier {
     if (index != -1) {
       await playAtIndex(index);
     } else {
-      await setQueue([song]);
-      await playAtIndex(0);
+      addToQueue(song);
+      await playAtIndex(_queue.indexOf(song));
     }
   }
 
   Future<void> playAtIndex(int index) async {
     if (index < 0 || index >= _queue.length) return;
-    _currentIndex = index;
+    final request = ++_loadRequest;
     final song = _queue[index];
     _log('playAtIndex($index): ${song.title} — ${song.filePath}');
     try {
       // Load first, so the mini-player never shows a track that has no
       // audio source behind it yet.
-      await _player.setAudioSource(
-        await MediaSourceResolver.audioSource(song.filePath),
-      );
+      final source = await MediaSourceResolver.audioSource(
+        song.filePath,
+      ).timeout(const Duration(seconds: 12));
+      if (request != _loadRequest) return;
+      await _player.setAudioSource(source).timeout(const Duration(seconds: 20));
+      if (request != _loadRequest) return;
+      final loadedIndex = _queue.indexOf(song);
+      if (loadedIndex == -1) return;
+      _currentIndex = loadedIndex;
+      playbackError = null;
       _log('  -> loaded, reported duration=${_player.duration}');
 
       _recordRecent(song);
@@ -351,6 +362,15 @@ class AudioManager extends ChangeNotifier {
       unawaited(AppObservability.instance.playStarted(song.id));
       _log('  -> play() requested');
     } catch (e) {
+      if (request != _loadRequest) return;
+      try {
+        await _player.stop().timeout(const Duration(seconds: 3));
+      } catch (_) {}
+      if (request != _loadRequest) return;
+      _currentIndex = -1;
+      playbackError = 'This song could not be played. Please try again.';
+      _emitCurrentSong();
+      notifyListeners();
       _log('  !! FAILED to play ${song.filePath}: $e');
       debugPrint('Error playing ${song.filePath}: $e');
       rethrow;
@@ -368,7 +388,9 @@ class AudioManager extends ChangeNotifier {
     } else if (_player.processingState == ProcessingState.idle &&
         _currentIndex >= 0) {
       _log('  -> idle, reloading track $_currentIndex');
-      await playAtIndex(_currentIndex);
+      try {
+        await playAtIndex(_currentIndex);
+      } catch (_) {}
     } else {
       // Same rule as playAtIndex: play() must NOT be awaited. Awaiting it here
       // left togglePlayPause pending for the rest of the track, so anything
@@ -399,7 +421,11 @@ class AudioManager extends ChangeNotifier {
       unawaited(AppObservability.instance.skip(skippedSong.id, 'next'));
     }
     final next = _relativeIndex(1, wrap: true);
-    if (next != null) await playAtIndex(next);
+    if (next != null) {
+      try {
+        await playAtIndex(next);
+      } catch (_) {}
+    }
   }
 
   /// Restarts the current track if more than three seconds have played,
@@ -420,7 +446,11 @@ class AudioManager extends ChangeNotifier {
       unawaited(AppObservability.instance.skip(skippedSong.id, 'previous'));
     }
     final previous = _relativeIndex(-1, wrap: true);
-    if (previous != null) await playAtIndex(previous);
+    if (previous != null) {
+      try {
+        await playAtIndex(previous);
+      } catch (_) {}
+    }
   }
 
   Future<void> toggleShuffle() async {
@@ -456,13 +486,6 @@ class AudioManager extends ChangeNotifier {
   }
 
   double get volume => _player.volume;
-
-  bool isDownloaded(Song song) => _downloadedIds.contains(song.id);
-  Future<void> download(Song song) async {
-    _downloadedIds.add(song.id);
-    _persistActivity();
-    notifyListeners();
-  }
 
   bool isSaved(Song song) => isInLibrary(song);
   void toggleSave(Song song) {

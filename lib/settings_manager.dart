@@ -31,8 +31,10 @@ class SettingsManager extends ChangeNotifier {
 
     _autoplay = _prefs.getBool('autoplay') ?? true;
     _shuffle = _prefs.getBool('shuffle') ?? false;
-    _repeatMode =
-        LoopMode.values[_prefs.getInt('repeatMode') ?? LoopMode.off.index];
+    final savedRepeat = _prefs.getInt('repeatMode') ?? LoopMode.off.index;
+    _repeatMode = savedRepeat >= 0 && savedRepeat < LoopMode.values.length
+        ? LoopMode.values[savedRepeat]
+        : LoopMode.off;
     final savedLocale = _prefs.getString('localeCode') ?? 'en';
     _localeCode = supportedLocaleCodes.contains(savedLocale)
         ? savedLocale

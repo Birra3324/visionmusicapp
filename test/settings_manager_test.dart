@@ -66,4 +66,12 @@ void main() {
     expect(manager.localeCode, 'en');
     expect(manager.locale, const Locale('en'));
   });
+  test('invalid stored repeat modes do not crash startup', () async {
+    for (final value in [-1, 999]) {
+      SharedPreferences.setMockInitialValues({'repeatMode': value});
+      final settings = SettingsManager();
+      await settings.init();
+      expect(settings.repeatMode, LoopMode.off);
+    }
+  });
 }

@@ -1,3 +1,4 @@
+import 'package:visionmusicapp/l10n/listener_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:visionmusicapp/audio_manager.dart';
 import 'package:visionmusicapp/now_playing_screen.dart';
@@ -11,6 +12,8 @@ import 'package:visionmusicapp/core/services/app_config.dart';
 import 'package:visionmusicapp/core/services/app_observability.dart';
 import 'package:visionmusicapp/l10n/app_localizations.dart';
 import '../recognition/presentation/screens/music_identification_screen.dart';
+import '../video/video_hub_screen.dart';
+import '../../widgets/audio_catalog_empty_state.dart';
 
 class SearchHubScreen extends StatefulWidget {
   final AudioManager audioManager;
@@ -56,57 +59,85 @@ class _SearchHubScreenState extends State<SearchHubScreen> {
                 (song.albumTitle?.toLowerCase().contains(q) ?? false);
           }).toList();
 
+    final suggestions = allSongs
+        .map((song) => song.artist.trim())
+        .where((artist) => artist.isNotEmpty)
+        .toSet()
+        .take(3)
+        .toList();
+
     return VisionBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.search,
-                  style: const TextStyle(
-                    color: kTextMain,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
+          child: CustomScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            slivers: [
+              SliverPadding(
+                padding: const EdgeInsets.all(20),
+                sliver: SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.search,
+                        style: const TextStyle(
+                          color: kTextMain,
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        l10n.searchDescription,
+                        style: const TextStyle(
+                          color: kTextSoft,
+                          fontSize: 14,
+                          height: 1.45,
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      _buildSearchBar(),
+                      if (suggestions.isNotEmpty) ...[
+                        const SizedBox(height: 18),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            for (final artist in suggestions)
+                              _SearchHintChip(
+                                label: artist,
+                                onTap: () => _setQuery(artist),
+                              ),
+                          ],
+                        ),
+                      ],
+                      const SizedBox(height: 20),
+                      if (allSongs.isEmpty)
+                        AudioCatalogEmptyState(
+                          onWatch: () => Navigator.push(
+                            context,
+                            fadeRoute(const VideoHubScreen()),
+                          ),
+                        )
+                      else if (_query.isEmpty || results.isEmpty)
+                        _buildResults(results, l10n),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  l10n.searchDescription,
-                  style: const TextStyle(
-                    color: kTextSoft,
-                    fontSize: 14,
-                    height: 1.45,
+              ),
+              if (results.isNotEmpty)
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  sliver: SliverList.builder(
+                    itemCount: results.length,
+                    itemBuilder: (context, index) => _SearchResultRow(
+                      song: results[index],
+                      audioManager: audioManager,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 18),
-                _buildSearchBar(),
-                const SizedBox(height: 18),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    _SearchHintChip(
-                      label: 'Ali Birra',
-                      onTap: () => _setQuery('Ali Birra'),
-                    ),
-                    _SearchHintChip(
-                      label: 'Shukri Jamal',
-                      onTap: () => _setQuery('Shukri Jamal'),
-                    ),
-                    _SearchHintChip(
-                      label: 'Oromo Music',
-                      onTap: () => _setQuery('Oromo'),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Expanded(child: _buildResults(results, l10n)),
-              ],
-            ),
+            ],
           ),
         ),
       ),
@@ -161,18 +192,12 @@ class _SearchHubScreenState extends State<SearchHubScreen> {
       );
     }
 
-    return ListView.builder(
-      itemCount: results.length,
-      itemBuilder: (context, index) {
-        final song = results[index];
-        return _SearchResultRow(song: song, audioManager: widget.audioManager);
-      },
-    );
+    return const SizedBox.shrink();
   }
 
   Widget _buildSearchBar() {
     return Container(
-      height: 52,
+      constraints: const BoxConstraints(minHeight: 52),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.07),
         borderRadius: BorderRadius.circular(kRadiusL),
@@ -218,19 +243,17 @@ class _SearchHubScreenState extends State<SearchHubScreen> {
             ),
           ),
           if (_query.isNotEmpty)
-            GestureDetector(
-              onTap: () {
+            IconButton(
+              tooltip: context.l10n.clear,
+              onPressed: () {
                 _controller.clear();
                 setState(() => _query = '');
               },
-              child: const Icon(
-                Icons.close_rounded,
-                color: kTextSoft,
-                size: 18,
-              ),
+              icon: const Icon(Icons.close_rounded, color: kTextSoft, size: 18),
             )
           else if (AppConfig.recognitionEnabled)
             IconButton(
+              tooltip: context.l10n.detectSong,
               onPressed: () {
                 Navigator.push(
                   context,
@@ -238,7 +261,7 @@ class _SearchHubScreenState extends State<SearchHubScreen> {
                 );
               },
               icon: const Icon(Icons.mic_rounded, color: kVisionGold, size: 22),
-              constraints: const BoxConstraints(),
+              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
               padding: EdgeInsets.zero,
             ),
         ],
@@ -255,90 +278,95 @@ class _SearchResultRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () async {
-        try {
-          await AppObservability.instance.searchResultSelected(song.id);
-          await audioManager.playSong(song);
-          if (context.mounted) {
-            Navigator.push(
-              context,
-              fadeRoute(NowPlayingScreen(audioManager: audioManager)),
-            );
+    return Semantics(
+      button: true,
+      label: context.l10n.playSongBy(song.artist, song.title),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () async {
+          try {
+            await AppObservability.instance.searchResultSelected(song.id);
+            await audioManager.playSong(song);
+            if (context.mounted) {
+              Navigator.push(
+                context,
+                fadeRoute(NowPlayingScreen(audioManager: audioManager)),
+              );
+            }
+          } catch (_) {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(context.l10n.songPlaybackError)),
+              );
+            }
           }
-        } catch (_) {
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('This song could not be played.')),
-            );
-          }
-        }
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: kDarkCard.withValues(alpha: 0.96),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: song.imagePath != null
-                  ? Image(
-                      image: MediaSourceResolver.artwork(song.imagePath),
-                      width: 44,
-                      height: 44,
-                      fit: BoxFit.cover,
-                    )
-                  : Container(
-                      height: 44,
-                      width: 44,
-                      color: kDarkBackground,
-                      child: const Icon(
-                        Icons.music_note,
-                        color: kVisionGoldLight,
-                        size: 24,
+        },
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: kDarkCard.withValues(alpha: 0.96),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: song.imagePath != null
+                    ? Image(
+                        image: MediaSourceResolver.artwork(song.imagePath),
+                        width: 44,
+                        height: 44,
+                        fit: BoxFit.cover,
+                      )
+                    : Container(
+                        height: 44,
+                        width: 44,
+                        color: kDarkBackground,
+                        child: const Icon(
+                          Icons.music_note,
+                          color: kVisionGoldLight,
+                          size: 24,
+                        ),
                       ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      song.title,
+                      style: const TextStyle(
+                        color: kTextMain,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
                     ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    song.title,
-                    style: const TextStyle(
-                      color: kTextMain,
-                      fontWeight: FontWeight.w600,
+                    const SizedBox(height: 2),
+                    Text(
+                      '${song.artist}${song.albumTitle != null ? ' • ${song.albumTitle}' : ''}',
+                      style: const TextStyle(color: kTextSoft, fontSize: 12),
+                      maxLines: 1,
                     ),
-                    maxLines: 1,
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${song.artist}${song.albumTitle != null ? ' • ${song.albumTitle}' : ''}',
-                    style: const TextStyle(color: kTextSoft, fontSize: 12),
-                    maxLines: 1,
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            Container(
-              height: 30,
-              width: 30,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: kVisionGoldLight,
+              Container(
+                height: 30,
+                width: 30,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: kVisionGoldLight,
+                ),
+                child: const Icon(
+                  Icons.play_arrow,
+                  color: Colors.black,
+                  size: 18,
+                ),
               ),
-              child: const Icon(
-                Icons.play_arrow,
-                color: Colors.black,
-                size: 18,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

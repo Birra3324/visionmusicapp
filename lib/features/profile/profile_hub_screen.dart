@@ -1,3 +1,4 @@
+import 'package:visionmusicapp/l10n/listener_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:just_audio/just_audio.dart';
@@ -63,9 +64,11 @@ class ProfileHubScreen extends StatelessWidget {
                         Text(
                           user?.displayName?.trim().isNotEmpty == true
                               ? user!.displayName!
-                              : 'Guest listener',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                              : context.l10n.guestListener,
+                          maxLines: user == null ? null : 2,
+                          overflow: user == null
+                              ? TextOverflow.clip
+                              : TextOverflow.ellipsis,
                           style: const TextStyle(
                             color: kTextMain,
                             fontSize: 19,
@@ -74,10 +77,11 @@ class ProfileHubScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          user?.email ??
-                              'Your listening activity is saved on this device.',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                          user?.email ?? context.l10n.activitySaved,
+                          maxLines: user == null ? null : 2,
+                          overflow: user == null
+                              ? TextOverflow.clip
+                              : TextOverflow.ellipsis,
                           style: const TextStyle(
                             color: kTextSoft,
                             fontSize: 13,
@@ -104,20 +108,21 @@ class ProfileHubScreen extends StatelessWidget {
     final languageNames = {
       'en': 'English',
       'om': 'Afaan Oromo',
-      'am': 'Amharic',
+      'am': 'አማርኛ',
       'ar': 'العربية',
       'fr': 'Français',
       'es': 'Español',
     };
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           l10n.language,
           style: const TextStyle(color: kTextMain, fontSize: 15),
         ),
         DropdownButton<String>(
+          isExpanded: true,
           value: settings.localeCode,
           dropdownColor: kDarkCard,
           onChanged: (code) {
@@ -135,6 +140,8 @@ class ProfileHubScreen extends StatelessWidget {
                   value: e.key,
                   child: Text(
                     e.value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(color: kTextMain),
                   ),
                 ),

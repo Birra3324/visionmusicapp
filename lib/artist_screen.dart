@@ -1,3 +1,4 @@
+import 'package:visionmusicapp/l10n/listener_strings.dart';
 import 'package:flutter/material.dart';
 
 import 'audio_manager.dart';
@@ -35,9 +36,9 @@ class ArtistScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
         child: songs.isEmpty
-            ? const Center(
+            ? Center(
                 child: Text(
-                  'No songs for this artist yet.',
+                  context.l10n.noArtistSongs,
                   style: TextStyle(color: kTextSoft),
                 ),
               )

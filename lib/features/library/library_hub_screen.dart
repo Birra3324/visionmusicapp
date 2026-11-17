@@ -1,3 +1,4 @@
+import 'package:visionmusicapp/l10n/listener_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:visionmusicapp/artist_screen.dart';
 import 'package:visionmusicapp/audio_manager.dart';
@@ -8,6 +9,7 @@ import 'package:visionmusicapp/song.dart';
 import 'package:visionmusicapp/vision_theme.dart';
 import 'package:visionmusicapp/widgets/fade_route.dart';
 import 'package:visionmusicapp/widgets/vision_background.dart';
+import 'package:visionmusicapp/widgets/audio_catalog_empty_state.dart';
 import 'package:visionmusicapp/core/services/media_source_resolver.dart';
 
 class LibraryHubScreen extends StatelessWidget {
@@ -47,8 +49,8 @@ class LibraryHubScreen extends StatelessWidget {
           return Scaffold(
             backgroundColor: Colors.transparent,
             appBar: AppBar(
-              title: const Text(
-                'Library',
+              title: Text(
+                context.l10n.library,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
               ),
               backgroundColor: Colors.transparent,
@@ -57,17 +59,27 @@ class LibraryHubScreen extends StatelessWidget {
             body: ListView(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 48),
               children: [
+                if (songs.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: AudioCatalogEmptyState(
+                      onWatch: () => Navigator.push(
+                        context,
+                        fadeRoute(const VideoHubScreen()),
+                      ),
+                    ),
+                  ),
                 _SectionCard(
-                  title: 'Favorites',
+                  title: context.l10n.favorites,
                   subtitle: favorites.isEmpty
-                      ? 'Tap the heart on any song to save it here.'
-                      : '${favorites.length} favorite ${favorites.length == 1 ? 'song' : 'songs'}.',
+                      ? context.l10n.favoritesHint
+                      : context.l10n.favoriteCount(favorites.length),
                   children: favorites.isEmpty
                       ? [
                           _EmptyHint(
                             icon: Icons.favorite_outline_rounded,
-                            text: 'Your favorites will appear here.',
-                            actionLabel: 'Explore catalog',
+                            text: context.l10n.favoritesEmpty,
+                            actionLabel: context.l10n.exploreCatalog,
                             onAction: () => _showSongListSheet(context, songs),
                           ),
                         ]
@@ -82,15 +94,15 @@ class LibraryHubScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 _SectionCard(
-                  title: 'Recently Played',
+                  title: context.l10n.recentlyPlayed,
                   subtitle: recents.isEmpty
-                      ? "What you've been listening to will show up here."
-                      : '${recents.length} recent ${recents.length == 1 ? 'track' : 'tracks'}.',
+                      ? context.l10n.recentHint
+                      : context.l10n.recentCount(recents.length),
                   children: recents.isEmpty
-                      ? const [
+                      ? [
                           _EmptyHint(
                             icon: Icons.history_rounded,
-                            text: 'Play a song to start your history.',
+                            text: context.l10n.recentEmpty,
                           ),
                         ]
                       : recents
@@ -105,13 +117,13 @@ class LibraryHubScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 _SectionCard(
-                  title: 'Your Collection',
-                  subtitle: 'Quick access to the core of Vision Music.',
+                  title: context.l10n.yourCollection,
+                  subtitle: context.l10n.collectionHint,
                   children: [
                     _buildNavTile(
                       context,
-                      title: 'Playlists',
-                      subtitle: 'Create and organize your listening sets',
+                      title: context.l10n.playlists,
+                      subtitle: context.l10n.playlistsHint,
                       icon: Icons.queue_music_rounded,
                       onTap: () {
                         Navigator.push(
@@ -124,34 +136,32 @@ class LibraryHubScreen extends StatelessWidget {
                       },
                     ),
                     _buildInfoTile(
-                      title: 'Artists',
-                      subtitle:
-                          '${artists.length} artists available in this build',
+                      title: context.l10n.artists,
+                      subtitle: context.l10n.artistCount(artists.length),
                       icon: Icons.mic_rounded,
                       onTap: () => _openArtistList(context, artists),
                     ),
                     _buildInfoTile(
-                      title: 'Albums',
-                      subtitle:
-                          '${albums.length} albums in the current catalog',
+                      title: context.l10n.albums,
+                      subtitle: context.l10n.albumCount(albums.length),
                       icon: Icons.album_rounded,
                       onTap: () => _showSimpleListSheet(
                         context,
-                        title: 'Albums',
+                        title: context.l10n.albums,
                         items: albums,
-                        emptyMessage: 'No albums yet.',
+                        emptyMessage: context.l10n.noAlbums,
                       ),
                     ),
                     _buildInfoTile(
-                      title: 'Songs',
-                      subtitle: '${songs.length} songs ready to play',
+                      title: context.l10n.songs,
+                      subtitle: context.l10n.songCount(songs.length),
                       icon: Icons.music_note_rounded,
                       onTap: () => _showSongListSheet(context, songs),
                     ),
                     _buildNavTile(
                       context,
-                      title: 'Videos',
-                      subtitle: 'Music videos, podcasts, and more',
+                      title: context.l10n.videos,
+                      subtitle: context.l10n.videoLibraryHint,
                       icon: Icons.video_library_rounded,
                       onTap: () {
                         Navigator.push(
@@ -233,8 +243,8 @@ class LibraryHubScreen extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Artists',
+              Text(
+                context.l10n.artists,
                 style: TextStyle(
                   color: kTextMain,
                   fontSize: 20,
@@ -347,8 +357,8 @@ class LibraryHubScreen extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Songs',
+              Text(
+                context.l10n.songs,
                 style: TextStyle(
                   color: kTextMain,
                   fontSize: 20,
@@ -461,8 +471,8 @@ class _CompactSongTile extends StatelessWidget {
               ),
               onPressed: () => audioManager.toggleFavorite(song),
               tooltip: isFavorite
-                  ? 'Remove from favorites'
-                  : 'Add to favorites',
+                  ? context.l10n.removeFavorite
+                  : context.l10n.addFavorite,
             ),
           ],
         ),

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:visionmusicapp/core/services/app_config.dart';
 import 'package:visionmusicapp/mock_videos.dart';
 import 'package:visionmusicapp/models/video.dart';
 
@@ -7,7 +8,7 @@ import 'package:visionmusicapp/models/video.dart';
 // VideoService
 //
 // Single source of truth for all video data.
-// Priority:  Firestore → mock fallback
+// Catalog mode matches music; demo fallback must be explicitly enabled.
 //
 // Firestore collections:
 //   videos/{videoId}
@@ -17,17 +18,36 @@ import 'package:visionmusicapp/models/video.dart';
 class VideoService {
   final FirebaseFirestore? _firestore;
 
-  VideoService({FirebaseFirestore? firestore}) : _firestore = firestore;
+  final Duration _requestTimeout;
+  final bool _useFirebase;
+  final bool _allowLocalFallback;
+
+  VideoService({
+    this._firestore,
+    this._requestTimeout = const Duration(seconds: 12),
+    this._useFirebase = AppConfig.useFirebaseCatalog,
+    this._allowLocalFallback = AppConfig.fallbackToLocalOnEmpty,
+  });
+
+  List<Video> get _fallbackVideos =>
+      !_useFirebase || _allowLocalFallback ? mockVideos : const [];
+
+  List<Video> get _fallbackFeatured =>
+      _fallbackVideos.where((video) => video.isFeatured).toList();
 
   // ── Firestore helpers ────────────────────────────────────────────────────
 
-  CollectionReference? get _videosRef {
+  CollectionReference<Map<String, dynamic>>? get _videosRef {
     try {
       return (_firestore ?? FirebaseFirestore.instance).collection('videos');
     } catch (_) {
       return null;
     }
   }
+
+  Query<Map<String, dynamic>> get _publishedVideos => _videosRef!
+      .where('status', isEqualTo: 'published')
+      .where('approved', isEqualTo: true);
 
   CollectionReference? get _categoriesRef {
     try {
@@ -39,40 +59,42 @@ class VideoService {
     }
   }
 
-  bool get _firestoreAvailable => _videosRef != null;
+  bool get _firestoreAvailable => _useFirebase && _videosRef != null;
 
   // ── Public API ───────────────────────────────────────────────────────────
 
   /// All published videos, newest first.
   Future<List<Video>> fetchAllVideos() async {
-    if (!_firestoreAvailable) return mockVideos;
+    if (!_firestoreAvailable) return _fallbackVideos;
     try {
-      final snap = await _videosRef!
-          .where('isPublished', isEqualTo: true)
+      final snap = await _publishedVideos
           .orderBy('releaseDate', descending: true)
-          .get();
+          .get()
+          .timeout(_requestTimeout);
       final results = snap.docs.map(Video.fromFirestore).toList();
-      return results.isEmpty ? mockVideos : results;
+      return results.isEmpty ? _fallbackVideos : results;
     } catch (e) {
       debugPrint('[VideoService] fetchAllVideos error: $e');
-      return mockVideos;
+      if (_useFirebase && !_allowLocalFallback) rethrow;
+      return _fallbackVideos;
     }
   }
 
   /// Featured videos for the hero banner.
   Future<List<Video>> fetchFeaturedVideos() async {
-    if (!_firestoreAvailable) return featuredMockVideos;
+    if (!_firestoreAvailable) return _fallbackFeatured;
     try {
-      final snap = await _videosRef!
-          .where('isPublished', isEqualTo: true)
+      final snap = await _publishedVideos
           .where('isFeatured', isEqualTo: true)
           .orderBy('releaseDate', descending: true)
-          .get();
+          .get()
+          .timeout(_requestTimeout);
       final results = snap.docs.map(Video.fromFirestore).toList();
-      return results.isEmpty ? featuredMockVideos : results;
+      return results.isEmpty ? _fallbackFeatured : results;
     } catch (e) {
       debugPrint('[VideoService] fetchFeaturedVideos error: $e');
-      return featuredMockVideos;
+      if (_useFirebase && !_allowLocalFallback) rethrow;
+      return _fallbackFeatured;
     }
   }
 
@@ -83,11 +105,13 @@ class VideoService {
       final snap = await _categoriesRef!
           .where('isActive', isEqualTo: true)
           .orderBy('sortOrder')
-          .get();
+          .get()
+          .timeout(_requestTimeout);
       if (snap.docs.isEmpty) return kDefaultVideoCategories;
       return snap.docs.map(VideoCategory.fromFirestore).toList();
     } catch (e) {
       debugPrint('[VideoService] fetchVideoCategories error: $e');
+      if (_useFirebase && !_allowLocalFallback) rethrow;
       return kDefaultVideoCategories;
     }
   }
@@ -95,22 +119,23 @@ class VideoService {
   /// Videos in a given category, newest first.
   Future<List<Video>> fetchVideosByCategory(String categoryId) async {
     if (!_firestoreAvailable) {
-      return mockVideos.where((v) => v.category == categoryId).toList();
+      return _fallbackVideos.where((v) => v.category == categoryId).toList();
     }
     try {
-      final snap = await _videosRef!
-          .where('isPublished', isEqualTo: true)
+      final snap = await _publishedVideos
           .where('category', isEqualTo: categoryId)
           .orderBy('releaseDate', descending: true)
-          .get();
+          .get()
+          .timeout(_requestTimeout);
       final results = snap.docs.map(Video.fromFirestore).toList();
       if (results.isEmpty) {
-        return mockVideos.where((v) => v.category == categoryId).toList();
+        return _fallbackVideos.where((v) => v.category == categoryId).toList();
       }
       return results;
     } catch (e) {
       debugPrint('[VideoService] fetchVideosByCategory($categoryId) error: $e');
-      return mockVideos.where((v) => v.category == categoryId).toList();
+      if (_useFirebase && !_allowLocalFallback) rethrow;
+      return _fallbackVideos.where((v) => v.category == categoryId).toList();
     }
   }
 
@@ -130,12 +155,12 @@ class VideoService {
   Future<Map<String, List<Video>>> fetchVideosByAllCategories(
     List<VideoCategory> categories,
   ) async {
+    // One catalog read avoids a sequential network request for every category.
+    final all = await fetchAllVideos();
     final map = <String, List<Video>>{};
     for (final cat in categories) {
-      final videos = await fetchVideosByCategory(cat.id);
-      if (videos.isNotEmpty) {
-        map[cat.id] = videos;
-      }
+      final videos = all.where((video) => video.category == cat.id).toList();
+      if (videos.isNotEmpty) map[cat.id] = videos;
     }
     return map;
   }
@@ -144,19 +169,23 @@ class VideoService {
   Future<Video?> fetchVideoById(String id) async {
     if (!_firestoreAvailable) {
       try {
-        return mockVideos.firstWhere((v) => v.id == id);
+        return _fallbackVideos.firstWhere((v) => v.id == id);
       } catch (_) {
         return null;
       }
     }
     try {
-      final doc = await _videosRef!.doc(id).get();
-      if (!doc.exists) return null;
+      final doc = await _videosRef!.doc(id).get().timeout(_requestTimeout);
+      final data = doc.data();
+      if (data?['status'] != 'published' || data?['approved'] != true) {
+        return null;
+      }
       return Video.fromFirestore(doc);
     } catch (e) {
       debugPrint('[VideoService] fetchVideoById($id) error: $e');
+      if (_useFirebase && !_allowLocalFallback) rethrow;
       try {
-        return mockVideos.firstWhere((v) => v.id == id);
+        return _fallbackVideos.firstWhere((v) => v.id == id);
       } catch (_) {
         return null;
       }
@@ -167,9 +196,10 @@ class VideoService {
   Future<void> incrementViewCount(String videoId) async {
     if (!_firestoreAvailable) return;
     try {
-      await _videosRef!.doc(videoId).update({
-        'viewCount': FieldValue.increment(1),
-      });
+      await _videosRef!
+          .doc(videoId)
+          .update({'viewCount': FieldValue.increment(1)})
+          .timeout(_requestTimeout);
     } catch (e) {
       debugPrint('[VideoService] incrementViewCount error: $e');
     }

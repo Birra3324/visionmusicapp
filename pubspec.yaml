@@ -67,5 +67,17 @@ flutter:
   generate: true
   uses-material-design: true
   assets:
-    - assets/audio/
-    - assets/images/
+    - assets/images/visionlogo.jpg
+    - assets/fonts/OFL-Roboto.txt
+    - assets/fonts/OFL-NotoSansEthiopic.txt
+    - assets/fonts/OFL-NotoSansArabic.txt
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+    - family: VisionEthiopic
+      fonts:
+        - asset: assets/fonts/NotoSansEthiopic-Regular.ttf
+    - family: VisionArabic
+      fonts:
+        - asset: assets/fonts/NotoSansArabic-Regular.ttf

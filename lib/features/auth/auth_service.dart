@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:visionmusicapp/core/services/firebase_bootstrap.dart';
@@ -8,7 +9,8 @@ class AuthService {
 
   static final AuthService instance = AuthService._();
 
-  bool get isFirebaseReady => !FirebaseBootstrap.hasPlaceholderConfig;
+  bool get isFirebaseReady =>
+      Firebase.apps.isNotEmpty && !FirebaseBootstrap.hasPlaceholderConfig;
 
   Stream<User?> authStateChanges() {
     if (!isFirebaseReady) {
@@ -31,7 +33,7 @@ class AuthService {
 
     final googleUser = await GoogleSignIn().signIn();
     if (googleUser == null) {
-      throw Exception('Google sign-in was cancelled.');
+      throw FirebaseAuthException(code: 'popup-closed-by-user');
     }
 
     final googleAuth = await googleUser.authentication;

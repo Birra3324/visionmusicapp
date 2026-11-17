@@ -1,8 +1,9 @@
+import 'package:visionmusicapp/l10n/listener_strings.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:visionmusicapp/l10n/app_localizations.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:visionmusicapp/l10n/localization_delegates.dart';
 import 'package:provider/provider.dart';
 import 'package:visionmusicapp/audio/audio_handler.dart';
 import 'package:visionmusicapp/audio_manager.dart';
@@ -15,7 +16,6 @@ import 'package:visionmusicapp/core/services/local_song_repository.dart';
 import 'package:visionmusicapp/core/services/song_repository.dart';
 import 'package:visionmusicapp/core/services/video_service.dart';
 import 'package:visionmusicapp/features/auth/login_screen.dart';
-import 'package:visionmusicapp/mock_songs.dart';
 import 'package:visionmusicapp/settings_manager.dart';
 import 'package:visionmusicapp/song.dart';
 import 'package:visionmusicapp/vision_theme.dart';
@@ -50,9 +50,13 @@ class _AppBootstrapperState extends State<AppBootstrapper> {
     await SettingsManager.instance.init();
 
     _firebaseBootstrapResult = await FirebaseBootstrap.initialize();
-    await AppObservability.instance.initialize(
-      firebaseReady: _firebaseBootstrapResult?.isReady ?? false,
-    );
+    try {
+      await AppObservability.instance
+          .initialize(firebaseReady: _firebaseBootstrapResult?.isReady ?? false)
+          .timeout(const Duration(seconds: 3));
+    } catch (error) {
+      debugPrint('Optional observability initialization unavailable: $error');
+    }
 
     // Initialise video service (uses Firebase if available)
     VideoServiceLocator.init();
@@ -87,8 +91,7 @@ class _AppBootstrapperState extends State<AppBootstrapper> {
     loadRemote: () => FirestoreSongRepository().fetchAll(),
     loadLocal: () async {
       const SongRepository local = LocalSongRepository();
-      final tracks = await local.fetchAll();
-      return tracks.isEmpty ? List<Song>.from(mockSongs) : tracks;
+      return local.fetchAll();
     },
   );
 
@@ -97,30 +100,40 @@ class _AppBootstrapperState extends State<AppBootstrapper> {
     return FutureBuilder<void>(
       future: _initFuture,
       builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return const MaterialApp(
-            debugShowCheckedModeBanner: false,
-            home: Scaffold(
-              backgroundColor: Colors.black,
-              body: Center(
-                child: CircularProgressIndicator(color: Color(0xFFC39A4A)),
-              ),
-            ),
-          );
-        }
-
-        if (snapshot.hasError) {
+        if (snapshot.connectionState != ConnectionState.done ||
+            snapshot.hasError) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            home: Scaffold(
-              backgroundColor: Colors.black,
-              body: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    'Startup failed:\n${snapshot.error}',
-                    style: const TextStyle(color: Colors.white),
-                    textAlign: TextAlign.center,
+            locale: SettingsManager.instance.locale,
+            localizationsDelegates: visionLocalizationDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            theme: buildVisionGoldTheme(),
+            home: Builder(
+              builder: (context) => Scaffold(
+                body: Center(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (!snapshot.hasError)
+                          const CircularProgressIndicator(),
+                        const SizedBox(height: 20),
+                        Text(
+                          snapshot.hasError
+                              ? context.l10n.startupError
+                              : context.l10n.loadingApp,
+                          textAlign: TextAlign.center,
+                        ),
+                        if (snapshot.hasError) ...[
+                          const SizedBox(height: 12),
+                          Text(
+                            context.l10n.checkConnection,
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -161,20 +174,8 @@ class VisionMusicApp extends StatelessWidget {
       themeMode: ThemeMode.dark,
       locale: settingsManager.locale,
       // Localization support
-      localizationsDelegates: [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('en'), // English
-        Locale('om'), // Afaan Oromo
-        Locale('am'), // Amharic
-        Locale('ar'), // Arabic
-        Locale('fr'), // French
-        Locale('es'), // Spanish
-      ],
+      localizationsDelegates: visionLocalizationDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       builder: (context, child) {
         // Ensure RTL is applied for Arabic
         return Directionality(

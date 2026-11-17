@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
-/// Build configuration. Demo data is explicit; a live build never silently
-/// substitutes bundled songs when Firebase is unavailable or empty.
+/// Build configuration. The local catalog contains only reviewed content.
+/// A strict live build never falls back when Firebase is unavailable or empty.
 class AppConfig {
   static const bool useFirebaseCatalog = bool.fromEnvironment(
     'USE_FIREBASE_CATALOG',

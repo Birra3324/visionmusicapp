@@ -1,3 +1,4 @@
+import 'package:visionmusicapp/l10n/listener_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:visionmusicapp/audio_manager.dart';
 import 'package:visionmusicapp/now_playing_screen.dart';
@@ -5,6 +6,7 @@ import 'package:visionmusicapp/song.dart';
 import 'package:visionmusicapp/vision_theme.dart';
 import 'package:visionmusicapp/widgets/fade_route.dart';
 import 'package:visionmusicapp/core/services/media_source_resolver.dart';
+import 'package:visionmusicapp/l10n/app_localizations.dart';
 
 /// Persistent player that sits directly above the bottom navigation whenever
 /// audio is loaded.
@@ -29,7 +31,8 @@ class MiniPlayer extends StatelessWidget {
         final song = songSnap.data ?? audioManager.currentSong;
         if (song == null) return const SizedBox.shrink();
 
-        return GestureDetector(
+        return InkWell(
+          borderRadius: BorderRadius.circular(kRadiusM),
           onTap: () => Navigator.push(
             context,
             fadeRoute(NowPlayingScreen(audioManager: audioManager)),
@@ -199,8 +202,9 @@ class _Controls extends StatelessWidget {
     // Previous and queue are dropped on very narrow screens rather than allowed
     // to overflow. Play/pause and next always survive.
     final width = MediaQuery.sizeOf(context).width;
-    final showPrevious = width >= 340;
-    final showQueue = width >= 380;
+    final showPrevious = width >= 400;
+    final showQueue = width >= 480;
+    final l10n = AppLocalizations.of(context)!;
 
     return StreamBuilder<bool>(
       stream: audioManager.isPlayingStream,
@@ -213,34 +217,38 @@ class _Controls extends StatelessWidget {
             if (showPrevious)
               _IconButton(
                 icon: Icons.skip_previous_rounded,
+                tooltip: l10n.previous,
                 onTap: audioManager.skipToPrevious,
               ),
             // Strongest gold emphasis sits on play/pause.
-            GestureDetector(
-              onTap: audioManager.togglePlayPause,
-              behavior: HitTestBehavior.opaque,
-              child: Container(
-                width: 42,
-                height: 42,
-                margin: const EdgeInsets.symmetric(horizontal: kSpaceXXS),
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: kVisionGold,
-                ),
-                child: Icon(
-                  playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                  color: Colors.black,
-                  size: 24,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: kSpaceXXS),
+              child: SizedBox(
+                width: 48,
+                height: 48,
+                child: IconButton.filled(
+                  tooltip: playing ? l10n.pause : l10n.play,
+                  onPressed: audioManager.togglePlayPause,
+                  style: IconButton.styleFrom(
+                    backgroundColor: kVisionGold,
+                    foregroundColor: Colors.black,
+                  ),
+                  icon: Icon(
+                    playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                    size: 24,
+                  ),
                 ),
               ),
             ),
             _IconButton(
               icon: Icons.skip_next_rounded,
+              tooltip: l10n.next,
               onTap: audioManager.skipToNext,
             ),
             if (showQueue)
               _IconButton(
                 icon: Icons.queue_music_rounded,
+                tooltip: context.l10n.upNext,
                 onTap: () => _showQueue(context),
               ),
           ],
@@ -265,18 +273,22 @@ class _Controls extends StatelessWidget {
 
 class _IconButton extends StatelessWidget {
   final IconData icon;
+  final String tooltip;
   final VoidCallback onTap;
-  const _IconButton({required this.icon, required this.onTap});
+  const _IconButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: kSpaceXXS, vertical: 6),
-        child: Icon(icon, color: kTextSoft, size: 24),
-      ),
+    return IconButton(
+      tooltip: tooltip,
+      onPressed: onTap,
+      constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+      padding: const EdgeInsets.all(8),
+      icon: Icon(icon, color: kTextSoft, size: 24),
     );
   }
 }
@@ -289,7 +301,7 @@ class _QueueSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tracks = audioManager.tracks;
+    final tracks = audioManager.queue;
     final current = audioManager.currentSong;
 
     return SafeArea(
@@ -301,9 +313,9 @@ class _QueueSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
+            Padding(
               padding: EdgeInsets.fromLTRB(kSpaceL, 0, kSpaceL, kSpaceS),
-              child: Text('Up next', style: kStyleHeadline),
+              child: Text(context.l10n.upNext, style: kStyleHeadline),
             ),
             Flexible(
               child: ListView.builder(
@@ -354,9 +366,11 @@ class _QueueSheet extends StatelessWidget {
                             size: 20,
                           )
                         : null,
-                    onTap: () {
+                    onTap: () async {
                       Navigator.of(context).pop();
-                      audioManager.playSong(song);
+                      try {
+                        await audioManager.playSong(song);
+                      } catch (_) {}
                     },
                   );
                 },

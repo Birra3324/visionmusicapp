@@ -1,8 +1,11 @@
+import 'package:visionmusicapp/l10n/listener_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:visionmusicapp/audio_manager.dart';
 import 'package:visionmusicapp/controllers/playlist_controller.dart';
 import 'package:visionmusicapp/playlist_detail_screen.dart';
 import 'package:visionmusicapp/vision_theme.dart';
+import 'widgets/playlist_name_dialog.dart';
+import 'models/playlist.dart';
 
 class PlaylistsScreen extends StatefulWidget {
   final AudioManager audioManager;
@@ -23,46 +26,47 @@ class _PlaylistsScreenState extends State<PlaylistsScreen> {
     _controller.load();
   }
 
-  void _createNewPlaylist() async {
-    final name = await showDialog<String>(
-      context: context,
-      builder: (context) {
-        final controller = TextEditingController();
-        return AlertDialog(
-          backgroundColor: kDarkCard,
-          title: const Text('New Playlist', style: TextStyle(color: kTextMain)),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            style: const TextStyle(color: kTextMain),
-            decoration: const InputDecoration(
-              hintText: 'Playlist Name',
-              hintStyle: TextStyle(color: kTextSoft),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: kTextSoft),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: kVisionGold),
-              ),
-            ),
-          ),
+  Future<void> _createNewPlaylist() async {
+    final name = await showPlaylistNameDialog(context);
+    if (!mounted || name == null) return;
+    await _controller.createPlaylist(name);
+  }
+
+  Future<void> _managePlaylist(Playlist playlist, String action) async {
+    if (action == 'rename') {
+      final name = await showPlaylistNameDialog(
+        context,
+        initialName: playlist.name,
+      );
+      if (!mounted || name == null) return;
+      await _controller.renamePlaylist(playlist.id, name);
+    } else if (action == 'delete') {
+      final remove = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: Text(context.l10n.deletePlaylistTitle),
+          content: Text(context.l10n.deletePlaylistMessage(playlist.name)),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel', style: TextStyle(color: kTextSoft)),
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text(context.l10n.cancel),
             ),
             TextButton(
-              onPressed: () => Navigator.pop(context, controller.text),
-              child: const Text('Create', style: TextStyle(color: kVisionGold)),
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: Text(context.l10n.delete),
             ),
           ],
-        );
-      },
-    );
-
-    if (name != null && name.isNotEmpty) {
-      await _controller.createPlaylist(name);
+        ),
+      );
+      if (!mounted || remove != true) return;
+      await _controller.deletePlaylist(playlist.id);
     }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -70,15 +74,17 @@ class _PlaylistsScreenState extends State<PlaylistsScreen> {
     return Scaffold(
       backgroundColor: kAppBackground,
       appBar: AppBar(
-        title: const Text('Playlists', style: TextStyle(color: kTextMain)),
+        title: Text(context.l10n.playlists, style: TextStyle(color: kTextMain)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: kTextMain),
           onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
           IconButton(
+            tooltip: context.l10n.createPlaylist,
             icon: const Icon(Icons.add, color: kVisionGold),
             onPressed: _createNewPlaylist,
           ),
@@ -99,8 +105,8 @@ class _PlaylistsScreenState extends State<PlaylistsScreen> {
                     color: kTextSoft,
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'No Playlists',
+                  Text(
+                    context.l10n.noPlaylists,
                     style: TextStyle(color: kTextMain, fontSize: 18),
                   ),
                   const SizedBox(height: 8),
@@ -110,7 +116,7 @@ class _PlaylistsScreenState extends State<PlaylistsScreen> {
                       backgroundColor: kVisionGold,
                       foregroundColor: Colors.black,
                     ),
-                    child: const Text('Create Playlist'),
+                    child: Text(context.l10n.createPlaylist),
                   ),
                 ],
               ),
@@ -135,11 +141,27 @@ class _PlaylistsScreenState extends State<PlaylistsScreen> {
                   style: const TextStyle(color: kTextMain),
                 ),
                 subtitle: Text(
-                  '${playlist.trackIndices.length} songs',
+                  context.l10n.songCount(
+                    _controller.songsForPlaylist(playlist).length,
+                  ),
                   style: const TextStyle(color: kTextSoft),
                 ),
-                onTap: () {
-                  Navigator.push(
+                trailing: PopupMenuButton<String>(
+                  tooltip: context.l10n.managePlaylist(playlist.name),
+                  onSelected: (action) => _managePlaylist(playlist, action),
+                  itemBuilder: (_) => [
+                    PopupMenuItem(
+                      value: 'rename',
+                      child: Text(context.l10n.rename),
+                    ),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Text(context.l10n.delete),
+                    ),
+                  ],
+                ),
+                onTap: () async {
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => PlaylistDetailScreen(
@@ -148,6 +170,7 @@ class _PlaylistsScreenState extends State<PlaylistsScreen> {
                       ),
                     ),
                   );
+                  if (mounted) await _controller.load();
                 },
               );
             },

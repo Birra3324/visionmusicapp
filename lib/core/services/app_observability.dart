@@ -37,7 +37,9 @@ class AppObservability {
   Future<void> event(String name, {Map<String, Object>? parameters}) async {
     if (!_enabled) return;
     try {
-      await _analytics?.logEvent(name: name, parameters: parameters);
+      await _analytics
+          ?.logEvent(name: name, parameters: parameters)
+          .timeout(const Duration(seconds: 3));
     } catch (error, stack) {
       if (kDebugMode) {
         debugPrint('[VM-ANALYTICS] $name failed: $error');
