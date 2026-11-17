@@ -20,11 +20,12 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.44.4'
           channel: stable
           cache: true
 
       - name: Install dependencies
-        run: flutter pub get
+        run: flutter pub get --enforce-lockfile
 
       - name: Analyze
         # fatal-infos defaults to on. Info-level lints stay visible and do not fail CI.
@@ -33,3 +34,6 @@ jobs:
 
       - name: Test
         run: flutter test
+
+      - name: Test live catalog configuration
+        run: flutter test test/catalog_loader_test.dart --dart-define=USE_FIREBASE_CATALOG=true --dart-define=FALLBACK_TO_LOCAL_CATALOG=false
