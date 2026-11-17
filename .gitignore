@@ -67,6 +67,7 @@ ios/build/
 
 # ---- CocoaPods stale/temp copies — never commit ----
 ios/Pods.stale-icloud-*/
+assets/release_audio/
 ios/Podfile.pre-cleanup-*
 ios/Podfile.lock.pre-cleanup-*
 ios/Podfile.lock.stale-icloud-*

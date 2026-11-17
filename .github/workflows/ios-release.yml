@@ -40,6 +40,7 @@ concurrency:
 
 jobs:
   validate:
+    if: ${{ !startsWith(github.ref_name, 'secure-release/') }}
     name: Test and build without signing or uploading
     runs-on: macos-15
     timeout-minutes: 40
@@ -69,7 +70,7 @@ jobs:
         run: flutter build ios --release --no-codesign --dart-define=USE_FIREBASE_CATALOG=${{ inputs.use_firebase_catalog }} --dart-define=FALLBACK_TO_LOCAL_CATALOG=false
 
   testflight:
-    if: ${{ inputs.upload_to_testflight == true }}
+    if: ${{ inputs.upload_to_testflight == true && !startsWith(github.ref_name, 'secure-release/') }}
     needs: validate
     environment: app-store
     name: Approved TestFlight upload
@@ -169,3 +170,90 @@ jobs:
       - name: Remove API key
         if: always()
         run: rm -rf "$RUNNER_TEMP/asc"
+
+  protected-release:
+    # Secrets and decrypted media are available only after this environment's
+    # required reviewer has checked the exact branch, commit and package hash.
+    environment: app-store
+    if: ${{ github.event_name == 'workflow_dispatch' && github.ref_type == 'branch' && startsWith(github.ref_name, 'secure-release/') }}
+    runs-on: macos-15
+    timeout-minutes: 90
+    steps:
+      - name: Checkout the workflow commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Verify commit and ciphertext
+        env:
+          REQUESTED_REF: ${{ inputs.ref }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$REQUESTED_REF" = "$GITHUB_REF_NAME"
+          test -f release/secure_audio.sha256
+          EXPECTED_CIPHERTEXT_SHA256=$(cat release/secure_audio.sha256)
+          [[ "$EXPECTED_CIPHERTEXT_SHA256" =~ ^[0-9a-f]{64}$ ]]
+          test -f release/secure_audio.enc
+          actual=$(shasum -a 256 release/secure_audio.enc | awk '{print $1}')
+          test "$actual" = "$EXPECTED_CIPHERTEXT_SHA256"
+      - name: Select Xcode 26
+        run: |
+          set -euo pipefail
+          xcode=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | grep -viE 'beta|candidate' | sort -V | tail -1)
+          test -n "$xcode"
+          sudo xcode-select -s "$xcode/Contents/Developer"
+          xcodebuild -version
+      - name: Decrypt authenticated audio on runner
+        env:
+          VISION_AUDIO_KEY: ${{ secrets.VISION_AUDIO_KEY }}
+        run: |
+          set -euo pipefail
+          umask 077
+          SDKROOT="$(xcrun --sdk macosx --show-sdk-path)" xcrun swift scripts/release_audio.swift open release/secure_audio.enc "$GITHUB_WORKSPACE"
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.4'
+          channel: stable
+          cache: true
+      - run: flutter pub get --enforce-lockfile
+      - name: Test selected catalog
+        run: flutter test --dart-define=USE_FIREBASE_CATALOG=false --dart-define=FALLBACK_TO_LOCAL_CATALOG=false
+      - name: Build unsigned iOS app
+        run: flutter build ios --release --no-codesign --dart-define=USE_FIREBASE_CATALOG=false --dart-define=FALLBACK_TO_LOCAL_CATALOG=false
+      - name: Prepare signing key
+        if: ${{ inputs.upload_to_testflight }}
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          set -euo pipefail
+          test -n "$ASC_KEY_ID" && test -n "$ASC_ISSUER_ID" && test -n "$ASC_KEY_P8"
+          umask 077
+          mkdir -p "$RUNNER_TEMP/asc"
+          printf '%s\n' "$ASC_KEY_P8" > "$RUNNER_TEMP/asc/AuthKey_${ASC_KEY_ID}.p8"
+      - name: Archive and upload to App Store Connect
+        if: ${{ inputs.upload_to_testflight }}
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          test -f release/build_number.txt
+          BUILD_NUMBER=$(cat release/build_number.txt)
+          [[ "$BUILD_NUMBER" =~ ^[1-9][0-9]{0,8}$ ]]
+          key_path="$RUNNER_TEMP/asc/AuthKey_${ASC_KEY_ID}.p8"
+          flutter build ios --release --no-codesign --build-number="$BUILD_NUMBER" --dart-define=USE_FIREBASE_CATALOG=false --dart-define=FALLBACK_TO_LOCAL_CATALOG=false
+          xcodebuild archive -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/Runner.xcarchive" \
+            -derivedDataPath "$RUNNER_TEMP/vision-derived" \
+            -allowProvisioningUpdates -authenticationKeyPath "$key_path" \
+            -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/Runner.xcarchive" \
+            -exportOptionsPlist ios/ExportOptions.plist -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates -authenticationKeyPath "$key_path" \
+            -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+      - name: Remove plaintext and signing material
+        if: always()
+        run: rm -rf "$GITHUB_WORKSPACE/assets/release_audio" "$GITHUB_WORKSPACE/build" "$RUNNER_TEMP/asc" "$RUNNER_TEMP/Runner.xcarchive" "$RUNNER_TEMP/vision-derived" "$RUNNER_TEMP/export"
