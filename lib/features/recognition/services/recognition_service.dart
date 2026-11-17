@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:record/record.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
 import '../domain/recognition_state.dart';
 import 'recognition_repository.dart';
@@ -34,13 +33,12 @@ class MusicRecognitionService extends ChangeNotifier {
 
     _setStatus(MusicRecognitionStatus.requestingPermission);
 
-    final status = await Permission.microphone.request();
-    if (status != PermissionStatus.granted) {
-      _setStatus(MusicRecognitionStatus.permissionDenied);
-      return;
-    }
-
     try {
+      if (!await _audioRecorder.hasPermission(request: true)) {
+        _setStatus(MusicRecognitionStatus.permissionDenied);
+        return;
+      }
+
       final tempDir = await getTemporaryDirectory();
       final path = '${tempDir.path}/recognition_sample.m4a';
       _lastRecordedFilePath = path;
