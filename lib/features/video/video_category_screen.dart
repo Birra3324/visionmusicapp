@@ -1,3 +1,4 @@
+import 'package:visionmusicapp/l10n/listener_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:visionmusicapp/features/video/video_player_screen.dart';
 import 'package:visionmusicapp/models/video.dart';
@@ -21,7 +22,10 @@ class VideoCategoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenW = MediaQuery.of(context).size.width;
-    final crossAxisCount = screenW > 900
+    final largeText = MediaQuery.textScalerOf(context).scale(14) > 21;
+    final crossAxisCount = screenW < 400 || largeText
+        ? 1
+        : screenW > 900
         ? 4
         : screenW > 600
         ? 3
@@ -34,6 +38,7 @@ class VideoCategoryScreen extends StatelessWidget {
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
+            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
             icon: const Icon(Icons.arrow_back_rounded, color: kTextMain),
             onPressed: () => Navigator.pop(context),
           ),
@@ -41,12 +46,16 @@ class VideoCategoryScreen extends StatelessWidget {
             children: [
               Icon(category.icon, color: kVisionGoldLight, size: 20),
               const SizedBox(width: 8),
-              Text(
-                category.name,
-                style: const TextStyle(
-                  color: kTextMain,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
+              Expanded(
+                child: Text(
+                  localizedVideoCategory(context, category.id, category.name),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: kTextMain,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],
@@ -60,7 +69,7 @@ class VideoCategoryScreen extends StatelessWidget {
           ),
         ),
         body: videos.isEmpty
-            ? const Center(
+            ? Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -71,7 +80,7 @@ class VideoCategoryScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 16),
                     Text(
-                      'No videos in this category',
+                      context.l10n.noCategoryVideos,
                       style: TextStyle(color: kTextSoft, fontSize: 15),
                     ),
                   ],
@@ -111,7 +120,7 @@ class _GridCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final thumb = video.displayThumbnail;
 
-    return GestureDetector(
+    return InkWell(
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => VideoPlayerScreen(video: video)),
@@ -217,7 +226,7 @@ class _GridCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: FontWeight.w700,
                         height: 1.2,
                       ),
@@ -227,10 +236,7 @@ class _GridCard extends StatelessWidget {
                       video.artistName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 10,
-                      ),
+                      style: const TextStyle(color: kTextSoft, fontSize: 12),
                     ),
                   ],
                 ),

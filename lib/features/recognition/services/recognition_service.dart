@@ -11,8 +11,7 @@ class MusicRecognitionService extends ChangeNotifier {
   final AudioRecorder _audioRecorder = AudioRecorder();
   final MusicRecognitionRepository _repository;
 
-  MusicRecognitionService({required MusicRecognitionRepository repository})
-    : _repository = repository;
+  MusicRecognitionService({required this._repository});
 
   MusicRecognitionStatus _status = MusicRecognitionStatus.idle;
   MusicRecognitionStatus get status => _status;

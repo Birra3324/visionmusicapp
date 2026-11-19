@@ -17,6 +17,7 @@ const kGold = kVisionGold;
 const kVisionRed = Color(0xFF8E2B2B); // Video accent
 const kVisionRedDeep = Color(0xFF3A1214); // Video card surface
 const kVisionRedBright = Color(0xFFD9483F); // Video badge / icon
+const kVisionRedText = Color(0xFFFFB4AB); // Readable on burgundy surfaces
 
 // ─── Backgrounds ─────────────────────────────────────────────────────────────
 const kBackgroundDark = Color(0xFF0B0806); // Near-black premium background
@@ -29,7 +30,8 @@ const kDarkCard = kCardBlack;
 // ─── Text ────────────────────────────────────────────────────────────────────
 const kTextMain = Color(0xFFF7F4EF); // Warm white primary text
 const kTextSoft = Color(0xFFA99B90); // Warm grey secondary text
-const kTextDim = Color(0xFF7A6E64); // Faint / inactive text
+// Muted, still-readable labels: at least 5.5:1 on the darkest card surfaces.
+const kTextDim = Color(0xFF9D8F83);
 const kTextBlack = Colors.black;
 
 // ─── Spacing ─────────────────────────────────────────────────────────────────
@@ -49,7 +51,11 @@ const kRadiusL = 20.0;
 const kRadiusXL = 28.0;
 
 // ─── Typography ───────────────────────────────────────────────────────────────
+const kVisionFontFallback = ['VisionEthiopic', 'VisionArabic'];
+
 const kStyleDisplay = TextStyle(
+  fontFamily: 'Roboto',
+  fontFamilyFallback: kVisionFontFallback,
   color: kTextMain,
   fontSize: 32,
   fontWeight: FontWeight.w800,
@@ -57,6 +63,8 @@ const kStyleDisplay = TextStyle(
   height: 1.1,
 );
 const kStyleTitle = TextStyle(
+  fontFamily: 'Roboto',
+  fontFamilyFallback: kVisionFontFallback,
   color: kTextMain,
   fontSize: 22,
   fontWeight: FontWeight.w700,
@@ -64,26 +72,34 @@ const kStyleTitle = TextStyle(
   height: 1.2,
 );
 const kStyleHeadline = TextStyle(
+  fontFamily: 'Roboto',
+  fontFamilyFallback: kVisionFontFallback,
   color: kTextMain,
   fontSize: 18,
   fontWeight: FontWeight.w600,
   height: 1.3,
 );
 const kStyleBody = TextStyle(
+  fontFamily: 'Roboto',
+  fontFamilyFallback: kVisionFontFallback,
   color: kTextMain,
   fontSize: 15,
   fontWeight: FontWeight.w500,
   height: 1.4,
 );
 const kStyleCaption = TextStyle(
+  fontFamily: 'Roboto',
+  fontFamilyFallback: kVisionFontFallback,
   color: kTextSoft,
   fontSize: 13,
   fontWeight: FontWeight.w400,
   height: 1.4,
 );
 const kStyleLabel = TextStyle(
+  fontFamily: 'Roboto',
+  fontFamilyFallback: kVisionFontFallback,
   color: kTextSoft,
-  fontSize: 11,
+  fontSize: 12,
   fontWeight: FontWeight.w500,
   letterSpacing: 0.6,
 );
@@ -113,7 +129,12 @@ BoxDecoration kGlassDecoration({
 
 // ─── Full ThemeData ───────────────────────────────────────────────────────────
 ThemeData buildVisionGoldTheme() {
-  final base = ThemeData.dark(useMaterial3: true);
+  final base = ThemeData(
+    brightness: Brightness.dark,
+    useMaterial3: true,
+    fontFamily: 'Roboto',
+    fontFamilyFallback: kVisionFontFallback,
+  );
   return base.copyWith(
     scaffoldBackgroundColor: kBackgroundDark,
     canvasColor: kBackgroundDark,
@@ -143,14 +164,20 @@ ThemeData buildVisionGoldTheme() {
       // selected tab. Selection is carried by icon and label colour alone,
       // which is what every major streaming app does.
       indicatorColor: Colors.transparent,
-      overlayColor: WidgetStateProperty.all(Colors.transparent),
+      overlayColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.focused) ||
+            states.contains(WidgetState.pressed)) {
+          return kVisionGold.withValues(alpha: 0.16);
+        }
+        return null;
+      }),
       labelTextStyle: WidgetStateProperty.resolveWith((states) {
         final selected = states.contains(WidgetState.selected);
         return kStyleLabel.copyWith(
           color: selected ? kVisionGoldLight : kTextDim,
           fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
           letterSpacing: 0.2,
-          fontSize: 11,
+          fontSize: 12,
         );
       }),
       iconTheme: WidgetStateProperty.resolveWith((states) {
@@ -160,7 +187,7 @@ ThemeData buildVisionGoldTheme() {
           size: 24,
         );
       }),
-      height: 62,
+      height: 80,
       labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
     ),
     sliderTheme: const SliderThemeData(

@@ -13,7 +13,7 @@ It is live at [https://www.visionmusic.et](https://www.visionmusic.et). The app 
 - Playlists, favorites, and recently played, stored on the device
 - Search by song, artist, or album
 - Continue as a guest, or sign in with Google
-- A bundled catalog so the app plays music on a local run while `AppConfig.useFirebaseCatalog` is off
+- A curated local video catalog linked to the official Vision Entertainment channel; audio awaits verified masters
 - An optional Cloud Firestore catalog when that flag is turned on
 - English, Afaan Oromo, Amharic, Arabic, French, and Spanish
 
@@ -21,7 +21,7 @@ On the login screen, **Continue as Guest** opens the app without a Firebase sess
 
 ## Screenshots
 
-Captured from a web build in guest mode, using the bundled catalog.
+Historical design screenshots. The sample audio, names and photos shown below are not the current release catalog. See [the catalog reset and intake plan](docs/AUDIO_CATALOG.md).
 
 | Login | Home | Now Playing | Library | Search |
 |---|---|---|---|---|
@@ -55,6 +55,17 @@ flutter run -d chrome
 
 `flutter devices` lists phones, simulators, and desktop targets. `flutter run` with no `-d` picks one. Choose **Continue as Guest** on the login screen.
 
+For a browser preview with Google sign-in:
+
+```bash
+flutter run -d web-server --web-hostname localhost --web-port 7357
+```
+
+Open **http://localhost:7357/**. The development Firebase project authorizes
+`localhost`; `127.0.0.1` is a different OAuth domain and will fail sign-in.
+Check Authentication > Settings > Authorized domains when using another host.
+See [Firebase's authorized-domain guidance](https://firebase.google.com/docs/auth/faq-and-troubleshooting#limit_your_authorized_authentication_domains).
+
 ## Tests
 
 From the repository root:
@@ -78,16 +89,16 @@ lib/
   audio_manager.dart         # queue, favorites, recent plays
   controllers/               # playlists
   core/services/             # catalog flag, Firebase bootstrap, media sources
-  mock_songs.dart            # bundled catalog
+  catalog/bundled_catalog.dart # reviewed audio and official video entries
   l10n/                      # en, om, am, ar, fr, es
-assets/audio/                # tracks used by the local catalog
+assets/audio/                # preserved design samples; not bundled
 assets/images/
 docs/screenshots/            # login, home, player, library, search
 test/
 android/  ios/  macos/  web/  linux/  windows/
 ```
 
-Catalog audio and artwork belong to Vision Entertainment LLC.
+Old sample media remain preserved for development history and are excluded from the app bundle. Only reviewed original audio and matching artwork should enter the listener catalog.
 
 ## Author
 

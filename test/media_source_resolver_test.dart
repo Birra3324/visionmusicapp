@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:visionmusicapp/core/services/media_source_resolver.dart';
-import 'package:visionmusicapp/mock_songs.dart';
+import 'fixtures/sample_songs.dart';
 
 /// Media paths used to be bundled-asset-only, so `AudioManager.playAtIndex`
 /// called `AudioSource.asset()` unconditionally and every artwork widget called
@@ -167,7 +167,7 @@ void main() {
     );
   });
 
-  group('bundled catalog', () {
+  group('sample source fixtures', () {
     test('every mock song still classifies as a loadable source', () {
       for (final song in mockSongs) {
         expect(
@@ -178,7 +178,7 @@ void main() {
       }
     });
 
-    test('the bundled catalog needs no network access', () {
+    test('local sample paths need no network access', () {
       for (final song in mockSongs) {
         expect(
           MediaSourceResolver.isRemote(song.filePath),

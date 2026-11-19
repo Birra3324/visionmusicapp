@@ -1,3 +1,4 @@
+import 'package:visionmusicapp/l10n/listener_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:visionmusicapp/controllers/playlist_controller.dart';
 import 'package:visionmusicapp/models/playlist.dart';
@@ -36,6 +37,7 @@ class _PlaylistDetailScreenState extends State<PlaylistDetailScreen> {
           backgroundColor: kDarkBackground,
           appBar: AppBar(
             leading: IconButton(
+              tooltip: MaterialLocalizations.of(context).backButtonTooltip,
               icon: const Icon(
                 Icons.arrow_back_ios_new_rounded,
                 color: kTextMain,
@@ -45,9 +47,9 @@ class _PlaylistDetailScreenState extends State<PlaylistDetailScreen> {
             title: Text(currentPlaylist.name),
           ),
           body: songs.isEmpty
-              ? const Center(
+              ? Center(
                   child: Text(
-                    'This playlist is empty.\nAdd songs from the 3-dot menu.',
+                    context.l10n.emptyPlaylist,
                     textAlign: TextAlign.center,
                     style: TextStyle(color: kTextSoft),
                   ),
@@ -59,6 +61,8 @@ class _PlaylistDetailScreenState extends State<PlaylistDetailScreen> {
                     return SongRow(
                       song: song,
                       audioManager: widget.controller.audioManager,
+                      onRemoveFromPlaylist: () => widget.controller
+                          .removeSongFromPlaylist(currentPlaylist, song.id),
                     );
                   },
                 ),

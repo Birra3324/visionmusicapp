@@ -6,7 +6,7 @@
 // 1. YouTube Data API v3 key from Google Cloud Console
 // 2. Add the API key to your environment or config
 //
-// For now, videos can be manually added to Firebase or mock data.
+// Curated links in catalog/bundled_catalog.dart require no API key.
 
 class YouTubeConfig {
   /// Your YouTube channel handle
@@ -16,16 +16,15 @@ class YouTubeConfig {
   static const String channelUrl =
       'https://youtube.com/@visionentertainment4507';
 
-  /// Channel ID (you can find this in YouTube Studio → Settings → Channel → Advanced)
-  /// Replace with your actual channel ID for API calls
-  static const String? channelId = null; // e.g., 'UCxxxxxxxxxxxxxxxxxxx'
+  /// Confirmed channel ID from the owner’s YouTube Studio.
+  static const String channelId = 'UCUMRvDa74KYAovuMM21_Iag';
 
   /// YouTube Data API v3 key
   /// Get from: https://console.cloud.google.com/apis/credentials
   static const String? apiKey = null;
 
   /// Check if API is configured
-  static bool get isConfigured => channelId != null && apiKey != null;
+  static bool get isConfigured => apiKey != null;
 
   /// Build channel videos API URL
   static String? get channelVideosUrl {

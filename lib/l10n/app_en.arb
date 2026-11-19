@@ -33,7 +33,7 @@
   "profile": "Profile",
   "playback": "Playback",
   "autoplay": "Autoplay",
-  "autoplayDescription": "Automatically play the next related track",
+  "autoplayDescription": "Automatically play the next track in the queue",
   "shuffleDescription": "Play songs in random order",
   "repeatDescription": "Repeat the current queue",
   "searchDescription": "Find songs, artists, and albums in the Vision Music catalog.",
@@ -41,5 +41,220 @@
   "searchQuestion": "What do you want to hear?",
   "searchInstructions": "Search by song, artist, or album—or choose a suggestion above.",
   "noMatches": "No matches found.",
-  "continueAsGuest": "Continue as Guest"
+  "continueAsGuest": "Continue as Guest",
+  "welcome": "Welcome to Vision Music",
+  "greeting": "Welcome, {name}",
+  "@greeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "recent": "Recent",
+  "all": "All",
+  "added": "Added",
+  "listen": "Listen",
+  "music": "Music",
+  "videos": "Videos",
+  "exploreMusic": "Explore music",
+  "seeAll": "See all",
+  "audioCatalogTitle": "Our audio catalog is on its way",
+  "audioCatalogDescription": "Explore Vision Entertainment’s official music videos while we prepare the audio releases.",
+  "watchMusicVideos": "Watch music videos",
+  "guestListener": "Guest listener",
+  "activitySaved": "Your listening activity is saved on this device.",
+  "loginDescription": "Discover Oromo artists, albums, songs, and music videos.",
+  "signInGoogle": "Sign in with Google",
+  "signInUnavailable": "Sign in temporarily unavailable",
+  "guestAvailable": "You can continue without signing in.",
+  "localActivity": "Favorites and recent listening are saved on this device.",
+  "signedInAs": "Signed in as {name}",
+  "@signedInAs": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "favorites": "Favorites",
+  "favoritesHint": "Tap the heart on any song to save it here.",
+  "favoritesEmpty": "Your favorites will appear here.",
+  "exploreCatalog": "Explore catalog",
+  "recentlyPlayed": "Recently Played",
+  "recentHint": "What you've been listening to will show up here.",
+  "recentEmpty": "Play a song to start your history.",
+  "yourCollection": "Your Collection",
+  "collectionHint": "Your saved music and playlists.",
+  "playlists": "Playlists",
+  "playlistsHint": "Create and organize your listening sets",
+  "artists": "Artists",
+  "albums": "Albums",
+  "songs": "Songs",
+  "noAlbums": "No albums yet.",
+  "songCount": "Songs: {count}",
+  "@songCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "artistCount": "Artists: {count}",
+  "@artistCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "albumCount": "Albums: {count}",
+  "@albumCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "favoriteCount": "Favorites: {count}",
+  "@favoriteCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recentCount": "Recently played: {count}",
+  "@recentCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "videoLibraryHint": "Music videos, podcasts, and more",
+  "removeFavorite": "Remove from favorites",
+  "addFavorite": "Add to favorites",
+  "channelDescription": "Explore our music videos on YouTube.",
+  "openChannel": "Open YouTube channel",
+  "loadingVideos": "Loading videos…",
+  "videoLoadError": "Could not load videos",
+  "checkConnection": "Please check your connection and try again.",
+  "retry": "Retry",
+  "searchVideos": "Search videos",
+  "videoSearchHint": "Videos and artists",
+  "clear": "Clear",
+  "back": "Back",
+  "noVideoMatches": "No matching videos.",
+  "featured": "Featured",
+  "upNext": "Up next",
+  "openYouTube": "Open in YouTube",
+  "watchYouTube": "Watch on YouTube",
+  "playVideo": "Play video",
+  "videoUnpublished": "This video has not been published yet.",
+  "videoPlaybackError": "This video could not be played. Check your connection and try again.",
+  "noCategoryVideos": "No videos in this category",
+  "youTubeError": "Could not open YouTube. Please try again.",
+  "lyricsLoadError": "Could not load lyrics",
+  "tryLater": "Please try again in a moment.",
+  "lyricsUnavailable": "Lyrics not available yet",
+  "lyricsSourceHint": "We only show lyrics provided by the artist or a licensed source.",
+  "volume": "Volume",
+  "volumePercent": "{count} percent",
+  "@volumePercent": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noSongPlaying": "No song playing",
+  "playbackPosition": "Playback position",
+  "songPlaybackError": "This song could not be played. Please try again.",
+  "newPlaylist": "New Playlist",
+  "renamePlaylist": "Rename Playlist",
+  "playlistName": "Playlist name",
+  "cancel": "Cancel",
+  "create": "Create",
+  "save": "Save",
+  "delete": "Delete",
+  "rename": "Rename",
+  "deletePlaylistTitle": "Delete playlist?",
+  "deletePlaylistMessage": "Delete “{name}”? The songs will stay in your catalog.",
+  "@deletePlaylistMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "createPlaylist": "Create Playlist",
+  "noPlaylists": "No Playlists",
+  "managePlaylist": "Manage {name}",
+  "@managePlaylist": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "emptyPlaylist": "This playlist is empty. Add songs from the song menu.",
+  "moreSongOptions": "More options for {title}",
+  "@moreSongOptions": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "removeFromPlaylist": "Remove from Playlist",
+  "addToQueue": "Add to Queue",
+  "removeFromLibrary": "Remove from Library",
+  "addToLibrary": "Add to Library",
+  "addToPlaylist": "Add to Playlist",
+  "share": "Share",
+  "shareCopied": "Share text copied.",
+  "addedToPlaylist": "Added to playlist.",
+  "watchSong": "Watch {title} on YouTube",
+  "@watchSong": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "playSong": "Play {title}",
+  "@playSong": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "playSongBy": "Play {title} by {artist}",
+  "@playSongBy": {
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "startupError": "Could not start Vision Music.",
+  "loadingApp": "Opening Vision Music…",
+  "slowConnection": "This is taking longer than usual. Check your connection.",
+  "allowSignInWindow": "Allow the Google sign-in window in your browser, then try again.",
+  "signInCanceled": "Sign-in was canceled. Try again or continue as a guest.",
+  "accountUnavailable": "This account is unavailable. Please contact support.",
+  "noArtistSongs": "No songs for this artist yet.",
+  "categoryMusic": "Music Videos",
+  "categoryLive": "Live Performances",
+  "categoryStudio": "Studio Sessions",
+  "categoryInterviews": "Interviews",
+  "categoryPodcasts": "Podcast Clips",
+  "categoryConcerts": "Concerts",
+  "categoryNew": "New Releases",
+  "categoryClassics": "Oromo Classics"
 }
