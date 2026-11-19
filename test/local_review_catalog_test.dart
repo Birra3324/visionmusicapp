@@ -31,10 +31,6 @@ void main() {
       for (final track in tracks) {
         expect(track.duration, greaterThan(Duration.zero));
         expect(assets, contains(track.filePath));
-        expect(
-          (await rootBundle.load(track.filePath)).lengthInBytes,
-          greaterThan(1000000),
-        );
         expect(await repository.fetchById(track.id), track);
       }
       expect(
@@ -57,5 +53,18 @@ void main() {
       });
       expect(tracks, bundledSongs);
     },
+  );
+
+  test(
+    'protected recordings contain release media rather than CI silence',
+    () async {
+      for (final track in bundledSongs) {
+        expect(
+          (await rootBundle.load(track.filePath)).lengthInBytes,
+          greaterThan(1000000),
+        );
+      }
+    },
+    tags: ['protected_audio'],
   );
 }

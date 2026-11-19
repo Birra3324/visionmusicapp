@@ -7,10 +7,11 @@ import '../domain/recognition_state.dart';
 import 'recognition_repository.dart';
 
 class MusicRecognitionService extends ChangeNotifier {
-  final AudioRecorder _audioRecorder = AudioRecorder();
+  final AudioRecorder _audioRecorder;
   final MusicRecognitionRepository _repository;
 
-  MusicRecognitionService({required this._repository});
+  MusicRecognitionService({required this._repository, AudioRecorder? recorder})
+    : _audioRecorder = recorder ?? AudioRecorder();
 
   MusicRecognitionStatus _status = MusicRecognitionStatus.idle;
   MusicRecognitionStatus get status => _status;

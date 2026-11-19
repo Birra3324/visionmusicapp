@@ -65,9 +65,22 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get --enforce-lockfile
-      - run: flutter test --dart-define=USE_FIREBASE_CATALOG=${{ inputs.use_firebase_catalog }} --dart-define=FALLBACK_TO_LOCAL_CATALOG=false
+      - name: Prepare synthetic audio for unsigned validation only
+        if: ${{ !inputs.upload_to_testflight }}
+        run: python3 scripts/ci_audio_fixtures.py prepare --synthetic-only
+      - name: Test code without protected recordings
+        if: ${{ !inputs.upload_to_testflight }}
+        run: flutter test --exclude-tags protected_audio --dart-define=USE_FIREBASE_CATALOG=${{ inputs.use_firebase_catalog }} --dart-define=FALLBACK_TO_LOCAL_CATALOG=false
+      - name: Test complete release before any approved upload
+        if: ${{ inputs.upload_to_testflight }}
+        run: flutter test --dart-define=USE_FIREBASE_CATALOG=${{ inputs.use_firebase_catalog }} --dart-define=FALLBACK_TO_LOCAL_CATALOG=false
       - name: Unsigned iOS build
         run: flutter build ios --release --no-codesign --dart-define=USE_FIREBASE_CATALOG=${{ inputs.use_firebase_catalog }} --dart-define=FALLBACK_TO_LOCAL_CATALOG=false
+      - name: Audit built iOS permission references
+        run: python3 scripts/audit_ios_permissions.py build/ios/iphoneos/Runner.app
+      - name: Remove synthetic audio
+        if: ${{ always() && !inputs.upload_to_testflight }}
+        run: python3 scripts/ci_audio_fixtures.py cleanup --synthetic-only
 
   testflight:
     if: ${{ inputs.upload_to_testflight == true && !startsWith(github.ref_name, 'secure-release/') }}
@@ -145,6 +158,7 @@ jobs:
         env:
           VM_UPLOAD_CRASHLYTICS_SYMBOLS: "true"
         run: |
+          python3 scripts/audit_ios_permissions.py build/ios/iphoneos/Runner.app
           xcodebuild archive \
             -workspace ios/Runner.xcworkspace \
             -scheme Runner \
@@ -221,6 +235,8 @@ jobs:
         run: flutter test --dart-define=USE_FIREBASE_CATALOG=false --dart-define=FALLBACK_TO_LOCAL_CATALOG=false
       - name: Build unsigned iOS app
         run: flutter build ios --release --no-codesign --dart-define=USE_FIREBASE_CATALOG=false --dart-define=FALLBACK_TO_LOCAL_CATALOG=false
+      - name: Audit built iOS permission references
+        run: python3 scripts/audit_ios_permissions.py build/ios/iphoneos/Runner.app
       - name: Prepare signing key
         if: ${{ inputs.upload_to_testflight }}
         env:
@@ -245,6 +261,7 @@ jobs:
           [[ "$BUILD_NUMBER" =~ ^[1-9][0-9]{0,8}$ ]]
           key_path="$RUNNER_TEMP/asc/AuthKey_${ASC_KEY_ID}.p8"
           flutter build ios --release --no-codesign --build-number="$BUILD_NUMBER" --dart-define=USE_FIREBASE_CATALOG=false --dart-define=FALLBACK_TO_LOCAL_CATALOG=false
+          python3 scripts/audit_ios_permissions.py build/ios/iphoneos/Runner.app
           xcodebuild archive -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release \
             -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/Runner.xcarchive" \
             -derivedDataPath "$RUNNER_TEMP/vision-derived" \
