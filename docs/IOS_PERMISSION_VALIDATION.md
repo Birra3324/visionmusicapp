@@ -7,6 +7,14 @@ microphone permission. The pinned `record_ios` implementation requests only
 added to Info.plist. Build number 107 is a proposal, not a reservation in App
 Store Connect.
 
+The first native binary audit still found `requestWhenInUseAuthorization` in
+Runner after removing `permission_handler`. Symbol and source inspection traced
+it to `file_picker` → `DKImagePickerController` → `DKCameraLocationManager`.
+The listener app has no Dart imports or calls to `file_picker`, so this unused
+dependency is also removed, together with its generated plugin registration.
+This avoids adding an unnecessary location purpose string or patching a cached
+third-party package. The native audit must pass on the resulting binary.
+
 ## Public code checks without protected music
 
 The original PR CI failure (run 44144558499, job 134256028444) consisted of three
