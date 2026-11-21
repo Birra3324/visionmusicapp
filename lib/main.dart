@@ -8,6 +8,7 @@ import 'package:visionmusicapp/audio/audio_handler.dart';
 import 'package:visionmusicapp/audio_manager.dart';
 import 'package:visionmusicapp/core/services/app_config.dart';
 import 'package:visionmusicapp/core/services/catalog_loader.dart';
+import 'package:visionmusicapp/core/services/cdn_song_repository.dart';
 import 'package:visionmusicapp/core/services/app_observability.dart';
 import 'package:visionmusicapp/core/services/firebase_bootstrap.dart';
 import 'package:visionmusicapp/core/services/firestore_song_repository.dart';
@@ -80,7 +81,18 @@ class _AppBootstrapperState extends State<AppBootstrapper> {
     );
   }
 
-  Future<List<Song>> _loadCatalog() => loadCatalog<Song>(
+  /// CDN songs first (approved songs only). If the CDN has none yet or can't
+  /// be reached, keep the existing Firebase / bundled behaviour.
+  Future<List<Song>> _loadCatalog() async {
+    if (AppConfig.useCdnCatalog) {
+      final cdnSongs =
+          await CdnSongRepository(baseUrl: AppConfig.cdnBaseUrl).fetchAll();
+      if (cdnSongs.isNotEmpty) return cdnSongs;
+    }
+    return _loadFirebaseOrLocalCatalog();
+  }
+
+  Future<List<Song>> _loadFirebaseOrLocalCatalog() => loadCatalog<Song>(
     useFirebase: AppConfig.useFirebaseCatalog,
     firebaseReady: _firebaseBootstrapResult?.isReady ?? false,
     allowLocalFallback: AppConfig.fallbackToLocalOnEmpty,

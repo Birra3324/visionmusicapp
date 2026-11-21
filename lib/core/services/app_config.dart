@@ -8,6 +8,20 @@ class AppConfig {
     defaultValue: false,
   );
 
+  /// Read songs from the Vision Music CDN first. On by default; turn off with
+  /// `--dart-define=USE_CDN_CATALOG=false`. When the CDN catalog is empty or
+  /// unreachable, the app falls through to the Firebase / bundled logic below.
+  static const bool useCdnCatalog = bool.fromEnvironment(
+    'USE_CDN_CATALOG',
+    defaultValue: true,
+  );
+
+  /// Base URL of the song CDN (Cloudflare R2 behind a Worker).
+  static const String cdnBaseUrl = String.fromEnvironment(
+    'CDN_BASE_URL',
+    defaultValue: 'https://cdn.visionmusic.et/',
+  );
+
   static const bool fallbackToLocalOnEmpty = bool.fromEnvironment(
     'FALLBACK_TO_LOCAL_CATALOG',
     defaultValue: !useFirebaseCatalog,
