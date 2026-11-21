@@ -41,17 +41,35 @@ class VideoService {
 
   bool get _firestoreAvailable => _videosRef != null;
 
+  /// Published videos only. The live Firestore rules allow reading a video
+  /// only when `status == 'published'` and `approved == true`, and Firestore
+  /// refuses any query that could return a document the rules deny. Every
+  /// video query must start here or it fails with PERMISSION_DENIED.
+  Query get _publishedVideos => _videosRef!
+      .where('status', isEqualTo: 'published')
+      .where('approved', isEqualTo: true);
+
+  /// Newest first, sorted on the device so no composite index is needed.
+  static List<Video> _newestFirst(Iterable<Video> videos) {
+    final list = videos.toList();
+    list.sort((a, b) {
+      final ad = a.releaseDate, bd = b.releaseDate;
+      if (ad == null && bd == null) return 0;
+      if (ad == null) return 1;
+      if (bd == null) return -1;
+      return bd.compareTo(ad);
+    });
+    return list;
+  }
+
   // ── Public API ───────────────────────────────────────────────────────────
 
   /// All published videos, newest first.
   Future<List<Video>> fetchAllVideos() async {
     if (!_firestoreAvailable) return mockVideos;
     try {
-      final snap = await _videosRef!
-          .where('isPublished', isEqualTo: true)
-          .orderBy('releaseDate', descending: true)
-          .get();
-      final results = snap.docs.map(Video.fromFirestore).toList();
+      final snap = await _publishedVideos.get();
+      final results = _newestFirst(snap.docs.map(Video.fromFirestore));
       return results.isEmpty ? mockVideos : results;
     } catch (e) {
       debugPrint('[VideoService] fetchAllVideos error: $e');
@@ -63,12 +81,10 @@ class VideoService {
   Future<List<Video>> fetchFeaturedVideos() async {
     if (!_firestoreAvailable) return featuredMockVideos;
     try {
-      final snap = await _videosRef!
-          .where('isPublished', isEqualTo: true)
+      final snap = await _publishedVideos
           .where('isFeatured', isEqualTo: true)
-          .orderBy('releaseDate', descending: true)
           .get();
-      final results = snap.docs.map(Video.fromFirestore).toList();
+      final results = _newestFirst(snap.docs.map(Video.fromFirestore));
       return results.isEmpty ? featuredMockVideos : results;
     } catch (e) {
       debugPrint('[VideoService] fetchFeaturedVideos error: $e');
@@ -98,12 +114,10 @@ class VideoService {
       return mockVideos.where((v) => v.category == categoryId).toList();
     }
     try {
-      final snap = await _videosRef!
-          .where('isPublished', isEqualTo: true)
+      final snap = await _publishedVideos
           .where('category', isEqualTo: categoryId)
-          .orderBy('releaseDate', descending: true)
           .get();
-      final results = snap.docs.map(Video.fromFirestore).toList();
+      final results = _newestFirst(snap.docs.map(Video.fromFirestore));
       if (results.isEmpty) {
         return mockVideos.where((v) => v.category == categoryId).toList();
       }
@@ -163,17 +177,10 @@ class VideoService {
     }
   }
 
-  /// Increment view count (fire-and-forget — not critical).
-  Future<void> incrementViewCount(String videoId) async {
-    if (!_firestoreAvailable) return;
-    try {
-      await _videosRef!.doc(videoId).update({
-        'viewCount': FieldValue.increment(1),
-      });
-    } catch (e) {
-      debugPrint('[VideoService] incrementViewCount error: $e');
-    }
-  }
+  /// View counts are not written from the app: the Firestore rules deny every
+  /// client write to `videos/`, so the old `update()` failed on every play.
+  /// Count views on the server side instead (e.g. a Worker or Cloud Function).
+  Future<void> incrementViewCount(String videoId) async {}
 }
 
 /// Singleton instance — initialised once in main.dart

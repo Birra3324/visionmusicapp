@@ -40,6 +40,25 @@ class FirestoreVideoRepository implements VideoRepository {
 
   CollectionReference get _videosCollection => _firestore.collection('videos');
 
+  /// Matches the live Firestore rules (status == 'published' and
+  /// approved == true); any other query is refused with PERMISSION_DENIED.
+  Query get _publishedVideos => _videosCollection
+      .where('status', isEqualTo: 'published')
+      .where('approved', isEqualTo: true);
+
+  /// Newest first, sorted on the device so no composite index is needed.
+  static List<Video> _newestFirst(Iterable<Video> videos) {
+    final list = videos.toList();
+    list.sort((a, b) {
+      final ad = a.releaseDate, bd = b.releaseDate;
+      if (ad == null && bd == null) return 0;
+      if (ad == null) return 1;
+      if (bd == null) return -1;
+      return bd.compareTo(ad);
+    });
+    return list;
+  }
+
   Video _docToVideo(DocumentSnapshot doc) {
     // Use the canonical Video.fromFirestore() which handles all field aliases
     return Video.fromFirestore(doc);
@@ -48,11 +67,8 @@ class FirestoreVideoRepository implements VideoRepository {
   @override
   Future<List<Video>> getAllVideos() async {
     try {
-      final snapshot = await _videosCollection
-          .where('isPublished', isEqualTo: true)
-          .orderBy('publishedAt', descending: true)
-          .get();
-      return snapshot.docs.map(_docToVideo).toList();
+      final snapshot = await _publishedVideos.get();
+      return _newestFirst(snapshot.docs.map(_docToVideo));
     } catch (e) {
       debugPrint('Error fetching videos from Firestore: $e');
       // Fallback to mock data on error
@@ -63,12 +79,10 @@ class FirestoreVideoRepository implements VideoRepository {
   @override
   Future<List<Video>> getVideosByType(VideoType type) async {
     try {
-      final snapshot = await _videosCollection
-          .where('isPublished', isEqualTo: true)
+      final snapshot = await _publishedVideos
           .where('type', isEqualTo: type.name)
-          .orderBy('publishedAt', descending: true)
           .get();
-      return snapshot.docs.map(_docToVideo).toList();
+      return _newestFirst(snapshot.docs.map(_docToVideo));
     } catch (e) {
       debugPrint('Error fetching videos by type from Firestore: $e');
       // Fallback to mock data
