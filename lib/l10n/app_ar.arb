@@ -41,5 +41,15 @@
   "searchQuestion": "ماذا تريد أن تسمع؟",
   "searchInstructions": "ابحث حسب الأغنية أو الفنان أو الألبوم.",
   "noMatches": "لم يتم العثور على نتائج.",
-  "continueAsGuest": "المتابعة كضيف"
+  "continueAsGuest": "المتابعة كضيف",
+  "accountAndPrivacy": "الحساب والخصوصية",
+  "privacyPolicy": "سياسة الخصوصية",
+  "signOut": "تسجيل الخروج",
+  "deleteAccount": "حذف حسابي",
+  "deleteAccountConfirmTitle": "حذف حسابك؟",
+  "deleteAccountConfirmBody": "سيؤدي هذا إلى حذف حساب Vision Music نهائيًا. تبقى قوائم التشغيل المحفوظة على هذا الهاتف. لا يمكن التراجع عن ذلك.",
+  "deleteAccountConfirmAction": "حذف",
+  "cancel": "إلغاء",
+  "accountDeleted": "تم حذف حسابك.",
+  "deleteAccountFailed": "تعذّر حذف حسابك. يُرجى المحاولة مرة أخرى."
 }

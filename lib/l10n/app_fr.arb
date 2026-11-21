@@ -41,5 +41,15 @@
   "searchQuestion": "Que voulez-vous écouter ?",
   "searchInstructions": "Recherchez par titre, artiste ou album.",
   "noMatches": "Aucun résultat trouvé.",
-  "continueAsGuest": "Continuer en tant qu'invité"
+  "continueAsGuest": "Continuer en tant qu'invité",
+  "accountAndPrivacy": "Compte et confidentialité",
+  "privacyPolicy": "Politique de confidentialité",
+  "signOut": "Se déconnecter",
+  "deleteAccount": "Supprimer mon compte",
+  "deleteAccountConfirmTitle": "Supprimer votre compte ?",
+  "deleteAccountConfirmBody": "Votre compte Vision Music sera supprimé définitivement. Les playlists enregistrées sur ce téléphone y restent. Cette action est irréversible.",
+  "deleteAccountConfirmAction": "Supprimer",
+  "cancel": "Annuler",
+  "accountDeleted": "Votre compte a été supprimé.",
+  "deleteAccountFailed": "Impossible de supprimer votre compte. Veuillez réessayer."
 }

@@ -134,4 +134,35 @@ class AppLocalizationsAm extends AppLocalizations {
 
   @override
   String get continueAsGuest => 'እንደ እንግዳ ይቀጥሉ';
+
+  @override
+  String get accountAndPrivacy => 'መለያ እና ግላዊነት';
+
+  @override
+  String get privacyPolicy => 'የግላዊነት ፖሊሲ';
+
+  @override
+  String get signOut => 'ውጣ';
+
+  @override
+  String get deleteAccount => 'መለያዬን ሰርዝ';
+
+  @override
+  String get deleteAccountConfirmTitle => 'መለያዎን ይሰርዙ?';
+
+  @override
+  String get deleteAccountConfirmBody =>
+      'ይህ የVision Music መለያዎን እስከመጨረሻው ይሰርዛል። በዚህ ስልክ ላይ የተቀመጡ የአጫዋች ዝርዝሮች እዚሁ ይቆያሉ። ይህ ሊቀለበስ አይችልም።';
+
+  @override
+  String get deleteAccountConfirmAction => 'ሰርዝ';
+
+  @override
+  String get cancel => 'ይቅር';
+
+  @override
+  String get accountDeleted => 'መለያዎ ተሰርዟል።';
+
+  @override
+  String get deleteAccountFailed => 'መለያዎን መሰረዝ አልተቻለም። እባክዎ እንደገና ይሞክሩ።';
 }
