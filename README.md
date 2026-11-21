@@ -31,7 +31,7 @@ Captured from a web build in guest mode, using the bundled catalog.
 
 | Layer | Tech |
 | --- | --- |
-| App | Flutter / Dart (`sdk: ^3.12.0`, Flutter `>=3.44.0`) |
+| App | Flutter / Dart (`sdk: ^3.13.7`, Flutter `>=3.47.8`) |
 | Playback | `just_audio`, `audio_service`, `audio_session` |
 | State | Provider |
 | Auth | Firebase Auth and Google Sign-In; guest entry needs neither |
@@ -44,7 +44,7 @@ The FlutterFire client files already in the tree (`lib/firebase_options.dart`, `
 
 ## Run locally
 
-Use Flutter 3.44 or newer and a Dart SDK that satisfies `^3.12.0` (`environment` in `pubspec.yaml`). Flutter 3.47.9 with Dart 3.13.7 meets that constraint.
+Use Flutter 3.47.8 or newer (Dart 3.13.7+). Older SDKs are refused on purpose: builds made with them carry the trusted-certificate list from before the Oct 2026 eMudhra certificate revocation (Firebase security notice, Nov 3 2026). CI uses 3.47.9.
 
 ```bash
 git clone https://github.com/Birra3324/visionmusicapp.git
