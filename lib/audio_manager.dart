@@ -10,6 +10,7 @@ import 'package:visionmusicapp/core/services/app_observability.dart';
 import 'package:visionmusicapp/settings_manager.dart';
 import 'package:visionmusicapp/song.dart';
 import 'package:visionmusicapp/models/playlist.dart';
+import 'package:visionmusicapp/core/services/song_id_aliases.dart';
 
 class AudioManager extends ChangeNotifier {
   final AudioPlayer _player = AudioPlayer();
@@ -141,24 +142,26 @@ class AudioManager extends ChangeNotifier {
 
   Future<void> initializePersistentState() async {
     _prefs = await SharedPreferences.getInstance();
+    final byId = {for (final song in _queue) song.id: song};
+    // Saved ids may come from a catalog with different ids for the same song
+    // (bundled vs CDN); map them onto the catalog loaded now.
+    final known = byId.keys.toSet();
+    List<String> saved(String key) =>
+        resolveSongIds(_prefs!.getStringList(key) ?? const [], known);
+
     _favoriteIds
       ..clear()
-      ..addAll(_prefs!.getStringList(_favoriteIdsKey) ?? const []);
+      ..addAll(saved(_favoriteIdsKey));
     _libraryIds
       ..clear()
-      ..addAll(_prefs!.getStringList(_libraryIdsKey) ?? const []);
+      ..addAll(saved(_libraryIdsKey));
     _downloadedIds
       ..clear()
-      ..addAll(_prefs!.getStringList(_downloadedIdsKey) ?? const []);
+      ..addAll(saved(_downloadedIdsKey));
 
-    final byId = {for (final song in _queue) song.id: song};
     _recent
       ..clear()
-      ..addAll(
-        (_prefs!.getStringList(_recentIdsKey) ?? const [])
-            .map((id) => byId[id])
-            .whereType<Song>(),
-      );
+      ..addAll(saved(_recentIdsKey).map((id) => byId[id]).whereType<Song>());
     notifyListeners();
   }
 
