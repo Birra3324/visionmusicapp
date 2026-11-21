@@ -42,7 +42,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Vision Music does not use the camera. A software library in the app can reference it, so iOS asks for this text.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Vision Music uses the microphone only when you tap Identify a song, to recognise music playing near you. Nothing is recorded otherwise.</string>
+	<string>Vision Music uses the microphone only when you ask it to identify a song playing near you.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Vision Music does not read your photo library. A software library in the app can reference it, so iOS asks for this text.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
