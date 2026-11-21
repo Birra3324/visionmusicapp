@@ -42,7 +42,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Vision Music may use the camera when you choose to capture photos or video for your profile or content.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Vision Music may use the microphone for voice features or recording when you choose to create audio content.</string>
+	<string>Vision Music uses the microphone only when you ask it to identify a song playing near you.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Vision Music may access your photo library so you can choose cover images or share artwork for playlists.</string>
 	<key>UIApplicationSceneManifest</key>
