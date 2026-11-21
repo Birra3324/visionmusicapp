@@ -40,11 +40,13 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Vision Music may use the camera when you choose to capture photos or video for your profile or content.</string>
+	<string>Vision Music does not use the camera. A software library in the app can reference it, so iOS asks for this text.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Vision Music may use the microphone for voice features or recording when you choose to create audio content.</string>
+	<string>Vision Music uses the microphone only when you tap Identify a song, to recognise music playing near you. Nothing is recorded otherwise.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Vision Music may access your photo library so you can choose cover images or share artwork for playlists.</string>
+	<string>Vision Music does not read your photo library. A software library in the app can reference it, so iOS asks for this text.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Vision Music does not use your location. A software library in the app can reference it, so iOS asks for this text.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
