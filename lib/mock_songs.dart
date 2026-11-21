@@ -29,6 +29,13 @@ import 'package:visionmusicapp/song.dart';
 //   alibiyyanqabaa — Naaima abdurahman.jpeg is 12KB (small). Replace when available.
 //
 // UNUSED ON DISK: davo.jpg (Tekalign Tena — no matching audio in catalog).
+// TRIMMED 2026-11-21:
+//   The app now bundles only the three songs Vision Entertainment has
+//   confirmed and already publishes on cdn.visionmusic.et (3Obsaa, Marartuu,
+//   Gumgume). They are the offline starter set when the CDN can't be reached.
+//   Markato, Hirphaa, Lagaa, Kuyubisaa and Alibiyyanqabaa were removed from the
+//   app until their rights are confirmed; their audio stays in git history.
+//   The notes above are kept for history.
 // ─────────────────────────────────────────────────────────────────────────────
 
 /// Shown when a track has no verified artist artwork. Using the brand mark is
@@ -36,26 +43,6 @@ import 'package:visionmusicapp/song.dart';
 const String kPlaceholderCover = 'assets/images/visionlogo.jpg';
 
 const mockSongs = [
-  Song(
-    id: 'markato',
-    title: 'Markato',
-    artist: 'Ali Birra',
-    albumTitle: 'Best of Ali Birra',
-    genre: 'Oromo Music',
-    filePath: 'assets/audio/nuho_gobana.mp3',
-    duration: Duration(minutes: 5, seconds: 0, milliseconds: 312),
-    imagePath: 'assets/images/alii birra.jpeg',
-  ),
-  Song(
-    id: 'hirphaa',
-    title: 'Hirphaa',
-    artist: 'Hirphaa Gaanfuree',
-    albumTitle: 'Gaanfuree Vol. 1',
-    genre: 'Oromo Music',
-    filePath: 'assets/audio/hirphaa.mp3',
-    duration: Duration(minutes: 4, seconds: 2, milliseconds: 424),
-    imagePath: kPlaceholderCover,
-  ),
   Song(
     id: 'yosan_getahun',
     title: '3Obsaa',
@@ -68,16 +55,6 @@ const mockSongs = [
     youtubeUrl: 'https://www.youtube.com/watch?v=8zlm6JVbi2U',
   ),
   Song(
-    id: 'lagaa',
-    title: 'Lagaa',
-    artist: 'Davo',
-    albumTitle: 'Single',
-    genre: 'Oromo Music',
-    filePath: 'assets/audio/daraara-lagaa.mp3',
-    duration: Duration(minutes: 4, seconds: 50, milliseconds: 880),
-    imagePath: kPlaceholderCover,
-  ),
-  Song(
     id: 'shagoye',
     title: 'Marartuu',
     artist: 'Shukri Jamal',
@@ -87,26 +64,6 @@ const mockSongs = [
     duration: Duration(minutes: 3, seconds: 19, milliseconds: 576),
     imagePath: 'assets/images/shukri_jamal.jpg',
     youtubeUrl: 'https://www.youtube.com/watch?v=F1cfzTGxcCs',
-  ),
-  Song(
-    id: 'kuyubisaa',
-    title: 'Kuyubisaa',
-    artist: 'Asanti',
-    albumTitle: 'Asanti Gold',
-    genre: 'Oromo Music',
-    filePath: 'assets/audio/kuyubisaa.mp3',
-    duration: Duration(minutes: 5, seconds: 37, milliseconds: 267),
-    imagePath: 'assets/images/asanti.jpg',
-  ),
-  Song(
-    id: 'alibiyyanqabaa',
-    title: 'Alibiyyanqabaa',
-    artist: 'Naaima Abdurahman',
-    albumTitle: 'Single',
-    genre: 'Oromo Music',
-    filePath: 'assets/audio/alibiyyanqabaa.mp3',
-    duration: Duration(minutes: 3, seconds: 59, milliseconds: 952),
-    imagePath: 'assets/images/Naaima abdurahman.jpeg',
   ),
   Song(
     id: 'andualem_gosa',
