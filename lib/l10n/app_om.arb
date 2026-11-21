@@ -41,5 +41,15 @@
   "searchQuestion": "Maal dhaggeeffachuu barbaadda?",
   "searchInstructions": "Sirba, artistii ykn albamiin barbaadi; yookaan yaada armaan olii fili.",
   "noMatches": "Wanti walsimu hin argamne.",
-  "continueAsGuest": "Akka keessummaatti itti fufi"
+  "continueAsGuest": "Akka keessummaatti itti fufi",
+  "accountAndPrivacy": "Herrega fi dhuunfummaa",
+  "privacyPolicy": "Imaammata dhuunfummaa",
+  "signOut": "Ba'i",
+  "deleteAccount": "Herrega koo haqi",
+  "deleteAccountConfirmTitle": "Herrega kee haquu?",
+  "deleteAccountConfirmBody": "Kun herrega Vision Music kee guutummaatti haqa. Tarreeffamni bilbila kana irratti kuufame asumatti hafa. Kun deebi'ee hin sirraa'u.",
+  "deleteAccountConfirmAction": "Haqi",
+  "cancel": "Dhiisi",
+  "accountDeleted": "Herregni kee haqameera.",
+  "deleteAccountFailed": "Herrega kee haquun hin danda'amne. Irra deebi'ii yaali."
 }

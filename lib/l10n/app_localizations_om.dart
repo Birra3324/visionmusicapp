@@ -138,4 +138,36 @@ class AppLocalizationsOm extends AppLocalizations {
 
   @override
   String get continueAsGuest => 'Akka keessummaatti itti fufi';
+
+  @override
+  String get accountAndPrivacy => 'Herrega fi dhuunfummaa';
+
+  @override
+  String get privacyPolicy => 'Imaammata dhuunfummaa';
+
+  @override
+  String get signOut => 'Ba\'i';
+
+  @override
+  String get deleteAccount => 'Herrega koo haqi';
+
+  @override
+  String get deleteAccountConfirmTitle => 'Herrega kee haquu?';
+
+  @override
+  String get deleteAccountConfirmBody =>
+      'Kun herrega Vision Music kee guutummaatti haqa. Tarreeffamni bilbila kana irratti kuufame asumatti hafa. Kun deebi\'ee hin sirraa\'u.';
+
+  @override
+  String get deleteAccountConfirmAction => 'Haqi';
+
+  @override
+  String get cancel => 'Dhiisi';
+
+  @override
+  String get accountDeleted => 'Herregni kee haqameera.';
+
+  @override
+  String get deleteAccountFailed =>
+      'Herrega kee haquun hin danda\'amne. Irra deebi\'ii yaali.';
 }

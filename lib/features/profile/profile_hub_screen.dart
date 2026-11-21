@@ -3,7 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import 'package:visionmusicapp/audio_manager.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:visionmusicapp/core/services/app_config.dart';
 import 'package:visionmusicapp/features/auth/auth_service.dart';
+import 'package:visionmusicapp/features/auth/login_screen.dart';
 import 'package:visionmusicapp/settings_manager.dart';
 import 'package:visionmusicapp/vision_theme.dart';
 import 'package:visionmusicapp/widgets/vision_background.dart';
@@ -94,6 +97,8 @@ class ProfileHubScreen extends StatelessWidget {
             _buildLanguageRow(settings, l10n),
             const SizedBox(height: 24),
             _buildPlaybackSection(settings, audioManager, l10n),
+            const SizedBox(height: 24),
+            AccountPrivacySection(signedIn: user != null),
           ],
         ),
       ),
@@ -205,6 +210,140 @@ class ProfileHubScreen extends StatelessWidget {
       activeThumbColor: kDarkBackground,
       activeTrackColor: kVisionGoldLight,
       onChanged: onChanged,
+    );
+  }
+}
+
+/// Privacy policy (everyone), plus sign out and account deletion for listeners
+/// signed in with Google. Both stores require the privacy link and in-app
+/// account deletion.
+class AccountPrivacySection extends StatefulWidget {
+  const AccountPrivacySection({super.key, required this.signedIn});
+
+  final bool signedIn;
+
+  @override
+  State<AccountPrivacySection> createState() => AccountPrivacySectionState();
+}
+
+class AccountPrivacySectionState extends State<AccountPrivacySection> {
+  bool _busy = false;
+
+  Future<void> _openPrivacyPolicy() async {
+    await launchUrl(
+      Uri.parse(AppConfig.privacyPolicyUrl),
+      mode: LaunchMode.externalApplication,
+    );
+  }
+
+  void _goToLogin() {
+    Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+      (_) => false,
+    );
+  }
+
+  Future<void> _signOut() async {
+    setState(() => _busy = true);
+    await AuthService.instance.signOut();
+    if (!mounted) return;
+    _goToLogin();
+  }
+
+  Future<void> _deleteAccount() async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: kDarkCard,
+        title: Text(
+          l10n.deleteAccountConfirmTitle,
+          style: const TextStyle(color: kTextMain),
+        ),
+        content: Text(
+          l10n.deleteAccountConfirmBody,
+          style: const TextStyle(color: kTextSoft, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.redAccent),
+            child: Text(l10n.deleteAccountConfirmAction),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _busy = true);
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    try {
+      await AuthService.instance.deleteAccount();
+      messenger?.showSnackBar(SnackBar(content: Text(l10n.accountDeleted)));
+      if (!mounted) return;
+      _goToLogin();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _busy = false);
+      messenger?.showSnackBar(
+        SnackBar(content: Text(l10n.deleteAccountFailed)),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.accountAndPrivacy,
+          style: const TextStyle(
+            color: kTextMain,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 8),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.privacy_tip_outlined, color: kTextSoft),
+          title: Text(
+            l10n.privacyPolicy,
+            style: const TextStyle(color: kTextMain),
+          ),
+          trailing: const Icon(Icons.open_in_new, color: kTextSoft, size: 18),
+          onTap: _openPrivacyPolicy,
+        ),
+        if (widget.signedIn) ...[
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.logout, color: kTextSoft),
+            title: Text(l10n.signOut, style: const TextStyle(color: kTextMain)),
+            enabled: !_busy,
+            onTap: _signOut,
+          ),
+          ListTile(
+            key: const Key('deleteAccountTile'),
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(
+              Icons.delete_forever_outlined,
+              color: Colors.redAccent,
+            ),
+            title: Text(
+              l10n.deleteAccount,
+              style: const TextStyle(color: Colors.redAccent),
+            ),
+            enabled: !_busy,
+            onTap: _deleteAccount,
+          ),
+        ],
+      ],
     );
   }
 }

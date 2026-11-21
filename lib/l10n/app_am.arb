@@ -41,5 +41,15 @@
   "searchQuestion": "ምን መስማት ይፈልጋሉ?",
   "searchInstructions": "በዘፈን፣ አርቲስት ወይም አልበም ይፈልጉ።",
   "noMatches": "ተዛማጅ ውጤት አልተገኘም።",
-  "continueAsGuest": "እንደ እንግዳ ይቀጥሉ"
+  "continueAsGuest": "እንደ እንግዳ ይቀጥሉ",
+  "accountAndPrivacy": "መለያ እና ግላዊነት",
+  "privacyPolicy": "የግላዊነት ፖሊሲ",
+  "signOut": "ውጣ",
+  "deleteAccount": "መለያዬን ሰርዝ",
+  "deleteAccountConfirmTitle": "መለያዎን ይሰርዙ?",
+  "deleteAccountConfirmBody": "ይህ የVision Music መለያዎን እስከመጨረሻው ይሰርዛል። በዚህ ስልክ ላይ የተቀመጡ የአጫዋች ዝርዝሮች እዚሁ ይቆያሉ። ይህ ሊቀለበስ አይችልም።",
+  "deleteAccountConfirmAction": "ሰርዝ",
+  "cancel": "ይቅር",
+  "accountDeleted": "መለያዎ ተሰርዟል።",
+  "deleteAccountFailed": "መለያዎን መሰረዝ አልተቻለም። እባክዎ እንደገና ይሞክሩ።"
 }

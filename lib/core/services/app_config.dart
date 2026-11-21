@@ -22,6 +22,13 @@ class AppConfig {
     defaultValue: 'https://cdn.visionmusic.et/',
   );
 
+  /// Public privacy policy (required inside the app by Google Play and the
+  /// App Store). Override with `--dart-define=PRIVACY_POLICY_URL=...`.
+  static const String privacyPolicyUrl = String.fromEnvironment(
+    'PRIVACY_POLICY_URL',
+    defaultValue: 'https://www.visionmusic.et/privacy',
+  );
+
   static const bool fallbackToLocalOnEmpty = bool.fromEnvironment(
     'FALLBACK_TO_LOCAL_CATALOG',
     defaultValue: !useFirebaseCatalog,
