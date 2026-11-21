@@ -10,7 +10,7 @@ Before release, verify Firebase configuration, App Check registration, and at le
 
 ## iOS validation and release
 
-The iOS workflow defaults to validation: tests and an unsigned release build with no Apple signing secrets and no TestFlight upload. Flutter and the dependency lockfile are pinned to the locally tested 3.44.4 SDK. The Xcode project records the SDK-generated Swift Package integration and resolved versions used for the successful build; the existing custom Podfile remains.
+The iOS workflow defaults to validation: tests and an unsigned release build with no Apple signing secrets and no TestFlight upload. Flutter and the dependency lockfile are pinned to the 3.47.9 SDK. Flutter 3.47.8+ (Dart 3.13.7+) is required for every Android and iOS release build because older SDKs compile in a TLS trust list that predates the Oct 2026 eMudhra certificate revocation; `pubspec.yaml` refuses older SDKs. The Xcode project records the SDK-generated Swift Package integration and resolved versions used for the successful build; the existing custom Podfile remains.
 
 Xcode's Crashlytics phase now skips symbol uploads unless `VM_UPLOAD_CRASHLYTICS_SYMBOLS=true` and signing is enabled. This fixes the unsigned build failure when `flutterfire` is absent. Only the optional signed archive job installs FlutterFire CLI 1.5.0 and enables that upload.
 
@@ -20,7 +20,7 @@ After Birra approves a specific release, configure required reviewers on the Git
 
 - 76 Flutter tests passed with live-catalog defines.
 - `flutter analyze --no-pub --no-fatal-infos` passed with two pre-existing info-level style suggestions.
-- `flutter build ios --release --no-codesign --dart-define=USE_FIREBASE_CATALOG=true --dart-define=FALLBACK_TO_LOCAL_CATALOG=false` succeeded on Flutter 3.44.4 / Xcode 26.6.
+- `flutter build ios --release --no-codesign --dart-define=USE_FIREBASE_CATALOG=true --dart-define=FALLBACK_TO_LOCAL_CATALOG=false` succeeded on Flutter 3.44.4 / Xcode 26.6 (before the 3.47.9 move; re-run the iOS validation workflow on 3.47.9 before the next TestFlight upload).
 - Workflow YAML and shell syntax, the default no-upload path, and the actual Xcode script's unsigned/unapproved upload guards were checked locally.
 
 The unsigned build does not validate Apple signing, App Store Connect credentials, live backend provisioning, or store acceptance. Those remain separate approved release checks.
