@@ -27,13 +27,23 @@ jobs:
       - name: Install dependencies
         run: flutter pub get --enforce-lockfile
 
+      - name: Prepare synthetic audio for public code tests
+        run: |
+          python3 scripts/test_ci_audio_fixtures.py
+          python3 scripts/test_ios_permission_audit.py
+          python3 scripts/ci_audio_fixtures.py prepare --synthetic-only
+
       - name: Analyze
         # fatal-infos defaults to on. Info-level lints stay visible and do not fail CI.
         # Warnings and errors still fail the job.
         run: flutter analyze --no-fatal-infos
 
       - name: Test
-        run: flutter test
+        run: flutter test --exclude-tags protected_audio
 
       - name: Test live catalog configuration
-        run: flutter test --dart-define=USE_FIREBASE_CATALOG=true --dart-define=FALLBACK_TO_LOCAL_CATALOG=false
+        run: flutter test --exclude-tags protected_audio --dart-define=USE_FIREBASE_CATALOG=true --dart-define=FALLBACK_TO_LOCAL_CATALOG=false
+
+      - name: Remove synthetic audio
+        if: always()
+        run: python3 scripts/ci_audio_fixtures.py cleanup --synthetic-only

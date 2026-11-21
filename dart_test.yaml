@@ -1,0 +1,4 @@
+tags:
+  # Requires authenticated original media. Public CI supplies synthetic silence
+  # only and excludes this tag; protected release validation runs every test.
+  protected_audio:
