@@ -26,7 +26,7 @@ class AppConfig {
   /// App Store). Override with `--dart-define=PRIVACY_POLICY_URL=...`.
   static const String privacyPolicyUrl = String.fromEnvironment(
     'PRIVACY_POLICY_URL',
-    defaultValue: 'https://www.visionmusic.et/privacy',
+    defaultValue: 'https://visionmusic.et/privacy',
   );
 
   static const bool fallbackToLocalOnEmpty = bool.fromEnvironment(
