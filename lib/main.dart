@@ -2,7 +2,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:visionmusicapp/l10n/app_localizations.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:visionmusicapp/l10n/fallback_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:visionmusicapp/audio/audio_handler.dart';
 import 'package:visionmusicapp/audio_manager.dart';
@@ -173,11 +173,9 @@ class VisionMusicApp extends StatelessWidget {
       themeMode: ThemeMode.dark,
       locale: settingsManager.locale,
       // Localization support
-      localizationsDelegates: [
+      localizationsDelegates: const [
         AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
+        ...appLocalizationsFallbackDelegates,
       ],
       supportedLocales: const [
         Locale('en'), // English
