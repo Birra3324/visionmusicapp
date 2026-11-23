@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +9,8 @@ import 'package:provider/provider.dart';
 import 'package:visionmusicapp/audio/audio_handler.dart';
 import 'package:visionmusicapp/audio_manager.dart';
 import 'package:visionmusicapp/core/services/app_config.dart';
+import 'package:visionmusicapp/core/services/audio_cache/audio_cache.dart';
+import 'package:visionmusicapp/core/services/catalog_cache.dart';
 import 'package:visionmusicapp/core/services/catalog_loader.dart';
 import 'package:visionmusicapp/core/services/cdn_song_repository.dart';
 import 'package:visionmusicapp/core/services/app_observability.dart';
@@ -58,6 +62,8 @@ class _AppBootstrapperState extends State<AppBootstrapper> {
     // Initialise video service (uses Firebase if available)
     VideoServiceLocator.init();
 
+    // Trim saved songs in the background; never delays startup.
+    unawaited(pruneAudioCache());
     final tracks = await _loadCatalog();
     _audioManager = AudioManager(initialTracks: tracks);
     await _audioManager.initializePersistentState();
@@ -85,8 +91,10 @@ class _AppBootstrapperState extends State<AppBootstrapper> {
   /// be reached, keep the existing Firebase / bundled behaviour.
   Future<List<Song>> _loadCatalog() async {
     if (AppConfig.useCdnCatalog) {
-      final cdnSongs =
-          await CdnSongRepository(baseUrl: AppConfig.cdnBaseUrl).fetchAll();
+      final cdnSongs = await CdnSongRepository(
+        baseUrl: AppConfig.cdnBaseUrl,
+        cache: const SharedPreferencesCatalogCache(),
+      ).fetchAll();
       if (cdnSongs.isNotEmpty) return cdnSongs;
     }
     return _loadFirebaseOrLocalCatalog();

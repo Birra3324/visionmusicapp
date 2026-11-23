@@ -1,0 +1,82 @@
+name: Android build
+
+# Builds the Android release app on every pull request so a change that breaks
+# the Android build is caught before it reaches a listener, and reports the
+# download size. Builds made here use the debug key (no upload key in CI), so
+# they cannot be uploaded to Google Play.
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Android release and report size
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.9'
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get --enforce-lockfile
+
+      - name: Build app bundle (what Google Play receives)
+        run: flutter build appbundle --release
+
+      - name: Build one APK for all phones (old way)
+        run: |
+          flutter build apk --release
+          mkdir -p "$RUNNER_TEMP/universal"
+          cp build/app/outputs/flutter-apk/app-release.apk "$RUNNER_TEMP/universal/"
+
+      - name: Build per-phone APKs (what a listener downloads from Play)
+        run: |
+          flutter build apk --release --split-per-abi
+          mkdir -p "$RUNNER_TEMP/plain"
+          cp build/app/outputs/flutter-apk/app-*-release.apk "$RUNNER_TEMP/plain/"
+
+      - name: Build per-phone APKs with Dart obfuscation (comparison only)
+        run: |
+          flutter build apk --release --split-per-abi --obfuscate --split-debug-info=build/symbols
+          mkdir -p "$RUNNER_TEMP/obf"
+          cp build/app/outputs/flutter-apk/app-*-release.apk "$RUNNER_TEMP/obf/"
+
+      - name: Report sizes
+        run: |
+          mb() { awk -v b="$1" 'BEGIN { printf "%.1f MB", b / 1048576 }'; }
+          {
+            echo "## Android release size"
+            echo
+            echo "| Build | Size |"
+            echo "| --- | --- |"
+            aab=build/app/outputs/bundle/release/app-release.aab
+            echo "| App bundle (upload to Play) | $(mb "$(stat -c%s "$aab")") |"
+            f="$RUNNER_TEMP/universal/app-release.apk"
+            echo "| One APK for all phones | $(mb "$(stat -c%s "$f")") |"
+            for f in "$RUNNER_TEMP"/plain/*.apk; do
+              echo "| $(basename "$f") | $(mb "$(stat -c%s "$f")") |"
+            done
+            for f in "$RUNNER_TEMP"/obf/*.apk; do
+              echo "| $(basename "$f" .apk) + obfuscation | $(mb "$(stat -c%s "$f")") |"
+            done
+            echo
+            echo "Bundled audio in assets/audio: $(du -sh assets/audio | cut -f1)"
+          } | tee -a "$GITHUB_STEP_SUMMARY"

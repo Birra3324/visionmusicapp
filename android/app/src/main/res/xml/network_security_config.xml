@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Everything stays HTTPS-only except the player's own on-device proxy.
+  just_audio's LockCachingAudioSource (song caching) serves the song to the
+  player from 127.0.0.1 on the phone itself; nothing leaves the device.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">127.0.0.1</domain>
+        <domain includeSubdomains="false">localhost</domain>
+    </domain-config>
+</network-security-config>
