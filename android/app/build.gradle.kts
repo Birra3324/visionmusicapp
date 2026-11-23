@@ -57,7 +57,16 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("release")
+            // Real releases are signed with the upload key from key.properties
+            // (on Birra's Mac). Without it, as on GitHub's build check, fall
+            // back to the debug key so the build can still be tested and
+            // measured. Google Play refuses debug-signed uploads, so such a
+            // build can never be published by mistake.
+            signingConfig = if (keystorePropertiesFile.exists()) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
 }
