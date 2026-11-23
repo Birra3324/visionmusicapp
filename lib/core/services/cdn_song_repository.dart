@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:visionmusicapp/core/services/catalog_cache.dart';
 import 'package:visionmusicapp/core/services/song_repository.dart';
 import 'package:visionmusicapp/song.dart';
 
@@ -36,12 +37,24 @@ class CdnSongRepository implements SongRepository {
     required this.baseUrl,
     http.Client? client,
     this.timeout = const Duration(seconds: 8),
+    this.cachedTimeout = const Duration(seconds: 3),
+    this.cache,
   }) : _client = client ?? http.Client();
 
   /// e.g. `https://cdn.visionmusic.et/` (trailing slash optional).
   final String baseUrl;
   final http.Client _client;
+
+  /// How long to wait for the CDN when there is no saved catalog.
   final Duration timeout;
+
+  /// How long to wait for the CDN when a saved catalog can be shown instead.
+  /// Short, so a slow connection doesn't hold the app on the loading screen.
+  final Duration cachedTimeout;
+
+  /// Last good catalog.json. When set, a successful fetch is saved and a
+  /// failed or slow fetch falls back to it.
+  final CatalogCache? cache;
 
   /// Free listeners stream 128 kbps; 64 is the fallback. 256 is kept for
   /// Premium and is only used when nothing else exists.
@@ -54,16 +67,41 @@ class CdnSongRepository implements SongRepository {
 
   @override
   Future<List<Song>> fetchAll() async {
+    final cached = await _readCache();
     try {
-      final response = await _client.get(catalogUri).timeout(timeout);
-      if (response.statusCode != 200) return <Song>[];
-      return parseCatalog(utf8.decode(response.bodyBytes), baseUrl);
+      final response = await _client
+          .get(catalogUri)
+          .timeout(cached == null ? timeout : cachedTimeout);
+      if (response.statusCode == 200) {
+        final body = utf8.decode(response.bodyBytes);
+        final songs = parseCatalog(body, baseUrl);
+        if (songs.isNotEmpty) {
+          await _writeCache(body);
+          return songs;
+        }
+      }
     } catch (error) {
       if (kDebugMode) {
         // ignore: avoid_print
         print('CdnSongRepository.fetchAll failed: $error');
       }
-      return <Song>[];
+    }
+    return cached == null ? <Song>[] : parseCatalog(cached, baseUrl);
+  }
+
+  Future<String?> _readCache() async {
+    try {
+      return await cache?.read();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> _writeCache(String body) async {
+    try {
+      await cache?.write(body);
+    } catch (_) {
+      // A full or unavailable store must never block playback.
     }
   }
 

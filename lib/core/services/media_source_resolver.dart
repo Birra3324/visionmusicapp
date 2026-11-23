@@ -1,6 +1,7 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/widgets.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:visionmusicapp/core/services/audio_cache/audio_cache.dart';
 
 /// Where a `Song.filePath` / `Song.imagePath` actually lives.
 enum MediaLocation {
@@ -101,7 +102,8 @@ class MediaSourceResolver {
       case MediaLocation.asset:
         return AudioSource.asset(value);
       case MediaLocation.network:
-        return AudioSource.uri(Uri.parse(value));
+        // Saved on the phone as it plays (Android), so replays use no data.
+        return cachedNetworkAudioSource(Uri.parse(value));
       case MediaLocation.storageRef:
         return AudioSource.uri(await resolveStorageRef(value));
       case MediaLocation.file:
