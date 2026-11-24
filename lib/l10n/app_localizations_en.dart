@@ -137,4 +137,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get continueAsGuest => 'Continue as Guest';
+
+  @override
+  String get accountAndPrivacy => 'Account and privacy';
+
+  @override
+  String get privacyPolicy => 'Privacy policy';
+
+  @override
+  String get signOut => 'Sign out';
+
+  @override
+  String get deleteAccount => 'Delete my account';
+
+  @override
+  String get deleteAccountConfirmTitle => 'Delete your account?';
+
+  @override
+  String get deleteAccountConfirmBody =>
+      'This permanently deletes your Vision Music account. Playlists saved on this phone stay here. This can\'t be undone.';
+
+  @override
+  String get deleteAccountConfirmAction => 'Delete';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get accountDeleted => 'Your account was deleted.';
+
+  @override
+  String get deleteAccountFailed =>
+      'Couldn\'t delete your account. Please try again.';
 }

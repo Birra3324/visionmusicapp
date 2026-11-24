@@ -137,4 +137,36 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get continueAsGuest => 'Continuer en tant qu\'invité';
+
+  @override
+  String get accountAndPrivacy => 'Compte et confidentialité';
+
+  @override
+  String get privacyPolicy => 'Politique de confidentialité';
+
+  @override
+  String get signOut => 'Se déconnecter';
+
+  @override
+  String get deleteAccount => 'Supprimer mon compte';
+
+  @override
+  String get deleteAccountConfirmTitle => 'Supprimer votre compte ?';
+
+  @override
+  String get deleteAccountConfirmBody =>
+      'Votre compte Vision Music sera supprimé définitivement. Les playlists enregistrées sur ce téléphone y restent. Cette action est irréversible.';
+
+  @override
+  String get deleteAccountConfirmAction => 'Supprimer';
+
+  @override
+  String get cancel => 'Annuler';
+
+  @override
+  String get accountDeleted => 'Votre compte a été supprimé.';
+
+  @override
+  String get deleteAccountFailed =>
+      'Impossible de supprimer votre compte. Veuillez réessayer.';
 }

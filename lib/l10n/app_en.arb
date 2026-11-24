@@ -41,5 +41,15 @@
   "searchQuestion": "What do you want to hear?",
   "searchInstructions": "Search by song, artist, or album—or choose a suggestion above.",
   "noMatches": "No matches found.",
-  "continueAsGuest": "Continue as Guest"
+  "continueAsGuest": "Continue as Guest",
+  "accountAndPrivacy": "Account and privacy",
+  "privacyPolicy": "Privacy policy",
+  "signOut": "Sign out",
+  "deleteAccount": "Delete my account",
+  "deleteAccountConfirmTitle": "Delete your account?",
+  "deleteAccountConfirmBody": "This permanently deletes your Vision Music account. Playlists saved on this phone stay here. This can't be undone.",
+  "deleteAccountConfirmAction": "Delete",
+  "cancel": "Cancel",
+  "accountDeleted": "Your account was deleted.",
+  "deleteAccountFailed": "Couldn't delete your account. Please try again."
 }
