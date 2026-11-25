@@ -1,0 +1,36 @@
+name: TestFlight public link
+
+# Runs only on pushes to claude/testflight-public-link. ACTION comes from
+# tools/testflight/ACTION (inspect = read-only, apply = set up the public
+# group and submit the newest build to Beta App Review).
+
+on:
+  push:
+    branches:
+      - claude/testflight-public-link
+
+permissions:
+  contents: read
+
+jobs:
+  testflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          umask 077
+          printf '%s\n' "$ASC_KEY_P8" > "$RUNNER_TEMP/key.p8"
+          export KEY_FILE="$RUNNER_TEMP/key.p8"
+          export ACTION="$(tr -d '[:space:]' < tools/testflight/ACTION)"
+          pip install --quiet pyjwt cryptography
+          python3 tools/testflight/testflight.py
+      - name: Remove key file
+        if: always()
+        run: rm -f "$RUNNER_TEMP/key.p8"
