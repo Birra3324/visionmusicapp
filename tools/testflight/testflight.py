@@ -114,7 +114,7 @@ for v in versions:
 print('App Store review contact on file:', {k: present(store.get(k)) for k in
       ('contactFirstName', 'contactLastName', 'contactPhone', 'contactEmail')})
 
-subs = call('GET', f'/v1/betaAppReviewSubmissions?filter[build]={",".join(b["id"] for b in builds["data"])}')['data'] if builds['data'] else []
+subs = call('GET', f'/v1/betaAppReviewSubmissions?filter[build]={",".join(b["id"] for b in builds["data"])}&include=build')['data'] if builds['data'] else []
 print('Beta review submissions:', [s['attributes'].get('betaReviewState') for s in subs] or 'none')
 
 if ACTION != 'apply':
