@@ -165,7 +165,10 @@ else:
 print('What to test: set')
 
 # 4. External group with a public link.
-group = next((g for g in groups if g['attributes']['name'] == GROUP_NAME), None)
+group = next((g for g in groups if not g['attributes'].get('isInternalGroup') and g['attributes'].get('publicLinkEnabled')), None) \
+    or next((g for g in groups if g['attributes']['name'] == GROUP_NAME), None)
+if group is not None:
+    print('Using external group', group['attributes']['name'])
 if group is None:
     group = call('POST', '/v1/betaGroups', {'data': {'type': 'betaGroups',
         'attributes': {'name': GROUP_NAME, 'publicLinkEnabled': True, 'publicLinkLimitEnabled': False},
