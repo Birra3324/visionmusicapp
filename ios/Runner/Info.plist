@@ -47,6 +47,8 @@
 	<string>Vision Music does not read your photo library. A software library in the app can reference it, so iOS asks for this text.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Vision Music does not use your location. A software library in the app can reference it, so iOS asks for this text.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Vision Music does not use your location. A software library in the app can reference it, so iOS asks for this text.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
